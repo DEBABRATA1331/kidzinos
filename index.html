@@ -1,0 +1,1471 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <meta name="description" content="Kidzinos S India's craziest skill challenge app powered by Crazy XYZ. Play, Win, Earn Zino Balloons!" />
+  <meta name="theme-color" content="#0F0F1A" />
+  <title>Kidzinos S Ab Kuch Crazy Karte Hai!</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<!-- ====== GLOBAL BRAND STRIP (all screens) ====== -->
+<div id="global-brand-strip" class="global-brand-strip hidden">
+  <span class="gs-item"><i class="fa-solid fa-brain"></i> Crazy Skills Only</span>
+  <span class="gs-pipe"></span>
+  <span class="gs-item"><i class="fa-solid fa-gift"></i> Rewarding</span>
+  <span class="gs-pipe"></span>
+  <span class="gs-item"><i class="fa-solid fa-bolt"></i> Powered by <strong>Crazy XYZ</strong></span>
+</div>
+
+<!-- ====== SPLASH SCREEN ====== -->
+<div id="screen-splash" class="screen active">
+  <div class="splash-bg">
+    <div class="splash-stars"></div>
+    <div class="splash-content">
+      <div class="splash-logo-wrap">
+        <img src="kidzinos-logo.png" alt="Kidzinos" class="splash-sticker animated-logo" />
+      </div>
+      <div class="splash-tagline">Ab Kuch Crazy Karte Hai! </div>
+      <div class="splash-loader">
+        <div class="loader-bar"><div class="loader-fill"></div></div>
+        <div class="loader-text">Loading your crazy world...</div>
+      </div>
+    </div>
+    <div class="splash-powered">Powered by <span>Crazy XYZ</span> </div>
+  </div>
+</div>
+
+<!-- ====== ONBOARDING: LOGIN ====== -->
+<div id="screen-login" class="screen">
+  <div class="onboard-bg">
+    <div class="onboard-top">
+      <div class="onboard-chars">
+        <img src="char3.jpg" alt="Crazy XYZ" class="char-float char-left" />
+        <img src="char4.jpg" alt="Crazy XYZ" class="char-float char-right" />
+      </div>
+      <div class="onboard-logo-area">
+        <div class="onboard-brand">Kidz<span>inos</span></div>
+        <div class="onboard-sub">Powered by Crazy XYZ </div>
+      </div>
+    </div>
+    <div class="auth-card">
+      <div class="auth-title">Welcome, Crazino! </div>
+      <div class="auth-sub">Enter your mobile number to get started</div>
+      <div class="input-group" id="mobile-group">
+        <label>Mobile Number</label>
+        <div class="phone-input-wrap">
+          <span class="phone-prefix"> +91</span>
+          <input type="tel" id="mobile-input" maxlength="10" placeholder="9876543210" inputmode="numeric" />
+        </div>
+      </div>
+      <div class="input-group hidden" id="otp-group">
+        <label>Enter OTP</label>
+        <div class="otp-boxes">
+          <input type="text" class="otp-box" maxlength="1" inputmode="numeric" />
+          <input type="text" class="otp-box" maxlength="1" inputmode="numeric" />
+          <input type="text" class="otp-box" maxlength="1" inputmode="numeric" />
+          <input type="text" class="otp-box" maxlength="1" inputmode="numeric" />
+        </div>
+        <div class="demo-otp-badge"> Demo OTP: <strong>1 2 3 4</strong></div>
+        <div class="otp-hint">Sent to +91 <span id="otp-mobile-display"></span></div>
+        <div class="otp-resend">Didn't receive? <a href="#" onclick="resendOtp()">Resend OTP</a></div>
+      </div>
+      <button class="btn-crazy" id="login-btn" onclick="handleLogin()">
+        <span>Get OTP</span> <i class="btn-icon">"</i>
+      </button>
+      <div class="auth-divider">New here? <a href="#" onclick="goToRegister()">Create Account</a></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== ONBOARDING: REGISTER ====== -->
+<div id="screen-register" class="screen">
+  <div class="onboard-bg reg-bg">
+    <div class="reg-header">
+      <button class="back-btn" onclick="navigateTo('login')"></button>
+      <div class="reg-title-wrap">
+        <div class="onboard-brand small">Kidz<span>inos</span></div>
+        <div class="reg-step-label">Create Your Profile</div>
+      </div>
+    </div>
+    <div class="auth-card reg-card">
+      <div class="reg-avatar-row">
+        <img src="crazinos-sticker.jpg" class="reg-sticker" alt="Crazinos" />
+        <div>
+          <div class="auth-title" style="font-size:1.3rem">Join The Crazy Gang! </div>
+          <div class="auth-sub">Fill your details below</div>
+        </div>
+      </div>
+      <div class="reg-form">
+        <div class="input-group">
+          <label>Your Name</label>
+          <input type="text" id="reg-name" placeholder="e.g. Arjun Kumar" />
+        </div>
+        <div class="input-group">
+          <label>Email Address</label>
+          <input type="email" id="reg-email" placeholder="arjun@email.com" />
+        </div>
+        <div class="reg-row">
+          <div class="input-group half">
+            <label>Date of Birth</label>
+            <input type="date" id="reg-dob" />
+          </div>
+          <div class="input-group half">
+            <label>City</label>
+            <input type="text" id="reg-city" placeholder="Mumbai" />
+          </div>
+        </div>
+        <button class="btn-crazy" onclick="handleRegister()">
+          <span>Start My Journey </span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== HOME SCREEN ====== -->
+<div id="screen-home" class="screen app-screen">
+  <div class="app-wrap">
+    <!-- Header -->
+    <div class="app-header">
+      <div class="header-left">
+        <div class="header-greeting">Welcome Back </div>
+        <div class="header-name" id="home-username">Jay!</div>
+      </div>
+      <div class="header-right">
+        <div class="zino-badge" onclick="navigateTo('store')">
+          <img src="zino-balloon.png" alt="Zino" class="zino-icon-sm" />
+          <span id="zino-count">250</span>
+        </div>
+        <div class="avatar-btn" onclick="navigateTo('profile')">
+          <div class="avatar-circle">J</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Actions Row -->
+    <div class="quick-actions">
+      <button class="quick-btn play-btn" onclick="navigateTo('play')">
+        <div class="quick-icon"><i class="fa-solid fa-gamepad"></i></div>
+        <div class="quick-label">Play</div>
+      </button>
+      <button class="quick-btn csi-btn" onclick="navigateTo('csi')">
+        <div class="quick-icon"><i class="fa-solid fa-chart-bar"></i></div>
+        <div class="quick-label">CSI</div>
+      </button>
+      <button class="quick-btn store-btn" onclick="navigateTo('store')">
+        <div class="quick-icon"><i class="fa-solid fa-bag-shopping"></i></div>
+        <div class="quick-label">Store</div>
+      </button>
+    </div>
+
+    <!-- Scrollable Content -->
+    <div class="home-scroll">
+
+      <!-- Hero Banner -->
+      <div class="banner-slider">
+        <!-- Slide 1: Crazy War -->
+        <div class="banner-slide active-slide" style="background:linear-gradient(135deg,#1a0500,#ff4500)">
+          <div class="banner-text">
+            <div class="banner-label"><i class="fa-solid fa-khanda"></i> 7-DAY CONTEST</div>
+            <div class="banner-title">Crazy Wars</div>
+            <div class="banner-sub">7 days  7 Qs on a theme  Win Big!</div>
+            <button class="banner-cta" onclick="navigateTo('play')">Join Now</button>
+          </div>
+          <img src="char1.jpg" class="banner-char" alt="Crazy XYZ" />
+        </div>
+        <!-- Slide 2: Weekly Clash -->
+        <div class="banner-slide" style="background:linear-gradient(135deg,#091830,#0050cc)">
+          <div class="banner-text">
+            <div class="banner-label"><i class="fa-solid fa-calendar-week"></i> THIS WEEK</div>
+            <div class="banner-title">Weekly Clash</div>
+            <div class="banner-sub">Once a week  Beat everyone  Win prizes!</div>
+            <button class="banner-cta" onclick="navigateTo('play')">Play Now</button>
+          </div>
+          <img src="char2.jpg" class="banner-char" alt="Crazy XYZ" />
+        </div>
+        <!-- Slide 3: Daily Drill -->
+        <div class="banner-slide" style="background:linear-gradient(135deg,#1a0e2e,#7c3aed)">
+          <div class="banner-text">
+            <div class="banner-label"><i class="fa-solid fa-bolt"></i> FREE DAILY</div>
+            <div class="banner-title">Daily Drill</div>
+            <div class="banner-sub">Free practice  1 set daily  Earn Balloons!</div>
+            <button class="banner-cta" onclick="openDailyDrill()">Start Now</button>
+          </div>
+          <img src="char3.jpg" class="banner-char" alt="Crazy XYZ" />
+        </div>
+        <!-- Slide 4: Crazy Pass -->
+        <div class="banner-slide crazy-pass-slide" style="background:linear-gradient(135deg,#1a0500,#c01030)">
+          <div class="banner-text">
+            <div class="banner-label pass-label"><i class="fa-solid fa-crown"></i> PREMIUM</div>
+            <div class="banner-title pass-title" style="color:#fff">Crazy Pass</div>
+            <div class="banner-sub" style="color:rgba(255,255,255,0.8)">Unlock Wars  Clash  Bonus Balloons!</div>
+            <div class="pass-price-tag" style="color:rgba(255,255,255,0.9)">From <strong style="color:#fff">a199</strong>/month</div>
+            <button class="banner-cta pass-cta" onclick="navigateTo('subscription')">Get Pass <i class="fa-solid fa-arrow-right"></i></button>
+          </div>
+          <img src="sticker1.jpg" class="banner-char" alt="Crazy XYZ" style="height:140px;opacity:0.95" />
+        </div>
+        <div class="banner-dots">
+          <span class="b-dot active"></span>
+          <span class="b-dot"></span>
+          <span class="b-dot"></span>
+          <span class="b-dot"></span>
+        </div>
+      </div>
+
+      <!-- Crazy War Challenge Card -->
+      <div class="section-header">
+        <div class="section-title"> Crazy WAR</div>
+        <a href="#" class="see-all" onclick="navigateTo('play')">View All</a>
+      </div>
+      <div class="challenge-card war-card" onclick="navigateTo('play')">
+        <div class="challenge-card-inner">
+          <div class="challenge-badge war-badge">LIVE </div>
+          <div class="challenge-title">Week 12  Day 3</div>
+          <div class="challenge-desc">Answer today's challenge & climb the leaderboard!</div>
+          <div class="challenge-meta">
+            <span> Top Prize: a2000</span>
+            <span> 1,247 Players</span>
+          </div>
+          <div class="challenge-progress-row">
+            <div class="challenge-days">
+              <div class="day-dot done">1</div>
+              <div class="day-dot done">2</div>
+              <div class="day-dot active">3</div>
+              <div class="day-dot">4</div>
+              <div class="day-dot">5</div>
+              <div class="day-dot">6</div>
+              <div class="day-dot">7</div>
+            </div>
+          </div>
+          <button class="card-btn war-btn"> Enter Battle</button>
+        </div>
+        <img src="char1.jpg" class="card-char" alt="" />
+      </div>
+
+      <!-- Weekly Stash Card -->
+      <div class="section-header" style="margin-top:16px">
+        <div class="section-title">" Weekly STASH</div>
+        <a href="#" class="see-all" onclick="navigateTo('play')">View All</a>
+      </div>
+      <div class="challenge-card stash-card" onclick="navigateTo('play')">
+        <div class="challenge-card-inner">
+          <div class="challenge-badge stash-badge">THIS WEEK</div>
+          <div class="challenge-title">Stash Challenge #24</div>
+          <div class="challenge-desc">Complete all 7 days to unlock the grand prize stash!</div>
+          <div class="challenge-meta">
+            <span>" Stash Value: a5000</span>
+            <span> 4 days left</span>
+          </div>
+          <div class="stash-prize-row">
+            <div class="prize-chip"> a2500</div>
+            <div class="prize-chip">  a1500</div>
+            <div class="prize-chip"> a1000</div>
+          </div>
+          <button class="card-btn stash-btn">" Enter Stash</button>
+        </div>
+        <img src="char2.jpg" class="card-char" alt="" />
+      </div>
+
+      <!-- Daily Drill Card -->
+      <div class="section-header" style="margin-top:16px">
+        <div class="section-title"> Daily Drill</div>
+        <a href="#" class="see-all" onclick="navigateTo('play')">View All</a>
+      </div>
+      <div class="daily-drill-card" onclick="navigateTo('play')">
+        <div class="drill-left">
+          <div class="drill-badge">TODAY</div>
+          <div class="drill-title">Sharpen Your Skills </div>
+          <div class="drill-meta">10 Questions  Free to Play</div>
+          <div class="drill-streak"> 5 Day Streak!</div>
+          <button class="card-btn drill-btn">Start Drill "</button>
+        </div>
+        <div class="drill-right">
+          <div class="drill-coin-anim">
+            <img src="zino-balloon.png" alt="Zino" class="drill-coin" />
+            <div class="drill-earn">+10 Balloons</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Zino Shop -->
+      <div class="section-header" style="margin-top:20px">
+        <div class="section-title"> Shop with Zino Balloons</div>
+        <a href="#" class="see-all" onclick="navigateTo('store')">Store</a>
+      </div>
+      <div class="shop-scroll">
+        <div class="shop-item" onclick="requestProduct('Crazy XYZ Cap', 500)">
+          <div class="shop-img-wrap"></div>
+          <div class="shop-name">Crazy XYZ Cap</div>
+          <div class="shop-coins"><img src="zino-balloon.png" class="coin-tiny" />500</div>
+          <button class="shop-req-btn">Request</button>
+        </div>
+        <div class="shop-item" onclick="requestProduct('Crazy T-Shirt', 800)">
+          <div class="shop-img-wrap"></div>
+          <div class="shop-name">Crazy T-Shirt</div>
+          <div class="shop-coins"><img src="zino-balloon.png" class="coin-tiny" />800</div>
+          <button class="shop-req-btn">Request</button>
+        </div>
+        <div class="shop-item locked-item" onclick="requestProduct('XYZ Hoodie', 1500)">
+          <div class="shop-img-wrap"></div>
+          <div class="shop-name">XYZ Hoodie</div>
+          <div class="shop-coins"><img src="zino-balloon.png" class="coin-tiny" />1500</div>
+          <button class="shop-req-btn">Request</button>
+        </div>
+        <div class="shop-item" onclick="requestProduct('Sticker Pack', 200)">
+          <div class="shop-img-wrap"></div>
+          <div class="shop-name">Sticker Pack</div>
+          <div class="shop-coins"><img src="zino-balloon.png" class="coin-tiny" />200</div>
+          <button class="shop-req-btn">Request</button>
+        </div>
+      </div>
+
+      <!-- XYZ Studio Banner -->
+      <div class="xyz-studio-banner" onclick="navigateTo('watch')">
+        <div class="studio-left">
+          <div class="studio-tag">NEW VIDEOS</div>
+          <div class="studio-title">XYZ Studio </div>
+          <div class="studio-sub">Watch & Earn Zino Balloons!</div>
+          <button class="studio-btn">Watch Now "</button>
+        </div>
+        <img src="char4.jpg" class="studio-char" alt="Crazy XYZ" />
+      </div>
+
+      <!-- How Scoring Works -->
+      <div class="scoring-section">
+        <div class="scoring-header">
+          <div class="section-title">S  How Scoring Works</div>
+        </div>
+        <div class="scoring-cards">
+          <div class="score-card">
+            <div class="score-emoji"></div>
+            <div class="score-label">Correct Answer</div>
+            <div class="score-val">+10 pts</div>
+          </div>
+          <div class="score-card">
+            <div class="score-emoji"></div>
+            <div class="score-label">Speed Bonus</div>
+            <div class="score-val">+5 pts</div>
+          </div>
+          <div class="score-card">
+            <div class="score-emoji"></div>
+            <div class="score-label">Streak Bonus</div>
+            <div class="score-val">2</div>
+          </div>
+          <div class="score-card">
+            <div class="score-emoji"></div>
+            <div class="score-label">Win Prize</div>
+            <div class="score-val">Balloons</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Powered By Footer -->
+      <div class="home-footer">
+        <div class="footer-badge">
+          <div class="footer-skills">Crazy Skills Only</div>
+          <div class="footer-rewarding"> Rewarding </div>
+          <div class="footer-powered">Powered by <strong>Crazy XYZ</strong> </div>
+        </div>
+        <img src="crazinos-sticker.jpg" class="footer-sticker" alt="" />
+      </div>
+      <div style="height:80px"></div>
+    </div><!-- end home-scroll -->
+  </div><!-- end app-wrap -->
+</div>
+
+<!-- ====== PLAY SCREEN ====== -->
+<div id="screen-play" class="screen app-screen">
+  <div class="app-wrap">
+
+    <!-- Play header -->
+    <div class="play-header-row">
+      <div class="play-header-left">
+        <div class="play-header-title">Play Zone</div>
+        <div class="play-header-sub">Choose your battle</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        <img src="sticker3.jpg" class="play-header-sticker" alt="" />
+        <div class="zino-badge-sm">
+          <img src="zino-balloon.png" class="zino-icon-sm" /><span id="play-zino">250</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tab pills -->
+    <div class="play-tab-row">
+      <button class="play-tab active-ptab" id="ptab-drill" onclick="switchPlayTab('drill')">
+        <i class="fa-solid fa-bolt"></i> Daily Drill
+      </button>
+      <button class="play-tab" id="ptab-clash" onclick="switchPlayTab('clash')">
+        <i class="fa-solid fa-calendar-week"></i> Weekly Clash
+      </button>
+      <button class="play-tab" id="ptab-war" onclick="switchPlayTab('war')">
+        <i class="fa-solid fa-khanda"></i> Crazy War
+      </button>
+    </div>
+
+    <div class="home-scroll">
+
+      <!-- ===== DAILY DRILL TAB ===== -->
+      <div id="ptab-content-drill" class="ptab-content">
+        <div class="ch-section-header">
+          <span class="ch-section-title"><i class="fa-solid fa-bolt"></i> Daily Drill</span>
+          <span class="ch-section-count">Free  1 set daily</span>
+        </div>
+
+        <!-- Today's drill card -->
+        <div class="challenge-card-new" onclick="openDailyDrill()">
+          <div class="chn-thumb drill-thumb">
+            <img src="crazinos-sticker.jpg" class="chn-bg-img" alt="" />
+            <div class="chn-thumb-overlay"></div>
+            <div class="chn-live-badge"><span class="live-dot"></span> LIVE</div>
+          </div>
+          <div class="chn-body">
+            <div class="chn-title">Today's Brain Drill</div>
+            <div class="chn-meta-row">
+              <span class="chn-meta-item gold-text"><i class="fa-solid fa-coins"></i> +10 Zino Balloons</span>
+              <span class="chn-meta-item"><i class="fa-solid fa-list-ol"></i> 10 Questions</span>
+            </div>
+            <div class="chn-meta-row">
+              <span class="chn-meta-item"><i class="fa-regular fa-clock"></i> ~5 mins</span>
+              <span class="chn-meta-item red-text"><i class="fa-solid fa-circle-dot"></i> Resets midnight</span>
+            </div>
+            <button class="chn-action-btn drill-action">
+              <i class="fa-solid fa-bolt"></i> Start Now
+            </button>
+          </div>
+        </div>
+
+        <!-- Drill info strip -->
+        <div class="drill-info-strip">
+          <div class="dis-item"><i class="fa-solid fa-circle-check"></i><span>Free forever</span></div>
+          <div class="dis-item"><i class="fa-solid fa-fire"></i><span>Build streaks</span></div>
+          <div class="dis-item"><i class="fa-solid fa-rotate-right"></i><span>New daily</span></div>
+        </div>
+      </div>
+
+      <!-- ===== WEEKLY CLASH TAB ===== -->
+      <div id="ptab-content-clash" class="ptab-content hidden">
+        <div class="ch-section-header">
+          <span class="ch-section-title"><i class="fa-solid fa-calendar-week"></i> Weekly Clash</span>
+          <span class="ch-section-count">Once a week</span>
+        </div>
+
+        <!-- Clash card like screenshot 3 -->
+        <div class="clash-card-new" onclick="showChallengeDetail('clash')">
+          <div class="ccn-top">
+            <div class="ccn-live"><span class="live-dot"></span> LIVE</div>
+          </div>
+          <div class="ccn-title">Week 12 &middot; Day 3</div>
+          <div class="ccn-desc">Answer today's challenge &amp; climb the leaderboard!</div>
+          <div class="ccn-stats-row">
+            <span class="ccn-stat"><i class="fa-solid fa-trophy"></i> Top Prize: <strong>&#8377;2,000</strong></span>
+            <span class="ccn-stat"><i class="fa-solid fa-users"></i> <strong>1,247</strong> Players</span>
+          </div>
+          <div class="ccn-day-dots">
+            <span class="cday done">1</span>
+            <span class="cday done">2</span>
+            <span class="cday active-day">3</span>
+            <span class="cday">4</span>
+            <span class="cday">5</span>
+            <span class="cday">6</span>
+            <span class="cday">7</span>
+          </div>
+          <div class="ccn-footer">
+            <img src="crazinos-sticker.jpg" class="ccn-img" alt="" />
+            <button class="ccn-enter-btn" onclick="event.stopPropagation(); showChallengeDetail('clash')">
+              <i class="fa-solid fa-khanda"></i> Enter Battle
+            </button>
+          </div>
+        </div>
+
+        <!-- Upcoming next week -->
+        <div class="ch-section-header" style="margin-top:16px">
+          <span class="ch-section-title"><i class="fa-regular fa-calendar"></i> Upcoming</span>
+        </div>
+        <div class="upcoming-card">
+          <i class="fa-solid fa-lock upcoming-lock"></i>
+          <div class="upcoming-text">
+            <div class="upcoming-title">Week 13 Clash</div>
+            <div class="upcoming-sub">Starts Monday  Crazy Pass required</div>
+          </div>
+          <button class="upcoming-pass-btn" onclick="navigateTo('subscription')">
+            <i class="fa-solid fa-crown"></i> Get Pass
+          </button>
+        </div>
+      </div>
+
+      <!-- ===== CRAZY WAR TAB ===== -->
+      <div id="ptab-content-war" class="ptab-content hidden">
+        <div class="ch-section-header">
+          <span class="ch-section-title"><i class="fa-solid fa-bolt-lightning"></i> Trending Challenges</span>
+          <span class="ch-section-count">3</span>
+        </div>
+
+        <!-- War challenge card 1 (like screenshot 1) -->
+        <div class="challenge-card-new" onclick="showChallengeDetail('war1')">
+          <div class="chn-thumb war-thumb">
+            <img src="char1.jpg" class="chn-bg-img" alt="" />
+            <div class="chn-thumb-overlay"></div>
+            <div class="chn-live-badge"><span class="live-dot"></span> LIVE</div>
+          </div>
+          <div class="chn-body">
+            <div class="chn-title">WAH WAH CHALLENGE</div>
+            <div class="chn-meta-row">
+              <span class="chn-meta-item gold-text"><i class="fa-solid fa-trophy"></i> &#8377;50,000 cash</span>
+              <span class="chn-meta-item"><i class="fa-solid fa-list-ol"></i> 7 Questions</span>
+            </div>
+            <div class="chn-meta-row">
+              <span class="chn-meta-item"><i class="fa-regular fa-clock"></i> ~4 mins</span>
+              <span class="chn-meta-item red-text"><i class="fa-solid fa-circle-dot"></i> Ends 28 Apr, 5:30 AM</span>
+            </div>
+            <div class="chn-completed-row">
+              <i class="fa-solid fa-circle-check"></i> COMPLETED
+            </div>
+          </div>
+        </div>
+
+        <!-- War challenge card 2 -->
+        <div class="challenge-card-new" onclick="showChallengeDetail('war2')">
+          <div class="chn-thumb" style="background:linear-gradient(135deg,#1a0028,#3d006e)">
+            <img src="char3.jpg" class="chn-bg-img" alt="" />
+            <div class="chn-thumb-overlay"></div>
+            <div class="chn-live-badge"><span class="live-dot"></span> LIVE</div>
+          </div>
+          <div class="chn-body">
+            <div class="chn-title">SCIENCE SHOWDOWN</div>
+            <div class="chn-meta-row">
+              <span class="chn-meta-item gold-text"><i class="fa-solid fa-trophy"></i> &#8377;25,000 cash</span>
+              <span class="chn-meta-item"><i class="fa-solid fa-list-ol"></i> 7 Questions</span>
+            </div>
+            <div class="chn-meta-row">
+              <span class="chn-meta-item"><i class="fa-regular fa-clock"></i> ~4 mins</span>
+              <span class="chn-meta-item red-text"><i class="fa-solid fa-circle-dot"></i> Ends 29 Apr, 5:30 AM</span>
+            </div>
+            <button class="chn-action-btn war-action">
+              <i class="fa-solid fa-khanda"></i> Enter War
+            </button>
+          </div>
+        </div>
+
+        <!-- War challenge card 3 -->
+        <div class="challenge-card-new" onclick="showChallengeDetail('war3')">
+          <div class="chn-thumb" style="background:linear-gradient(135deg,#002014,#005c3b)">
+            <img src="char2.jpg" class="chn-bg-img" alt="" />
+            <div class="chn-thumb-overlay"></div>
+            <div class="chn-live-badge"><span class="live-dot"></span> LIVE</div>
+          </div>
+          <div class="chn-body">
+            <div class="chn-title">HISTORY HUNTERS</div>
+            <div class="chn-meta-row">
+              <span class="chn-meta-item gold-text"><i class="fa-solid fa-trophy"></i> &#8377;10,000 cash</span>
+              <span class="chn-meta-item"><i class="fa-solid fa-list-ol"></i> 7 Questions</span>
+            </div>
+            <div class="chn-meta-row">
+              <span class="chn-meta-item"><i class="fa-regular fa-clock"></i> ~4 mins</span>
+              <span class="chn-meta-item red-text"><i class="fa-solid fa-circle-dot"></i> Ends 30 Apr, 5:30 AM</span>
+            </div>
+            <button class="chn-action-btn war-action">
+              <i class="fa-solid fa-khanda"></i> Enter War
+            </button>
+          </div>
+        </div>
+
+      </div><!-- end war tab -->
+
+      <div style="height:80px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== CHALLENGE DETAIL SCREEN ====== -->
+<div id="screen-challenge" class="screen app-screen">
+  <div class="app-wrap">
+    <div class="inner-header">
+      <button class="back-btn-inner" onclick="navigateTo('play')"><i class="fa-solid fa-arrow-left"></i></button>
+      <div class="inner-title">Challenge Info</div>
+      <div class="ch-detail-trophy"><i class="fa-solid fa-trophy"></i></div>
+    </div>
+    <div class="home-scroll">
+
+      <!-- LIVE + Title -->
+      <div class="chd-live-row">
+        <div class="chd-live-badge"><span class="live-dot"></span> LIVE</div>
+      </div>
+      <div class="chd-name" id="chd-name">WAH WAH CHALLENGE</div>
+
+      <!-- Rewards -->
+      <div class="chd-section-label">REWARDS</div>
+      <div class="chd-rewards-list">
+        <div class="chd-reward-row gold-reward"><i class="fa-solid fa-trophy"></i> 1st Prize: <strong>&#8377;50,000 cash</strong></div>
+        <div class="chd-reward-row silver-reward"><i class="fa-solid fa-medal"></i> 2nd Prize: <strong>&#8377;20,000 cash</strong></div>
+        <div class="chd-reward-row bronze-reward"><i class="fa-solid fa-award"></i> 3rd Prize: <strong>&#8377;10,000 cash</strong></div>
+      </div>
+
+      <!-- Progress stats -->
+      <div class="chd-stats-card">
+        <div class="chd-stat">
+          <div class="chd-stat-val red-text"><i class="fa-solid fa-fire"></i> Day 2</div>
+          <div class="chd-stat-lbl">Current</div>
+        </div>
+        <div class="chd-stat-div"></div>
+        <div class="chd-stat">
+          <div class="chd-stat-val"><i class="fa-solid fa-layer-group"></i> 2</div>
+          <div class="chd-stat-lbl">Total Days</div>
+        </div>
+        <div class="chd-stat-div"></div>
+        <div class="chd-stat">
+          <div class="chd-stat-val green-text"><i class="fa-regular fa-calendar-check"></i> 29 Apr</div>
+          <div class="chd-stat-lbl">Timeline</div>
+        </div>
+      </div>
+
+      <!-- Daily Challenges list -->
+      <div class="chd-section-label red-text"><i class="fa-regular fa-calendar-days"></i> Daily Challenges</div>
+      <div class="chd-days-list">
+        <div class="chd-day-item locked-day">
+          <div class="chd-day-left">
+            <div class="lock-icon-wrap"><i class="fa-solid fa-lock"></i></div>
+            <div class="chd-day-text">
+              <div class="chd-day-title">Day 1</div>
+              <div class="chd-day-sub">Pay to Unlock</div>
+            </div>
+          </div>
+          <div class="chd-day-pills">
+            <span class="chd-pill"><i class="fa-solid fa-brain"></i> Crazy Science</span>
+            <span class="chd-pill"><i class="fa-regular fa-clock"></i> ~1 min</span>
+            <span class="chd-pill"><i class="fa-solid fa-list-ol"></i> 2 Qs</span>
+          </div>
+        </div>
+        <div class="chd-day-item locked-day">
+          <div class="chd-day-left">
+            <div class="lock-icon-wrap"><i class="fa-solid fa-lock"></i></div>
+            <div class="chd-day-text">
+              <div class="chd-day-title">Day 2</div>
+              <div class="chd-day-sub">Pay to Unlock</div>
+            </div>
+          </div>
+          <div class="chd-day-pills">
+            <span class="chd-pill"><i class="fa-solid fa-bolt-lightning"></i> Speed &amp; Tech</span>
+            <span class="chd-pill"><i class="fa-regular fa-clock"></i> ~2 mins</span>
+            <span class="chd-pill"><i class="fa-solid fa-list-ol"></i> 4 Qs</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Rules -->
+      <div class="chd-section-label">RULES</div>
+      <div class="chd-rules-list">
+        <div class="chd-rule"><span class="chd-rule-num">1</span> <span>One Shot Only &ndash; Once you submit, that attempt is locked. No take-backs.</span></div>
+        <div class="chd-rule"><span class="chd-rule-num">2</span> <span>Beat the Clock &ndash; Finish before time runs out, or the test ends automatically.</span></div>
+        <div class="chd-rule"><span class="chd-rule-num">3</span> <span>Play Fair, Think Smart &ndash; No cheating, no outside help, no shortcuts.</span></div>
+        <div class="chd-rule"><span class="chd-rule-num">4</span> <span>Stable Net, Stable Mind &ndash; Poor connection is your risk. Keep internet ready.</span></div>
+        <div class="chd-rule"><span class="chd-rule-num">5</span> <span>Fast + Right Wins &ndash; Accuracy matters most, speed breaks ties.</span></div>
+        <div class="chd-rule"><span class="chd-rule-num">6</span> <span>Respect the Arena &ndash; Misuse, abuse, or suspicious activity can cancel rewards/ranks.</span></div>
+        <div class="chd-rule"><span class="chd-rule-num">7</span> <span>Enter Ready &ndash; Read questions carefully before tapping fast.</span></div>
+        <div class="chd-rule"><span class="chd-rule-num">8</span> <span>No Pauses &ndash; Once started, the timer keeps moving.</span></div>
+        <div class="chd-rule"><span class="chd-rule-num">9</span> <span>Stay Solo &ndash; This challenge is for your brain only.</span></div>
+        <div class="chd-rule"><span class="chd-rule-num">10</span> <span>Every Tap Counts &ndash; Random guessing can hurt your score.</span></div>
+        <div class="chd-rule"><span class="chd-rule-num">11</span> <span>Finish Strong &ndash; Incomplete tests may rank lower.</span></div>
+      </div>
+
+      <!-- Disclaimer -->
+      <div class="chd-disclaimer">
+        <i class="fa-solid fa-shield-halved"></i> No gambling. Skills-based evaluation.
+      </div>
+
+      <div style="height:100px"></div>
+    </div>
+  </div>
+  <!-- Sticky CTA -->
+  <div class="chd-sticky-cta">
+    <button class="chd-cta-btn" onclick="navigateTo('quiz')">
+      <i class="fa-solid fa-lock-open"></i> Pay &#8377;2 &amp; Unlock All
+    </button>
+  </div>
+</div>
+
+
+<!-- ====== QUIZ SCREEN (Daily Drill) ====== -->
+<div id="screen-quiz" class="screen app-screen">
+  <div class="app-wrap">
+    <div class="quiz-header">
+      <div class="quiz-back" onclick="goBackFromQuiz()"></div>
+      <div class="quiz-info">
+        <div class="quiz-mode-label" id="quiz-mode-name">Daily Drill</div>
+        <div class="quiz-progress-wrap">
+          <div class="quiz-progress-bar"><div class="quiz-progress-fill" id="quiz-prog-fill"></div></div>
+          <span class="quiz-qno" id="quiz-qno-label">1/10</span>
+        </div>
+      </div>
+      <div class="quiz-timer-circle" id="quiz-timer">30</div>
+    </div>
+
+    <div class="quiz-body">
+      <div class="quiz-streak-banner" id="quiz-streak-banner" style="display:none">
+         Streak x<span id="streak-num">2</span>! Keep going!
+      </div>
+      <div class="quiz-question-card">
+        <div class="q-category" id="q-category">Science & Technology</div>
+        <div class="q-text" id="q-text">Loading question...</div>
+      </div>
+      <div class="quiz-options" id="quiz-options">
+        <!-- Options inserted by JS -->
+      </div>
+      <div class="quiz-coins-earn">
+        <img src="zino-balloon.png" class="coin-tiny" />+10 Balloons for correct answer
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== RESULT SCREEN ====== -->
+<div id="screen-result" class="screen app-screen">
+  <div class="result-wrap">
+    <div class="result-burst"></div>
+    <div class="result-card">
+      <div class="result-icon" id="result-icon"></div>
+      <div class="result-title" id="result-title">You Crushed It!</div>
+      <div class="result-coins-row">
+        <img src="zino-balloon.png" class="result-coin-icon" />
+        <div class="result-coins-won" id="result-coins-won">+80</div>
+        <div class="result-coins-label">Zino Points Earned!</div>
+      </div>
+      <div class="result-rank-row">
+        <div class="result-rank-card">
+          <div class="result-rank-val" id="result-score">80</div>
+          <div class="result-rank-lbl">Score</div>
+        </div>
+        <div class="result-rank-card">
+          <div class="result-rank-val" id="result-rank">Top 5%</div>
+          <div class="result-rank-lbl">Rank</div>
+        </div>
+        <div class="result-rank-card">
+          <div class="result-rank-val" id="result-correct">8/10</div>
+          <div class="result-rank-lbl">Correct</div>
+        </div>
+      </div>
+      <div class="result-actions">
+        <button class="result-share-btn" onclick="shareResult()">S Share Result</button>
+        <button class="result-challenge-btn" onclick="challengeFriend()"> Challenge Friend</button>
+      </div>
+      <div class="result-chars">
+        <img src="char1.jpg" class="res-char" alt="" />
+        <img src="char2.jpg" class="res-char" alt="" />
+      </div>
+      <button class="result-home-btn" onclick="navigateTo('home')"> Back to Home</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== CSI SCREEN ====== -->
+<div id="screen-csi" class="screen app-screen">
+  <div class="app-wrap">
+    <div class="inner-header">
+      <button class="back-btn-inner" onclick="navigateTo('home')"></button>
+      <div class="inner-title">S CSI Index</div>
+      <div></div>
+    </div>
+    <div class="home-scroll">
+      <div class="csi-hero">
+        <div class="csi-label">Crazy Skill Index</div>
+        <div class="csi-score-wrap">
+          <svg class="csi-ring" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="50" fill="none" stroke="#1a1a3e" stroke-width="12"/>
+            <circle cx="60" cy="60" r="50" fill="none" stroke="url(#csi-grad)" stroke-width="12"
+              stroke-dasharray="226" stroke-dashoffset="56" stroke-linecap="round"
+              transform="rotate(-90 60 60)"/>
+            <defs>
+              <linearGradient id="csi-grad" x1="0%" y1="0%" x2="100%" y2="0%">
+                <stop offset="0%" style="stop-color:#ffd700"/>
+                <stop offset="100%" style="stop-color:#ff6b00"/>
+              </linearGradient>
+            </defs>
+          </svg>
+          <div class="csi-inner-score">
+            <div class="csi-number">7840</div>
+            <div class="csi-tag">WIZARD </div>
+          </div>
+        </div>
+        <div class="csi-global-rank"> Global Rank: <strong>#342</strong></div>
+      </div>
+
+      <div class="csi-stats-grid">
+        <div class="csi-stat-card">
+          <div class="csi-stat-icon">S</div>
+          <div class="csi-stat-val">248</div>
+          <div class="csi-stat-lbl">Total Questions</div>
+        </div>
+        <div class="csi-stat-card green-stat">
+          <div class="csi-stat-icon"></div>
+          <div class="csi-stat-val">192</div>
+          <div class="csi-stat-lbl">Correct</div>
+        </div>
+        <div class="csi-stat-card red-stat">
+          <div class="csi-stat-icon"></div>
+          <div class="csi-stat-val">56</div>
+          <div class="csi-stat-lbl">Incorrect</div>
+        </div>
+        <div class="csi-stat-card blue-stat">
+          <div class="csi-stat-icon"></div>
+          <div class="csi-stat-val">12.4s</div>
+          <div class="csi-stat-lbl">Avg. Time</div>
+        </div>
+      </div>
+
+      <!-- CSI Leaderboard -->
+      <div class="section-header" style="margin-top:20px">
+        <div class="section-title"> Global Leaderboard</div>
+      </div>
+      <div class="leaderboard-list">
+        <div class="lb-item gold-lb">
+          <div class="lb-rank"></div>
+          <div class="lb-avatar">A</div>
+          <div class="lb-info">
+            <div class="lb-name">Aarav Singh</div>
+            <div class="lb-city">Mumbai</div>
+          </div>
+          <div class="lb-score">12,450</div>
+        </div>
+        <div class="lb-item silver-lb">
+          <div class="lb-rank"> </div>
+          <div class="lb-avatar">P</div>
+          <div class="lb-info">
+            <div class="lb-name">Priya Sharma</div>
+            <div class="lb-city">Delhi</div>
+          </div>
+          <div class="lb-score">11,820</div>
+        </div>
+        <div class="lb-item bronze-lb">
+          <div class="lb-rank"></div>
+          <div class="lb-avatar">R</div>
+          <div class="lb-info">
+            <div class="lb-name">Rahul Verma</div>
+            <div class="lb-city">Pune</div>
+          </div>
+          <div class="lb-score">10,990</div>
+        </div>
+        <div class="lb-item you-lb">
+          <div class="lb-rank">#342</div>
+          <div class="lb-avatar you-av">J</div>
+          <div class="lb-info">
+            <div class="lb-name">Jay (You) </div>
+            <div class="lb-city">Your City</div>
+          </div>
+          <div class="lb-score">7,840</div>
+        </div>
+        <div class="lb-item">
+          <div class="lb-rank">#343</div>
+          <div class="lb-avatar">K</div>
+          <div class="lb-info">
+            <div class="lb-name">Karan Mehta</div>
+            <div class="lb-city">Bangalore</div>
+          </div>
+          <div class="lb-score">7,795</div>
+        </div>
+      </div>
+      <div style="height:80px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== WATCH SCREEN ====== -->
+<div id="screen-watch" class="screen app-screen">
+  <!-- Reels-style fullscreen container -->
+  <div class="reels-wrap">
+
+    <!-- Floating header -->
+    <div class="reels-header">
+      <div class="reels-brand"><i class="fa-brands fa-youtube"></i> Watch &amp; Earn</div>
+      <div class="reels-zino-badge">
+        <img src="zino-balloon.png" class="zino-icon-sm" />
+        <span id="watch-zino-count">250</span>
+      </div>
+    </div>
+
+    <!-- Reel Cards - snap scroll -->
+    <div class="reels-scroll" id="reels-scroll">
+
+      <!-- Reel 1 -->
+      <div class="reel" id="reel-0" data-earned="false">
+        <img src="crazinos-sticker.jpg" class="reel-bg" alt="" />
+        <div class="reel-gradient"></div>
+        <!-- Right actions -->
+        <div class="reel-actions">
+          <button class="reel-action-btn" onclick="reelEarn(0, this)">
+            <div class="ra-icon earn-icon" id="reel-earn-icon-0"><img src="zino-balloon.png" class="ra-coin" /></div>
+            <div class="ra-label">+1 Coin</div>
+          </button>
+          <button class="reel-action-btn" onclick="reelLike(this)">
+            <div class="ra-icon"><i class="fa-solid fa-heart"></i></div>
+            <div class="ra-label">4.2K</div>
+          </button>
+          <button class="reel-action-btn" onclick="reelShare()">
+            <div class="ra-icon"><i class="fa-solid fa-share-nodes"></i></div>
+            <div class="ra-label">Share</div>
+          </button>
+          <a href="https://youtube.com/@crazyxyz" target="_blank" class="reel-action-btn">
+            <div class="ra-icon"><i class="fa-brands fa-youtube"></i></div>
+            <div class="ra-label">YT</div>
+          </a>
+        </div>
+        <!-- Bottom info -->
+        <div class="reel-bottom">
+          <div class="reel-channel"><i class="fa-solid fa-circle-check"></i> Crazy XYZ</div>
+          <div class="reel-title">Ab Kuch Crazy Karte Hai! S Ep 42</div>
+          <div class="reel-meta"><i class="fa-regular fa-clock"></i> 12 min &nbsp;&nbsp; <i class="fa-solid fa-eye"></i> 2.1M views</div>
+          <div class="reel-prog-wrap" id="reel-prog-0">
+            <div class="reel-prog-bar"><div class="reel-prog-fill" id="reel-fill-0"></div></div>
+            <span class="reel-earn-hint" id="reel-hint-0">Watch 80% to earn</span>
+          </div>
+        </div>
+        <!-- Earn badge overlay -->
+        <div class="reel-earned-badge hidden" id="reel-earned-0">
+          <i class="fa-solid fa-coins"></i> +1 Zino Earned!
+        </div>
+        <!-- Play/pause tap zone -->
+        <div class="reel-tap-zone" onclick="toggleReelPlay(0)"></div>
+        <div class="reel-play-indicator hidden" id="reel-pi-0"><i class="fa-solid fa-pause"></i></div>
+      </div>
+
+      <!-- Reel 2 -->
+      <div class="reel" id="reel-1" data-earned="false" style="background:linear-gradient(180deg,#001a4d 0%,#0f0f1a 100%)">
+        <img src="char3.jpg" class="reel-bg" alt="" />
+        <div class="reel-gradient"></div>
+        <div class="reel-actions">
+          <button class="reel-action-btn" onclick="reelEarn(1, this)">
+            <div class="ra-icon earn-icon" id="reel-earn-icon-1"><img src="zino-balloon.png" class="ra-coin" /></div>
+            <div class="ra-label">+1 Coin</div>
+          </button>
+          <button class="reel-action-btn" onclick="reelLike(this)">
+            <div class="ra-icon"><i class="fa-solid fa-heart"></i></div>
+            <div class="ra-label">3.8K</div>
+          </button>
+          <button class="reel-action-btn" onclick="reelShare()">
+            <div class="ra-icon"><i class="fa-solid fa-share-nodes"></i></div>
+            <div class="ra-label">Share</div>
+          </button>
+          <a href="https://youtube.com/@crazyxyz" target="_blank" class="reel-action-btn">
+            <div class="ra-icon"><i class="fa-brands fa-youtube"></i></div>
+            <div class="ra-label">YT</div>
+          </a>
+        </div>
+        <div class="reel-bottom">
+          <div class="reel-channel"><i class="fa-solid fa-circle-check"></i> Crazy XYZ</div>
+          <div class="reel-title">Science Ka Crazy Experiment</div>
+          <div class="reel-meta"><i class="fa-regular fa-clock"></i> 18 min &nbsp;&nbsp; <i class="fa-solid fa-eye"></i> 1.4M views</div>
+          <div class="reel-prog-wrap" id="reel-prog-1">
+            <div class="reel-prog-bar"><div class="reel-prog-fill" id="reel-fill-1"></div></div>
+            <span class="reel-earn-hint" id="reel-hint-1">Watch 80% to earn</span>
+          </div>
+        </div>
+        <div class="reel-earned-badge hidden" id="reel-earned-1">
+          <i class="fa-solid fa-coins"></i> +1 Zino Earned!
+        </div>
+        <div class="reel-tap-zone" onclick="toggleReelPlay(1)"></div>
+        <div class="reel-play-indicator hidden" id="reel-pi-1"><i class="fa-solid fa-pause"></i></div>
+      </div>
+
+      <!-- Reel 3 (already earned) -->
+      <div class="reel" id="reel-2" data-earned="true" style="background:linear-gradient(180deg,#2d0050 0%,#0f0f1a 100%)">
+        <img src="char4.jpg" class="reel-bg" alt="" />
+        <div class="reel-gradient"></div>
+        <div class="reel-actions">
+          <button class="reel-action-btn earned-action">
+            <div class="ra-icon"><i class="fa-solid fa-circle-check"></i></div>
+            <div class="ra-label">Earned</div>
+          </button>
+          <button class="reel-action-btn" onclick="reelLike(this)">
+            <div class="ra-icon"><i class="fa-solid fa-heart"></i></div>
+            <div class="ra-label">6.1K</div>
+          </button>
+          <button class="reel-action-btn" onclick="reelShare()">
+            <div class="ra-icon"><i class="fa-solid fa-share-nodes"></i></div>
+            <div class="ra-label">Share</div>
+          </button>
+          <a href="https://youtube.com/@crazyxyz" target="_blank" class="reel-action-btn">
+            <div class="ra-icon"><i class="fa-brands fa-youtube"></i></div>
+            <div class="ra-label">YT</div>
+          </a>
+        </div>
+        <div class="reel-bottom">
+          <div class="reel-channel"><i class="fa-solid fa-circle-check"></i> Crazy XYZ</div>
+          <div class="reel-title">Crazy XYZ S Behind the Scenes</div>
+          <div class="reel-meta"><i class="fa-regular fa-clock"></i> 8 min &nbsp;&nbsp; <i class="fa-solid fa-eye"></i> 890K views</div>
+          <div class="reel-prog-wrap">
+            <div class="reel-prog-bar"><div class="reel-prog-fill" style="width:100%;background:var(--crazy-green)"></div></div>
+            <span class="reel-earn-hint" style="color:var(--crazy-green)"><i class="fa-solid fa-check"></i> +1 Zino Earned</span>
+          </div>
+        </div>
+        <div class="reel-tap-zone" onclick="toggleReelPlay(2)"></div>
+        <div class="reel-play-indicator hidden" id="reel-pi-2"><i class="fa-solid fa-pause"></i></div>
+      </div>
+
+      <!-- Reel 4 -->
+      <div class="reel" id="reel-3" data-earned="false" style="background:linear-gradient(180deg,#003320 0%,#0f0f1a 100%)">
+        <img src="char1.jpg" class="reel-bg" alt="" />
+        <div class="reel-gradient"></div>
+        <div class="reel-actions">
+          <button class="reel-action-btn" onclick="reelEarn(3, this)">
+            <div class="ra-icon earn-icon" id="reel-earn-icon-3"><img src="zino-balloon.png" class="ra-coin" /></div>
+            <div class="ra-label">+1 Coin</div>
+          </button>
+          <button class="reel-action-btn" onclick="reelLike(this)">
+            <div class="ra-icon"><i class="fa-solid fa-heart"></i></div>
+            <div class="ra-label">5.3K</div>
+          </button>
+          <button class="reel-action-btn" onclick="reelShare()">
+            <div class="ra-icon"><i class="fa-solid fa-share-nodes"></i></div>
+            <div class="ra-label">Share</div>
+          </button>
+          <a href="https://youtube.com/@crazyxyz" target="_blank" class="reel-action-btn">
+            <div class="ra-icon"><i class="fa-brands fa-youtube"></i></div>
+            <div class="ra-label">YT</div>
+          </a>
+        </div>
+        <div class="reel-bottom">
+          <div class="reel-channel"><i class="fa-solid fa-circle-check"></i> Crazy XYZ</div>
+          <div class="reel-title">Crazy Challenge with Friends</div>
+          <div class="reel-meta"><i class="fa-regular fa-clock"></i> 22 min &nbsp;&nbsp; <i class="fa-solid fa-eye"></i> 3.2M views</div>
+          <div class="reel-prog-wrap" id="reel-prog-3">
+            <div class="reel-prog-bar"><div class="reel-prog-fill" id="reel-fill-3"></div></div>
+            <span class="reel-earn-hint" id="reel-hint-3">Watch 80% to earn</span>
+          </div>
+        </div>
+        <div class="reel-earned-badge hidden" id="reel-earned-3">
+          <i class="fa-solid fa-coins"></i> +1 Zino Earned!
+        </div>
+        <div class="reel-tap-zone" onclick="toggleReelPlay(3)"></div>
+        <div class="reel-play-indicator hidden" id="reel-pi-3"><i class="fa-solid fa-pause"></i></div>
+      </div>
+
+    </div><!-- end reels-scroll -->
+  </div><!-- end reels-wrap -->
+</div>
+
+<!-- ====== STORE SCREEN ====== -->
+<div id="screen-store" class="screen app-screen">
+  <div class="app-wrap">
+    <div class="inner-header">
+      <button class="back-btn-inner" onclick="navigateTo('home')"></button>
+      <div class="inner-title"> Store</div>
+      <div class="zino-badge-sm">
+        <img src="zino-balloon.png" class="zino-icon-sm" /><span id="store-zino">250</span>
+      </div>
+    </div>
+    <div class="home-scroll">
+      <!-- Subscription Banner -->
+      <div class="crazy-pass-banner" onclick="navigateTo('subscription')">
+        <div class="pass-left">
+          <div class="pass-tag"> UPGRADE</div>
+          <div class="pass-title">Crazy Pass</div>
+          <div class="pass-desc">Unlock unlimited challenges & premium rewards!</div>
+          <button class="pass-btn">Get Crazy Pass "</button>
+        </div>
+        <img src="char2.jpg" class="pass-char" alt="" />
+      </div>
+
+      <!-- Products Grid -->
+      <div class="section-header" style="margin-top:16px">
+        <div class="section-title"> Zino Balloon Rewards</div>
+      </div>
+      <div class="store-grid">
+        <div class="store-product" onclick="requestProduct('Crazy XYZ Cap', 500)">
+          <div class="prod-emoji"></div>
+          <div class="prod-name">Crazy XYZ Cap</div>
+          <div class="prod-coins"><img src="zino-balloon.png" class="coin-tiny" /><span>500</span></div>
+          <button class="prod-req-btn" id="prod-btn-cap">Request</button>
+        </div>
+        <div class="store-product" onclick="requestProduct('Crazy T-Shirt', 800)">
+          <div class="prod-emoji"></div>
+          <div class="prod-name">Crazy T-Shirt</div>
+          <div class="prod-coins"><img src="zino-balloon.png" class="coin-tiny" /><span>800</span></div>
+          <button class="prod-req-btn">Request</button>
+        </div>
+        <div class="store-product" onclick="requestProduct('XYZ Water Bottle', 350)">
+          <div class="prod-emoji"></div>
+          <div class="prod-name">XYZ Bottle</div>
+          <div class="prod-coins"><img src="zino-balloon.png" class="coin-tiny" /><span>350</span></div>
+          <button class="prod-req-btn">Request</button>
+        </div>
+        <div class="store-product" onclick="requestProduct('Sticker Pack', 150)">
+          <div class="prod-emoji"></div>
+          <div class="prod-name">Sticker Pack</div>
+          <div class="prod-coins"><img src="zino-balloon.png" class="coin-tiny" /><span>150</span></div>
+          <button class="prod-req-btn">Request</button>
+        </div>
+        <div class="store-product" onclick="requestProduct('XYZ Hoodie', 1500)">
+          <div class="prod-emoji"></div>
+          <div class="prod-name">XYZ Hoodie</div>
+          <div class="prod-coins"><img src="zino-balloon.png" class="coin-tiny" /><span>1500</span></div>
+          <button class="prod-req-btn">Request</button>
+        </div>
+        <div class="store-product" onclick="requestProduct('Notebook', 200)">
+          <div class="prod-emoji">SS</div>
+          <div class="prod-name">XYZ Notebook</div>
+          <div class="prod-coins"><img src="zino-balloon.png" class="coin-tiny" /><span>200</span></div>
+          <button class="prod-req-btn">Request</button>
+        </div>
+      </div>
+
+      <!-- Shopify Store Section -->
+      <div class="section-header" style="margin-top:20px">
+        <div class="section-title">" Official Merch Store</div>
+      </div>
+      <div class="shopify-banner">
+        <div class="shopify-text">
+          <div class="shopify-title">Shop Now on Shopify</div>
+          <div class="shopify-sub">Exclusive Crazy XYZ merchandise with 5-10% discount for Crazy Pass holders!</div>
+        </div>
+        <button class="shopify-btn" onclick="openShopify()">Shop Now </button>
+      </div>
+
+      <div style="height:80px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== PROFILE SCREEN ====== -->
+<div id="screen-profile" class="screen app-screen">
+  <div class="app-wrap">
+    <div class="inner-header">
+      <button class="back-btn-inner" onclick="navigateTo('home')"><i class="fa-solid fa-arrow-left"></i></button>
+      <div class="inner-title">Profile</div>
+      <button class="prof-edit-btn" onclick="showToast('Edit profile coming soon!')"><i class="fa-solid fa-pen"></i> Edit</button>
+    </div>
+    <div class="home-scroll">
+
+      <!-- Hero Profile Card -->
+      <div class="prof-hero">
+        <div class="prof-hero-bg"></div>
+        <img src="sticker1.jpg" class="prof-hero-sticker" alt="" />
+        <div class="prof-avatar-ring">
+          <div class="prof-avatar-inner" id="profile-av-letter">J</div>
+          <div class="prof-avatar-badge"><i class="fa-solid fa-fire"></i> 5</div>
+        </div>
+        <div class="prof-hero-name" id="profile-display-name">Jay Kumar</div>
+        <div class="prof-hero-meta">
+          <span><i class="fa-solid fa-location-dot"></i> <span id="profile-display-city">Mumbai</span></span>
+          <span class="prof-dot"></span>
+          <span><i class="fa-solid fa-star"></i> Rising Star</span>
+        </div>
+        <div class="prof-xp-wrap">
+          <div class="prof-xp-label">
+            <span>XP Progress</span>
+            <span class="prof-xp-val">7,840 / 10,000</span>
+          </div>
+          <div class="prof-xp-bar"><div class="prof-xp-fill" style="width:78%"></div></div>
+        </div>
+      </div>
+
+      <!-- Coin + Stats Row -->
+      <div class="prof-stats-grid">
+        <div class="prof-stat-card">
+          <img src="zino-balloon.png" class="prof-stat-icon-img" />
+          <div class="prof-stat-val" id="profile-zino-display">250</div>
+          <div class="prof-stat-lbl">Zino Balloons</div>
+        </div>
+        <div class="prof-stat-card">
+          <div class="prof-stat-icon red-icon"><i class="fa-solid fa-khanda"></i></div>
+          <div class="prof-stat-val">37</div>
+          <div class="prof-stat-lbl">Challenges</div>
+        </div>
+        <div class="prof-stat-card">
+          <div class="prof-stat-icon red-icon"><i class="fa-solid fa-fire"></i></div>
+          <div class="prof-stat-val">5</div>
+          <div class="prof-stat-lbl">Day Streak</div>
+        </div>
+        <div class="prof-stat-card">
+          <div class="prof-stat-icon gold-icon"><i class="fa-solid fa-chart-line"></i></div>
+          <div class="prof-stat-val">7,840</div>
+          <div class="prof-stat-lbl">CSI Score</div>
+        </div>
+      </div>
+
+      <!-- Badges Shelf -->
+      <div class="prof-section-hdr">
+        <i class="fa-solid fa-medal"></i> Badges Earned
+        <span class="prof-badge-count">3 / 12</span>
+      </div>
+      <div class="prof-badges-row">
+        <div class="prof-badge earned-badge">
+          <div class="pb-icon"><i class="fa-solid fa-bolt"></i></div>
+          <div class="pb-label">Quick Fire</div>
+        </div>
+        <div class="prof-badge earned-badge">
+          <div class="pb-icon"><i class="fa-solid fa-fire"></i></div>
+          <div class="pb-label">5-Day Streak</div>
+        </div>
+        <div class="prof-badge earned-badge">
+          <div class="pb-icon"><i class="fa-solid fa-brain"></i></div>
+          <div class="pb-label">Big Brain</div>
+        </div>
+        <div class="prof-badge locked-badge">
+          <div class="pb-icon"><i class="fa-solid fa-lock"></i></div>
+          <div class="pb-label">War Hero</div>
+        </div>
+        <div class="prof-badge locked-badge">
+          <div class="pb-icon"><i class="fa-solid fa-lock"></i></div>
+          <div class="pb-label">Top 10</div>
+        </div>
+      </div>
+
+      <!-- Info Details -->
+      <div class="prof-section-hdr"><i class="fa-solid fa-circle-info"></i> My Details</div>
+      <div class="prof-info-card">
+        <div class="prof-info-row">
+          <div class="prof-info-icon-wrap"><i class="fa-solid fa-user"></i></div>
+          <div class="prof-info-text">
+            <div class="prof-info-lbl">Full Name</div>
+            <div class="prof-info-val" id="prof-name-val">Jay Kumar</div>
+          </div>
+        </div>
+        <div class="prof-info-divider"></div>
+        <div class="prof-info-row">
+          <div class="prof-info-icon-wrap"><i class="fa-solid fa-envelope"></i></div>
+          <div class="prof-info-text">
+            <div class="prof-info-lbl">Email</div>
+            <div class="prof-info-val" id="prof-email-val">jay@email.com</div>
+          </div>
+        </div>
+        <div class="prof-info-divider"></div>
+        <div class="prof-info-row">
+          <div class="prof-info-icon-wrap"><i class="fa-solid fa-mobile-screen"></i></div>
+          <div class="prof-info-text">
+            <div class="prof-info-lbl">Mobile</div>
+            <div class="prof-info-val">+91 98765xxxxx</div>
+          </div>
+        </div>
+        <div class="prof-info-divider"></div>
+        <div class="prof-info-row">
+          <div class="prof-info-icon-wrap"><i class="fa-solid fa-cake-candles"></i></div>
+          <div class="prof-info-text">
+            <div class="prof-info-lbl">Age</div>
+            <div class="prof-info-val" id="prof-age-val">15 years</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Crazy Pass CTA -->
+      <div class="prof-pass-cta">
+        <div class="prof-pass-left">
+          <div class="prof-pass-icon"><i class="fa-solid fa-crown"></i></div>
+          <div>
+            <div class="prof-pass-title">Upgrade to Crazy Pass</div>
+            <div class="prof-pass-sub">From <strong>&#8377;199/month</strong></div>
+          </div>
+        </div>
+        <button class="prof-pass-btn" onclick="navigateTo('subscription')">
+          Get Pass <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </div>
+
+      <!-- Menu -->
+      <div class="prof-section-hdr"><i class="fa-solid fa-sliders"></i> Settings</div>
+      <div class="prof-menu-card">
+        <button class="prof-menu-item" onclick="navigateTo('subscription')">
+          <div class="pmi-left">
+            <div class="pmi-icon pmi-red"><i class="fa-solid fa-crown"></i></div>
+            <span class="pmi-label">Crazy Pass</span>
+          </div>
+          <i class="fa-solid fa-chevron-right pmi-arrow"></i>
+        </button>
+        <div class="prof-info-divider"></div>
+        <button class="prof-menu-item" onclick="showToast('Fueled by Crazy XYZ  building the next generation of curious minds!')">
+          <div class="pmi-left">
+            <div class="pmi-icon pmi-blue"><i class="fa-solid fa-circle-info"></i></div>
+            <span class="pmi-label">About FSL</span>
+          </div>
+          <i class="fa-solid fa-chevron-right pmi-arrow"></i>
+        </button>
+        <div class="prof-info-divider"></div>
+        <button class="prof-menu-item" onclick="showToast('Your data is protected and never shared.')">
+          <div class="pmi-left">
+            <div class="pmi-icon pmi-green"><i class="fa-solid fa-shield-halved"></i></div>
+            <span class="pmi-label">Privacy Policy</span>
+          </div>
+          <i class="fa-solid fa-chevron-right pmi-arrow"></i>
+        </button>
+        <div class="prof-info-divider"></div>
+        <button class="prof-menu-item" onclick="handleLogout()">
+          <div class="pmi-left">
+            <div class="pmi-icon pmi-red"><i class="fa-solid fa-right-from-bracket"></i></div>
+            <span class="pmi-label logout-label">Logout</span>
+          </div>
+          <i class="fa-solid fa-chevron-right pmi-arrow"></i>
+        </button>
+      </div>
+      <div style="height:80px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SUBSCRIPTION SCREEN ====== -->
+<div id="screen-subscription" class="screen app-screen">
+  <div class="app-wrap">
+    <div class="inner-header">
+      <button class="back-btn-inner" onclick="navigateTo('profile')"></button>
+      <div class="inner-title"><i class="fa-solid fa-bolt"></i> Crazy Pass</div>
+      <div></div>
+    </div>
+    <div class="home-scroll">
+
+      <!-- Hero -->
+      <div class="sub-hero">
+        <div class="sub-char-row">
+          <img src="sticker2.jpg" class="sub-char-sticker sub-char-left" alt="" />
+          <div>
+            <div class="sub-crown-icon"><i class="fa-solid fa-crown"></i></div>
+            <div class="sub-title">Go Crazy Pass</div>
+          </div>
+          <img src="sticker4.jpg" class="sub-char-sticker sub-char-right" alt="" />
+        </div>
+        <div class="sub-desc">Unlock unlimited battles, rewards &amp; Zino bonuses</div>
+        <div class="sub-trust-row">
+          <span><i class="fa-solid fa-shield-halved"></i> Secure</span>
+          <span><i class="fa-solid fa-rotate-left"></i> Cancel Anytime</span>
+          <span><i class="fa-solid fa-star"></i> 4.9S Rated</span>
+        </div>
+      </div>
+
+      <!-- Toggle -->
+      <div class="plan-toggle-row">
+        <button class="plan-toggle-btn active-toggle" id="toggle-monthly" onclick="showPlan('monthly')">
+          <i class="fa-regular fa-calendar"></i> Monthly
+        </button>
+        <button class="plan-toggle-btn" id="toggle-annual" onclick="showPlan('annual')">
+          <i class="fa-solid fa-calendar-days"></i> Annual
+          <span class="save-badge">Save 66%</span>
+        </button>
+      </div>
+
+      <div class="plans-container">
+
+        <!-- Free tier -->
+        <div class="plan-card free-plan">
+          <div class="plan-tier-label">Free</div>
+          <div class="plan-price-row">
+            <div class="plan-price">a0</div>
+            <div class="plan-period-tag">forever</div>
+          </div>
+          <div class="plan-feat-list">
+            <div class="pfeat yes"><i class="fa-solid fa-check"></i> Daily Drill</div>
+            <div class="pfeat yes"><i class="fa-solid fa-check"></i> Watch &amp; Earn</div>
+            <div class="pfeat no"><i class="fa-solid fa-lock"></i> Crazy Wars</div>
+            <div class="pfeat no"><i class="fa-solid fa-lock"></i> Weekly Clash</div>
+            <div class="pfeat no"><i class="fa-solid fa-lock"></i> Leaderboard</div>
+            <div class="pfeat no"><i class="fa-solid fa-lock"></i> Zino Bonus Coins</div>
+          </div>
+          <button class="plan-btn current-plan-btn">Current Plan</button>
+        </div>
+
+        <!-- Monthly -->
+        <div class="plan-card monthly-plan popular-plan" id="plan-monthly">
+          <div class="popular-tag"><i class="fa-solid fa-star"></i> MOST POPULAR</div>
+          <div class="plan-tier-label">Crazy Pass Monthly</div>
+          <div class="plan-price-row">
+            <div class="plan-price">a199</div>
+            <div class="plan-period-tag">/month</div>
+          </div>
+          <div class="plan-feat-list">
+            <div class="pfeat yes"><i class="fa-solid fa-check"></i> Everything in Free</div>
+            <div class="pfeat yes"><i class="fa-solid fa-khanda"></i> Unlimited Crazy Wars</div>
+            <div class="pfeat yes"><i class="fa-solid fa-calendar-week"></i> Unlimited Weekly Clash</div>
+            <div class="pfeat yes"><i class="fa-solid fa-ranking-star"></i> Full Leaderboard Access</div>
+            <div class="pfeat yes"><i class="fa-solid fa-coins"></i> 100 Bonus Balloons/month</div>
+            <div class="pfeat yes"><i class="fa-solid fa-tag"></i> 5% Store Discount</div>
+            <div class="pfeat yes"><i class="fa-solid fa-ban"></i> Ad-Free Experience</div>
+          </div>
+          <button class="plan-btn monthly-plan-btn" onclick="subscribePlan('monthly', 199)">
+            <i class="fa-solid fa-bolt"></i> Get Monthly Pass S a199
+          </button>
+        </div>
+
+        <!-- Annual -->
+        <div class="plan-card annual-plan hidden" id="plan-annual">
+          <div class="popular-tag annual-tag"><i class="fa-solid fa-fire"></i> BEST VALUE</div>
+          <div class="plan-tier-label">Crazy Pass Annual</div>
+          <div class="plan-price-row">
+            <div class="plan-price">a799</div>
+            <div class="plan-period-tag">/year</div>
+          </div>
+          <div class="plan-price-sub"><i class="fa-solid fa-indian-rupee-sign"></i> Just a66/month  Save a1589!</div>
+          <div class="plan-feat-list">
+            <div class="pfeat yes"><i class="fa-solid fa-check"></i> Everything in Monthly</div>
+            <div class="pfeat yes"><i class="fa-solid fa-coins"></i> 200 Bonus Balloons/month</div>
+            <div class="pfeat yes"><i class="fa-solid fa-tag"></i> 10% Store Discount</div>
+            <div class="pfeat yes"><i class="fa-solid fa-chart-line"></i> Advanced Analytics</div>
+            <div class="pfeat yes"><i class="fa-solid fa-crown"></i> Priority Rank on Leaderboard</div>
+            <div class="pfeat yes"><i class="fa-solid fa-rocket"></i> Early Feature Access</div>
+          </div>
+          <button class="plan-btn annual-plan-btn" onclick="subscribePlan('annual', 799)">
+            <i class="fa-solid fa-crown"></i> Get Annual Pass S a799
+          </button>
+        </div>
+
+      </div>
+
+      <div class="sub-footer">
+        <div class="sub-footer-line">" Secure payment  Cancel anytime</div>
+        <div class="sub-footer-line">Powered by Crazy XYZ </div>
+      </div>
+      <div style="height:80px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== BOTTOM NAVBAR ====== -->
+<nav class="bottom-nav" id="bottom-nav">
+  <button class="nav-item active-nav" id="nav-home" onclick="navigateTo('home')">
+    <div class="nav-icon"><i class="fa-solid fa-house"></i></div>
+    <div class="nav-label">Home</div>
+  </button>
+  <button class="nav-item" id="nav-play" onclick="navigateTo('play')">
+    <div class="nav-icon"><i class="fa-solid fa-gamepad"></i></div>
+    <div class="nav-label">Play</div>
+  </button>
+  <button class="nav-item" id="nav-watch" onclick="navigateTo('watch')">
+    <div class="nav-icon"><i class="fa-solid fa-circle-play"></i></div>
+    <div class="nav-label">Watch</div>
+  </button>
+  <button class="nav-item" id="nav-store" onclick="navigateTo('store')">
+    <div class="nav-icon"><i class="fa-solid fa-bag-shopping"></i></div>
+    <div class="nav-label">Store</div>
+  </button>
+  <button class="nav-item" id="nav-profile" onclick="navigateTo('profile')">
+    <div class="nav-icon"><i class="fa-solid fa-circle-user"></i></div>
+    <div class="nav-label">Profile</div>
+  </button>
+</nav>
+
+<!-- ====== TOAST ====== -->
+<div id="toast" class="toast hidden"></div>
+
+<!-- ====== PRODUCT REQUEST MODAL ====== -->
+<div id="product-modal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <div class="modal-icon" id="modal-prod-emoji"></div>
+    <div class="modal-title" id="modal-prod-name">Crazy XYZ Cap</div>
+    <div class="modal-sub">Your request will be sent to admin for review</div>
+    <div class="modal-coin-row">
+      <img src="zino-balloon.png" class="coin-tiny" />
+      <span id="modal-coin-val">500</span> Zino Balloons required
+    </div>
+    <div class="modal-current">Your balance: <strong id="modal-balance">250</strong> Balloons</div>
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeModal()">Cancel</button>
+      <button class="modal-confirm" id="modal-confirm-btn" onclick="confirmRequest()">Confirm Request</button>
+    </div>
+  </div>
+</div>
+
+<script src="app.js"></script>
+</body>
+</html>
