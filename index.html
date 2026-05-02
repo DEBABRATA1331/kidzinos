@@ -205,14 +205,36 @@
           <div class="banner-text">
             <div class="banner-label pass-label"><i class="fa-solid fa-crown"></i> PREMIUM</div>
             <div class="banner-title pass-title" style="color:#fff">Crazy Pass</div>
-            <div class="banner-sub" style="color:rgba(255,255,255,0.8)">Unlock Wars  Clash  Bonus Balloons!</div>
-            <div class="pass-price-tag" style="color:rgba(255,255,255,0.9)">From <strong style="color:#fff">a199</strong>/month</div>
+            <div class="banner-sub" style="color:rgba(255,255,255,0.8)">Unlock Wars âœ¦ Clash âœ¦ Bonus Balloons!</div>
+            <div class="pass-price-tag" style="color:rgba(255,255,255,0.9)">From <strong style="color:#fff">â‚¹199</strong>/month</div>
             <button class="banner-cta pass-cta" onclick="navigateTo('subscription')">Get Pass <i class="fa-solid fa-arrow-right"></i></button>
           </div>
           <img src="sticker1.jpg" class="banner-char" alt="Crazy XYZ" style="height:140px;opacity:0.95" />
         </div>
+        <!-- Slide 5: Studio Tour Prize -->
+        <div class="banner-slide special-prize-slide" style="background:linear-gradient(135deg,#0a0018,#1a003a)">
+          <div class="banner-text">
+            <div class="banner-prize-tag"><i class="fa-solid fa-star"></i> GRAND PRIZE</div>
+            <div class="banner-prize-title">Amit ke Saath<br/>Studio Tour! ðŸŽ¬</div>
+            <div class="banner-prize-sub">Top scorer wins a real Crazy XYZ studio visit!</div>
+            <button class="banner-prize-cta" onclick="navigateTo('play')">Win Now âœ¨</button>
+          </div>
+          <img src="char4.jpg" class="prize-char-img" alt="Crazy XYZ" />
+        </div>
+        <!-- Slide 6: Feature in Video Prize -->
+        <div class="banner-slide special-prize-slide" style="background:linear-gradient(135deg,#001a0a,#003020)">
+          <div class="banner-text">
+            <div class="banner-prize-tag"><i class="fa-brands fa-youtube"></i> MEGA PRIZE</div>
+            <div class="banner-prize-title">Crazy XYZ Video<br/>Mein Feature Ho! ðŸš€</div>
+            <div class="banner-prize-sub">Win weekly clash â€” appear in the next video!</div>
+            <button class="banner-prize-cta" onclick="navigateTo('play')">Enter Now ðŸ”¥</button>
+          </div>
+          <img src="char2.jpg" class="prize-char-img" alt="Crazy XYZ" />
+        </div>
         <div class="banner-dots">
           <span class="b-dot active"></span>
+          <span class="b-dot"></span>
+          <span class="b-dot"></span>
           <span class="b-dot"></span>
           <span class="b-dot"></span>
           <span class="b-dot"></span>
@@ -227,7 +249,7 @@
       <div class="challenge-card war-card" onclick="navigateTo('play')">
         <div class="challenge-card-inner">
           <div class="challenge-badge war-badge">LIVE </div>
-          <div class="challenge-title">Week 12  Day 3</div>
+          <div class="challenge-title">Week 12   Day 3</div>
           <div class="challenge-desc">Answer today's challenge & climb the leaderboard!</div>
           <div class="challenge-meta">
             <span> Top Prize: a2000</span>
@@ -275,21 +297,75 @@
 
       <!-- Daily Drill Card -->
       <div class="section-header" style="margin-top:16px">
-        <div class="section-title"> Daily Drill</div>
+        <div class="section-title">âš¡ Daily Drill</div>
         <a href="#" class="see-all" onclick="navigateTo('play')">View All</a>
       </div>
       <div class="daily-drill-card" onclick="navigateTo('play')">
         <div class="drill-left">
           <div class="drill-badge">TODAY</div>
-          <div class="drill-title">Sharpen Your Skills </div>
-          <div class="drill-meta">10 Questions  Free to Play</div>
-          <div class="drill-streak"> 5 Day Streak!</div>
-          <button class="card-btn drill-btn">Start Drill "</button>
+          <div class="drill-title">Sharpen Your Skills âš¡</div>
+          <div class="drill-meta">10 Questions âœ¦ Free to Play</div>
+          <div class="drill-streak" id="home-streak-label">ðŸ”¥ 5 Day Streak!</div>
+          <button class="card-btn drill-btn">Start Drill ðŸš€</button>
         </div>
         <div class="drill-right">
           <div class="drill-coin-anim">
             <img src="zino-balloon.png" alt="Zino" class="drill-coin" />
             <div class="drill-earn">+10 Balloons</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Streak Strip -->
+      <div class="home-streak-strip" id="home-streak-strip">
+        <div class="hss-fire">ðŸ”¥</div>
+        <div class="hss-text">
+          <div class="hss-title" id="hss-title">5 Din Ka King! Koi Rok Nahi Sakta! ðŸ‘‘</div>
+          <div class="hss-sub">Daily streak â€” keep it going!</div>
+        </div>
+        <div class="hss-dots" id="hss-dots"></div>
+      </div>
+
+      <!-- Daily Missions -->
+      <div class="section-header" style="margin-top:16px">
+        <div class="section-title">ðŸŽ¯ Daily Missions</div>
+        <span style="font-size:0.72rem;color:var(--text-muted);font-weight:800;" id="missions-timer">Resets 00:00</span>
+      </div>
+      <div class="missions-wrap" id="missions-wrap">
+        <div class="mission-card" id="mission-0">
+          <div class="mission-icon-wrap mi-purple"><i class="fa-solid fa-bolt"></i></div>
+          <div class="mission-body">
+            <div class="mission-title">Complete Daily Drill</div>
+            <div class="mission-bar-wrap"><div class="mission-bar-fill" id="mbar-0" style="width:0%"></div></div>
+            <div class="mission-meta" id="mmeta-0">0 / 1 done</div>
+          </div>
+          <div class="mission-reward">+15 ðŸŽˆ<i class="fa-solid fa-circle-check hidden" id="mcheck-0"></i></div>
+        </div>
+        <div class="mission-card" id="mission-1">
+          <div class="mission-icon-wrap mi-blue"><i class="fa-brands fa-youtube"></i></div>
+          <div class="mission-body">
+            <div class="mission-title">Watch 2 Videos</div>
+            <div class="mission-bar-wrap"><div class="mission-bar-fill" id="mbar-1" style="width:0%"></div></div>
+            <div class="mission-meta" id="mmeta-1">0 / 2 watched</div>
+          </div>
+          <div class="mission-reward">+10 ðŸŽˆ<i class="fa-solid fa-circle-check hidden" id="mcheck-1"></i></div>
+        </div>
+        <div class="mission-card" id="mission-2">
+          <div class="mission-icon-wrap mi-orange"><i class="fa-solid fa-gamepad"></i></div>
+          <div class="mission-body">
+            <div class="mission-title">Play a Mini Game</div>
+            <div class="mission-bar-wrap"><div class="mission-bar-fill" id="mbar-2" style="width:0%"></div></div>
+            <div class="mission-meta" id="mmeta-2">0 / 1 played</div>
+          </div>
+          <div class="mission-reward">+10 ðŸŽˆ<i class="fa-solid fa-circle-check hidden" id="mcheck-2"></i></div>
+        </div>
+        <!-- Combo banner (shown when all done) -->
+        <div class="combo-banner hidden" id="combo-banner">
+          <div class="combo-icon">âš¡</div>
+          <div class="combo-text">
+            <div class="combo-label">Daily Crazy Combo!</div>
+            <div class="combo-title">Sabhi missions complete! ðŸ”¥</div>
+            <div class="combo-reward">+25 Bonus Zino Balloons claimed!</div>
           </div>
         </div>
       </div>
@@ -344,7 +420,7 @@
         </div>
         <div class="scoring-cards">
           <div class="score-card">
-            <div class="score-emoji"></div>
+            <div class="score-emoji"> </div>
             <div class="score-label">Correct Answer</div>
             <div class="score-val">+10 pts</div>
           </div>
@@ -356,7 +432,7 @@
           <div class="score-card">
             <div class="score-emoji"></div>
             <div class="score-label">Streak Bonus</div>
-            <div class="score-val">2</div>
+            <div class="score-val"> 2</div>
           </div>
           <div class="score-card">
             <div class="score-emoji"></div>
@@ -370,7 +446,7 @@
       <div class="home-footer">
         <div class="footer-badge">
           <div class="footer-skills">Crazy Skills Only</div>
-          <div class="footer-rewarding"> Rewarding </div>
+          <div class="footer-rewarding">  Rewarding  </div>
           <div class="footer-powered">Powered by <strong>Crazy XYZ</strong> </div>
         </div>
         <img src="crazinos-sticker.jpg" class="footer-sticker" alt="" />
@@ -378,6 +454,8 @@
       <div style="height:80px"></div>
     </div><!-- end home-scroll -->
   </div><!-- end app-wrap -->
+  <!-- Games Floating Button -->
+  <button class="games-fab" onclick="navigateTo('games')"><i class="fa-solid fa-gamepad"></i></button>
 </div>
 
 <!-- ====== PLAY SCREEN ====== -->
@@ -417,7 +495,7 @@
       <div id="ptab-content-drill" class="ptab-content">
         <div class="ch-section-header">
           <span class="ch-section-title"><i class="fa-solid fa-bolt"></i> Daily Drill</span>
-          <span class="ch-section-count">Free  1 set daily</span>
+          <span class="ch-section-count">Free   1 set daily</span>
         </div>
 
         <!-- Today's drill card -->
@@ -494,7 +572,7 @@
           <i class="fa-solid fa-lock upcoming-lock"></i>
           <div class="upcoming-text">
             <div class="upcoming-title">Week 13 Clash</div>
-            <div class="upcoming-sub">Starts Monday  Crazy Pass required</div>
+            <div class="upcoming-sub">Starts Monday   Crazy Pass required</div>
           </div>
           <button class="upcoming-pass-btn" onclick="navigateTo('subscription')">
             <i class="fa-solid fa-crown"></i> Get Pass
@@ -647,10 +725,8 @@
         <div class="chd-day-item locked-day">
           <div class="chd-day-left">
             <div class="lock-icon-wrap"><i class="fa-solid fa-lock"></i></div>
-            <div class="chd-day-text">
-              <div class="chd-day-title">Day 2</div>
-              <div class="chd-day-sub">Pay to Unlock</div>
-            </div>
+            <div class="chd-day-title">Day 2</div>
+            <div class="chd-day-sub">Pay to Unlock</div>
           </div>
           <div class="chd-day-pills">
             <span class="chd-pill"><i class="fa-solid fa-bolt-lightning"></i> Speed &amp; Tech</span>
@@ -697,7 +773,7 @@
 <div id="screen-quiz" class="screen app-screen">
   <div class="app-wrap">
     <div class="quiz-header">
-      <div class="quiz-back" onclick="goBackFromQuiz()"></div>
+      <div class="quiz-back" onclick="goBackFromQuiz()"> </div>
       <div class="quiz-info">
         <div class="quiz-mode-label" id="quiz-mode-name">Daily Drill</div>
         <div class="quiz-progress-wrap">
@@ -733,34 +809,60 @@
     <div class="result-card">
       <div class="result-icon" id="result-icon"></div>
       <div class="result-title" id="result-title">You Crushed It!</div>
-      <div class="result-coins-row">
-        <img src="zino-balloon.png" class="result-coin-icon" />
-        <div class="result-coins-won" id="result-coins-won">+80</div>
-        <div class="result-coins-label">Zino Points Earned!</div>
+
+      <!-- Hinglish motivational banner -->
+      <div class="result-hinglish-banner" id="result-hinglish">
+        <div class="result-hinglish-text" id="result-hinglish-text">"Amit ke saath judega toh aasman chhuyega!" ðŸš€</div>
+        <div class="result-hinglish-source">â€” Crazy XYZ Team</div>
       </div>
+
+      <!-- Zino Balloons Earned -->
+      <div class="result-zino-earned">
+        <img src="zino-balloon.png" style="width:44px;height:44px;object-fit:contain;" />
+        <div class="result-zino-big" id="result-coins-won">+80</div>
+        <div class="result-zino-label">
+          <div class="result-zino-title">Zino Balloons Earned!</div>
+          <div class="result-zino-sub" id="result-total-zinos">Total: 330 ðŸŽˆ</div>
+        </div>
+      </div>
+
+      <!-- Percentile card -->
+      <div class="result-percentile-card">
+        <div class="result-percentile-big" id="result-percentile">Top 8%</div>
+        <div class="result-percentile-sub">You are in the <span id="result-rank">Top 8%</span> of all players</div>
+        <div class="result-percentile-participants" id="result-participants">Out of 12,450 participants today</div>
+      </div>
+
+      <!-- Score row -->
       <div class="result-rank-row">
         <div class="result-rank-card">
           <div class="result-rank-val" id="result-score">80</div>
           <div class="result-rank-lbl">Score</div>
         </div>
         <div class="result-rank-card">
-          <div class="result-rank-val" id="result-rank">Top 5%</div>
-          <div class="result-rank-lbl">Rank</div>
-        </div>
-        <div class="result-rank-card">
           <div class="result-rank-val" id="result-correct">8/10</div>
           <div class="result-rank-lbl">Correct</div>
         </div>
+        <div class="result-rank-card">
+          <div class="result-rank-val" id="result-streak-show">ðŸ”¥5</div>
+          <div class="result-rank-lbl">Best Streak</div>
+        </div>
       </div>
+
+      <!-- XP Progress bar -->
+      <div class="result-xp-bar-wrap">
+        <div class="result-xp-label">
+          <span id="result-xp-level">Lv.14 Beast</span>
+          <span id="result-xp-val">7840 / 10000 XP</span>
+        </div>
+        <div class="result-xp-bar"><div class="result-xp-fill" id="result-xp-fill" style="width:60%"></div></div>
+      </div>
+
       <div class="result-actions">
-        <button class="result-share-btn" onclick="shareResult()">S Share Result</button>
-        <button class="result-challenge-btn" onclick="challengeFriend()"> Challenge Friend</button>
+        <button class="result-share-btn" onclick="shareResult()">ðŸ”— Share</button>
+        <button class="result-challenge-btn" onclick="challengeFriend()">ðŸ”¥ Challenge</button>
       </div>
-      <div class="result-chars">
-        <img src="char1.jpg" class="res-char" alt="" />
-        <img src="char2.jpg" class="res-char" alt="" />
-      </div>
-      <button class="result-home-btn" onclick="navigateTo('home')"> Back to Home</button>
+      <button class="result-home-btn" onclick="navigateTo('home')">ðŸ  Back to Home</button>
     </div>
   </div>
 </div>
@@ -1108,10 +1210,33 @@
           <button class="prod-req-btn">Request</button>
         </div>
         <div class="store-product" onclick="requestProduct('Notebook', 200)">
-          <div class="prod-emoji">SS</div>
+          <div class="prod-emoji">ðŸ““</div>
           <div class="prod-name">XYZ Notebook</div>
           <div class="prod-coins"><img src="zino-balloon.png" class="coin-tiny" /><span>200</span></div>
           <button class="prod-req-btn">Request</button>
+        </div>
+      </div>
+
+      <!-- Special Experience Prizes -->
+      <div class="section-header" style="margin-top:20px">
+        <div class="section-title">ðŸŒŸ Dream Prizes</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#1a0028,#3d0060);border:1.5px solid rgba(236,72,153,0.5);border-radius:20px;padding:18px;margin-bottom:12px;display:flex;align-items:center;gap:16px;">
+        <div style="font-size:2.8rem;flex-shrink:0;">ðŸŽ¬</div>
+        <div style="flex:1;">
+          <div style="font-size:0.65rem;font-weight:900;color:#f9a8d4;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px;">ðŸ† GRAND PRIZE</div>
+          <div style="font-size:1rem;font-weight:900;color:#fff;margin-bottom:4px;">Amit ke Saath Studio Tour!</div>
+          <div style="font-size:0.75rem;color:rgba(255,255,255,0.65);margin-bottom:10px;">Win the weekly leaderboard &amp; visit the real Crazy XYZ studio with Amit bhai!</div>
+          <div style="display:flex;align-items:center;gap:6px;"><img src="zino-balloon.png" style="width:16px;" /><span style="font-size:0.8rem;font-weight:900;color:#f9a8d4;">Top of Leaderboard</span></div>
+        </div>
+      </div>
+      <div style="background:linear-gradient(135deg,#001a20,#003040);border:1.5px solid rgba(96,200,255,0.4);border-radius:20px;padding:18px;margin-bottom:12px;display:flex;align-items:center;gap:16px;">
+        <div style="font-size:2.8rem;flex-shrink:0;">ðŸ“¹</div>
+        <div style="flex:1;">
+          <div style="font-size:0.65rem;font-weight:900;color:#67e8f9;letter-spacing:1.2px;text-transform:uppercase;margin-bottom:4px;">ðŸ“º WEEKLY PRIZE</div>
+          <div style="font-size:1rem;font-weight:900;color:#fff;margin-bottom:4px;">Crazy XYZ Video Mein Feature Ho!</div>
+          <div style="font-size:0.75rem;color:rgba(255,255,255,0.65);margin-bottom:10px;">Top 3 weekly clash scorers get featured in the next Crazy XYZ YouTube video!</div>
+          <div style="display:flex;align-items:center;gap:6px;"><img src="zino-balloon.png" style="width:16px;" /><span style="font-size:0.8rem;font-weight:900;color:#67e8f9;">Weekly Top 3</span></div>
         </div>
       </div>
 
@@ -1421,6 +1546,114 @@
   </div>
 </div>
 
+<!-- ====== MINI GAMES SCREEN ====== -->
+<div id="screen-games" class="screen app-screen">
+  <div class="app-wrap">
+    <div class="games-header">
+      <div>
+        <div style="font-family:var(--font-display);font-size:1.6rem;color:#fff;">ðŸŽ® Mini Games</div>
+        <div style="font-size:0.75rem;color:var(--text-muted);font-weight:700;">Play &amp; earn Zino Balloons!</div>
+      </div>
+      <button class="back-btn-inner" onclick="navigateTo('home')"><i class="fa-solid fa-arrow-left"></i></button>
+    </div>
+    <div class="games-grid">
+      <div class="game-card gc-balloon" onclick="launchGame('balloon')">
+        <div class="game-card-badge">FREE</div>
+        <span class="game-card-emoji">ðŸŽˆ</span>
+        <div class="game-card-name">Balloon Pop</div>
+        <div class="game-card-reward">+5 ðŸŽˆ per round</div>
+      </div>
+      <div class="game-card gc-math" onclick="launchGame('math')">
+        <div class="game-card-badge">FREE</div>
+        <span class="game-card-emoji">ðŸ§®</span>
+        <div class="game-card-name">Crazy Maths</div>
+        <div class="game-card-reward">+8 ðŸŽˆ per round</div>
+      </div>
+      <div class="game-card gc-memory" onclick="launchGame('memory')">
+        <div class="game-card-badge">FREE</div>
+        <span class="game-card-emoji">ðŸƒ</span>
+        <div class="game-card-name">Memory Match</div>
+        <div class="game-card-reward">+6 ðŸŽˆ per round</div>
+      </div>
+      <div class="game-card gc-reflex" onclick="launchGame('reflex')">
+        <div class="game-card-badge">FREE</div>
+        <span class="game-card-emoji">âš¡</span>
+        <div class="game-card-name">Reflex Rush</div>
+        <div class="game-card-reward">+10 ðŸŽˆ per round</div>
+      </div>
+      <!-- New arcade games -->
+      <div class="game-card gc-dino" onclick="launchGame('dino')" style="background:linear-gradient(135deg,#0a1a0a,#1a3a0a);border-color:rgba(34,197,94,0.5);">
+        <div class="game-card-badge" style="background:#22c55e;">NEW</div>
+        <span class="game-card-emoji">ðŸ¦•</span>
+        <div class="game-card-name">Crazy Dino Rush</div>
+        <div class="game-card-reward">+12 ðŸŽˆ per round</div>
+      </div>
+      <div class="game-card gc-cricket" onclick="launchGame('cricket')" style="background:linear-gradient(135deg,#1a0a00,#3a1a00);border-color:rgba(255,184,0,0.5);">
+        <div class="game-card-badge" style="background:#f59e0b;">HOT</div>
+        <span class="game-card-emoji">ðŸ</span>
+        <div class="game-card-name">IPL Smash</div>
+        <div class="game-card-reward">+15 ðŸŽˆ per round</div>
+      </div>
+      <div class="game-card gc-street" onclick="launchGame('street')" style="background:linear-gradient(135deg,#001a2e,#003a5a);border-color:rgba(6,182,212,0.5);">
+        <div class="game-card-badge" style="background:#06b6d4;">NEW</div>
+        <span class="game-card-emoji">ðŸƒ</span>
+        <div class="game-card-name">Street Rush</div>
+        <div class="game-card-reward">+15 ðŸŽˆ per round</div>
+      </div>
+    </div>
+    <!-- Prizes info -->
+    <div style="margin:0 16px;">
+      <div class="section-header" style="margin-bottom:10px;">
+        <div class="section-title">ðŸ† Special Game Prizes</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#1a0028,#3d0060);border:1.5px solid rgba(236,72,153,0.4);border-radius:18px;padding:16px;margin-bottom:12px;">
+        <div style="font-size:0.7rem;font-weight:900;color:#f9a8d4;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">ðŸŒŸ Grand Prize â€” Leaderboard Top</div>
+        <div style="font-size:1rem;font-weight:900;color:#fff;margin-bottom:4px;">Amit ke Saath Studio Tour! ðŸŽ¬</div>
+        <div style="font-size:0.78rem;color:rgba(255,255,255,0.7);">Score #1 in weekly games to win a real Crazy XYZ studio visit with Amit bhai!</div>
+      </div>
+      <div style="background:linear-gradient(135deg,#001a20,#003040);border:1.5px solid rgba(96,200,255,0.3);border-radius:18px;padding:16px;margin-bottom:12px;">
+        <div style="font-size:0.7rem;font-weight:900;color:#67e8f9;letter-spacing:1px;text-transform:uppercase;margin-bottom:6px;">ðŸ“¹ Weekly Prize</div>
+        <div style="font-size:1rem;font-weight:900;color:#fff;margin-bottom:4px;">Crazy XYZ Video Mein Feature Ho! ðŸš€</div>
+        <div style="font-size:0.78rem;color:rgba(255,255,255,0.7);">Top 3 weekly scorers get featured in the next Crazy XYZ YouTube video!</div>
+      </div>
+    </div>
+    <div style="height:80px"></div>
+  </div>
+  <!-- Mini game play overlay -->
+  <div class="mini-game-overlay hidden" id="mg-overlay">
+    <div class="mg-header">
+      <button class="mg-close" onclick="closeMiniGame()"><i class="fa-solid fa-xmark"></i></button>
+      <div class="mg-title" id="mg-title">Balloon Pop</div>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <div class="mg-timer" id="mg-timer">â± 30s</div>
+        <div class="mg-score-badge" id="mg-score">Score: 0</div>
+      </div>
+    </div>
+    <div id="mg-game-area" style="width:100%;display:flex;flex-direction:column;align-items:center;justify-content:center;flex:1;"></div>
+  </div>
+</div>
+
+<!-- ====== STREAK POPUP ====== -->
+<div class="streak-popup-overlay hidden" id="streak-popup">
+  <div class="streak-popup-card">
+    <div class="streak-fire-emoji">ðŸ”¥</div>
+    <div class="streak-popup-day" id="streak-popup-day">Day 5 Streak</div>
+    <div class="streak-popup-title" id="streak-popup-title">5 Din Ka King!</div>
+    <div class="streak-popup-sub">Koi rok nahi sakta tujhe! Keep the fire alive ðŸ”¥</div>
+    <div class="streak-calendar" id="streak-calendar"></div>
+    <div class="streak-bonus-row">
+      <img src="zino-balloon.png" style="width:28px;height:28px;" />
+      <span id="streak-bonus-text">+10 Bonus Zino Balloons!</span>
+    </div>
+    <button class="streak-popup-btn" onclick="closeStreakPopup()">Let's Go! ðŸš€</button>
+  </div>
+</div>
+
+<!-- Games FAB -->
+<button class="nav-games-fab" id="games-fab" onclick="navigateTo('games')">
+  ðŸŽ®
+</button>
+
 <!-- ====== BOTTOM NAVBAR ====== -->
 <nav class="bottom-nav" id="bottom-nav">
   <button class="nav-item active-nav" id="nav-home" onclick="navigateTo('home')">
@@ -1467,5 +1700,7 @@
 </div>
 
 <script src="app.js"></script>
+<script src="arcade-games.js"></script>
 </body>
 </html>
+

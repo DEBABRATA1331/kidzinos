@@ -205,14 +205,14 @@ function handleLogin() {
       return;
     }
 
-    // Correct OTP
-    boxes.forEach(b => {
-      b.style.borderColor = 'var(--crazy-green)';
-      b.style.background = 'rgba(16,185,129,0.1)';
-    });
-    state.loggedIn = true;
-    showToast(' OTP Verified! Welcome back!');
-    setTimeout(() => navigateTo('home'), 800);
+    setTimeout(() => {
+      state.loggedIn = true;
+      showToast('✅ OTP Verified! Welcome back!');
+      setTimeout(() => {
+        navigateTo('home');
+        setTimeout(() => showStreakPopup(), 1500);
+      }, 800);
+    }, 0);
     return;
   }
 
@@ -517,30 +517,67 @@ function showFloatingText(el, text) {
 }
 
 function endQuiz() {
-  const { score, correct, questions } = state.quiz;
+  const { score, correct, questions, mode, streak } = state.quiz;
   const earned = score;
-
-  // Add coins
   state.user.zinoCoins += earned;
+  state.user.csiScore += Math.floor(earned * 0.5);
   updateAllZinos();
 
-  // Calculate rank (mock)
-  const rankPct = Math.max(1, Math.floor(Math.random() * 30) + 1);
-
-  // Set result screen
-  const resultIcons = { 10: '', 8: '', 6: 'S', 4: 'a', 0: '"' };
+  const rankPct = Math.max(1, Math.floor(Math.random() * 25) + 1);
+  const participants = Math.floor(Math.random() * 8000) + 8000;
   const correctCount = correct;
-  const icon = correctCount >= 9 ? '' : correctCount >= 7 ? '' : correctCount >= 5 ? 'S' : '"';
+  const icon = correctCount >= 9 ? '🏆' : correctCount >= 7 ? '🔥' : correctCount >= 5 ? '💪' : '😅';
   const title = correctCount >= 9 ? 'You Crushed It!' : correctCount >= 7 ? 'Great Job!' : correctCount >= 5 ? 'Keep Going!' : 'Try Again!';
+
+  const dailyBanners = [
+    '"Amit ke saath judega toh aasman chhuyega!" 🚀',
+    '"Har sawaal ek step hai — top tak pahunchega tu!" ⚡',
+    '"Crazy XYZ ka fan hai? Toh topper bhi ban!" 🔥',
+  ];
+  const weeklyBanners = [
+    '"Main tumme ek future star dekhta hoon!" ⭐',
+    '"Ye results sirf start hain — asli game abhi baaki hai!" 🎯',
+    '"Weekly top mein aao — Crazy XYZ video mein feature ho!" 📹',
+  ];
+  const banners = (mode === 'daily') ? dailyBanners : weeklyBanners;
+  const banner = banners[Math.floor(Math.random() * banners.length)];
 
   document.getElementById('result-icon').textContent = icon;
   document.getElementById('result-title').textContent = title;
+  const hinglishEl = document.getElementById('result-hinglish-text');
+  if (hinglishEl) hinglishEl.textContent = banner;
   document.getElementById('result-coins-won').textContent = `+${earned}`;
+  const totalEl = document.getElementById('result-total-zinos');
+  if (totalEl) totalEl.textContent = `Total: ${state.user.zinoCoins} 🎈`;
+  const pctEl = document.getElementById('result-percentile');
+  if (pctEl) pctEl.textContent = `Top ${rankPct}%`;
+  const rankEl = document.getElementById('result-rank');
+  if (rankEl) rankEl.textContent = `Top ${rankPct}%`;
+  const partEl = document.getElementById('result-participants');
+  if (partEl) partEl.textContent = `Out of ${participants.toLocaleString()} participants today`;
   document.getElementById('result-score').textContent = score;
-  document.getElementById('result-rank').textContent = `Top ${rankPct}%`;
   document.getElementById('result-correct').textContent = `${correct}/${questions.length}`;
+  const strkEl = document.getElementById('result-streak-show');
+  if (strkEl) strkEl.textContent = `🔥${state.quiz.streak}`;
+
+  // XP/Level
+  const xp = state.user.csiScore;
+  const levels = [0,500,1200,2200,3500,5200,7200,9500,12500,16000,20000];
+  let lvl = 1;
+  for (let i = 0; i < levels.length; i++) { if (xp >= levels[i]) lvl = i + 1; }
+  const levelNames = ['Rookie','Newcomer','Challenger','Fighter','Warrior','Beast','Legend','Crazy Star','Unstoppable','GOD MODE'];
+  const lvlName = levelNames[Math.min(lvl - 1, levelNames.length - 1)];
+  const nextXP = levels[Math.min(lvl, levels.length - 1)] || xp + 5000;
+  const prevXP = levels[lvl - 1] || 0;
+  const xpPct = Math.min(100, Math.round(((xp - prevXP) / (nextXP - prevXP)) * 100));
+  const xpLvlEl = document.getElementById('result-xp-level');
+  const xpValEl = document.getElementById('result-xp-val');
+  if (xpLvlEl) xpLvlEl.textContent = `Lv.${lvl} ${lvlName}`;
+  if (xpValEl) xpValEl.textContent = `${xp.toLocaleString()} / ${nextXP.toLocaleString()} XP`;
+  setTimeout(() => { const f = document.getElementById('result-xp-fill'); if (f) f.style.width = xpPct + '%'; }, 300);
 
   state.user.challengeAttempts++;
+  completeMission(0);
   navigateTo('result');
 }
 
@@ -872,6 +909,8 @@ document.addEventListener('DOMContentLoaded', () => {
   setTimeout(() => {
     navigateTo('login');
     setupBannerSwipe();
+    initMissionsTimer();
+    setTimeout(() => showStreakPopup(), 1000);
   }, 2800);
 
   // Demo: auto-login after splash for testing
@@ -898,3 +937,344 @@ document.addEventListener('touchmove', function (e) {
   const target = e.target.closest('.home-scroll, .quiz-body, .reg-bg, .onboard-bg');
   if (!target) e.preventDefault();
 }, { passive: false });
+
+// ===== STREAK SYSTEM =====
+function showStreakPopup() {
+  if (!state.loggedIn) return;
+  const s = state.user.streak || 5;
+  const el = document.getElementById('streak-popup');
+  if (!el) return;
+  document.getElementById('streak-popup-day').textContent = `Day ${s} Streak`;
+  const titles = ['Pehla Kadam!','Aur Aage Badh!','Teen Din Ka Toofan!','Char Din Ka Cheetah!','5 Din Ka King!','6 Din Ka Legend!','7 Din Ka God!'];
+  document.getElementById('streak-popup-title').textContent = titles[Math.min(s-1, titles.length-1)];
+  const bonus = s >= 7 ? 25 : s >= 5 ? 15 : s >= 3 ? 10 : 5;
+  document.getElementById('streak-bonus-text').textContent = `+${bonus} Bonus Zino Balloons!`;
+  const cal = document.getElementById('streak-calendar');
+  if (cal) {
+    cal.innerHTML = '';
+    for (let i = 1; i <= 7; i++) {
+      const d = document.createElement('div');
+      d.className = 'sc-day' + (i < s ? ' done' : i === s ? ' today' : '');
+      d.textContent = i <= s ? '🔥' : i;
+      cal.appendChild(d);
+    }
+  }
+  el.classList.remove('hidden');
+}
+function closeStreakPopup() {
+  const el = document.getElementById('streak-popup');
+  if (el) el.classList.add('hidden');
+  const bonus = state.user.streak >= 7 ? 25 : state.user.streak >= 5 ? 15 : state.user.streak >= 3 ? 10 : 5;
+  state.user.zinoCoins += bonus;
+  updateAllZinos();
+  showToast(`🔥 +${bonus} Streak Bonus Balloons!`);
+  updateHomeStreakStrip();
+}
+function updateHomeStreakStrip() {
+  const s = state.user.streak || 5;
+  const el = document.getElementById('hss-title');
+  const titles = ['Pehla Kadam! 🌱','Aur Aage Badh! ⚡','Teen Din Ka Toofan! 🌪️','Char Din Ka Cheetah! 🐆','5 Din Ka King! 👑','6 Din Ka Legend! 🔥','7 Din Ka God! 🏆'];
+  if (el) el.textContent = titles[Math.min(s-1, titles.length-1)];
+  const lbl = document.getElementById('home-streak-label');
+  if (lbl) lbl.textContent = `🔥 ${s} Day Streak!`;
+  const dots = document.getElementById('hss-dots');
+  if (dots) {
+    dots.innerHTML = '';
+    for (let i = 1; i <= 7; i++) {
+      const d = document.createElement('div');
+      d.className = 'hss-dot' + (i <= s ? ' active' : '');
+      d.textContent = i <= s ? '🔥' : i;
+      dots.appendChild(d);
+    }
+  }
+}
+
+// ===== MISSIONS SYSTEM =====
+const missions = [
+  { target: 1, progress: 0, done: false },
+  { target: 2, progress: 0, done: false },
+  { target: 1, progress: 0, done: false },
+];
+function completeMission(idx) {
+  if (missions[idx].done) return;
+  missions[idx].progress = Math.min(missions[idx].target, missions[idx].progress + 1);
+  const pct = (missions[idx].progress / missions[idx].target) * 100;
+  const barEl = document.getElementById(`mbar-${idx}`);
+  const metaEl = document.getElementById(`mmeta-${idx}`);
+  const checkEl = document.getElementById(`mcheck-${idx}`);
+  const cardEl = document.getElementById(`mission-${idx}`);
+  if (barEl) barEl.style.width = pct + '%';
+  if (missions[idx].progress >= missions[idx].target) {
+    missions[idx].done = true;
+    if (checkEl) checkEl.classList.remove('hidden');
+    if (cardEl) cardEl.classList.add('mission-done');
+    const rewards = [15, 10, 10];
+    state.user.zinoCoins += rewards[idx];
+    updateAllZinos();
+    showToast(`✅ Mission done! +${rewards[idx]} Zino Balloons!`);
+    if (metaEl) metaEl.textContent = '✅ Completed!';
+    checkAllMissions();
+  } else {
+    const labels = ['/ 1 done','/ 2 watched','/ 1 played'];
+    if (metaEl) metaEl.textContent = `${missions[idx].progress} ${labels[idx]}`;
+    if (barEl) barEl.style.width = pct + '%';
+  }
+}
+function checkAllMissions() {
+  if (missions.every(m => m.done)) {
+    const combo = document.getElementById('combo-banner');
+    if (combo) combo.classList.remove('hidden');
+    state.user.zinoCoins += 25;
+    updateAllZinos();
+    showToast('⚡ DAILY CRAZY COMBO! +25 Bonus Balloons!');
+  }
+}
+function initMissionsTimer() {
+  function updateTimer() {
+    const now = new Date();
+    const midnight = new Date();
+    midnight.setHours(24, 0, 0, 0);
+    const diff = midnight - now;
+    const h = Math.floor(diff / 3600000);
+    const m = Math.floor((diff % 3600000) / 60000);
+    const el = document.getElementById('missions-timer');
+    if (el) el.textContent = `Resets in ${h}h ${m}m`;
+  }
+  updateTimer();
+  setInterval(updateTimer, 60000);
+}
+
+// ===== MINI GAMES =====
+let mgState = { type: '', score: 0, timer: null, timeLeft: 30, running: false };
+
+function launchGame(type) {
+  const overlay = document.getElementById('mg-overlay');
+  const gameArea = document.getElementById('mg-game-area');
+  if (!overlay || !gameArea) return;
+  mgState = { type, score: 0, timer: null, timeLeft: 30, running: true };
+  overlay.classList.remove('hidden');
+  document.getElementById('mg-score').textContent = 'Score: 0';
+  document.getElementById('mg-timer').textContent = '⏱ 30s';
+  const titles = { balloon: '🎈 Balloon Pop', math: '🧮 Crazy Maths', memory: '🃏 Memory Match', reflex: '⚡ Reflex Rush' };
+  document.getElementById('mg-title').textContent = titles[type] || 'Mini Game';
+  if (type === 'balloon') buildBalloonGame(gameArea);
+  else if (type === 'math') buildMathGame(gameArea);
+  else if (type === 'memory') buildMemoryGame(gameArea);
+  else if (type === 'reflex') buildReflexGame(gameArea);
+  startMgTimer();
+}
+function closeMiniGame() {
+  clearInterval(mgState.timer);
+  mgState.running = false;
+  const overlay = document.getElementById('mg-overlay');
+  if (overlay) overlay.classList.add('hidden');
+}
+function startMgTimer() {
+  clearInterval(mgState.timer);
+  mgState.timer = setInterval(() => {
+    mgState.timeLeft--;
+    const el = document.getElementById('mg-timer');
+    if (el) el.textContent = `⏱ ${mgState.timeLeft}s`;
+    if (el && mgState.timeLeft <= 10) el.style.color = 'var(--brand-red)';
+    if (mgState.timeLeft <= 0) { clearInterval(mgState.timer); endMiniGame(); }
+  }, 1000);
+}
+function addMgScore(pts) {
+  mgState.score += pts;
+  const el = document.getElementById('mg-score');
+  if (el) el.textContent = `Score: ${mgState.score}`;
+  showFloatingText(null, `+${pts}`);
+}
+function endMiniGame() {
+  mgState.running = false;
+  const rewards = { balloon: 5, math: 8, memory: 6, reflex: 10 };
+  const earned = rewards[mgState.type] || 5;
+  state.user.zinoCoins += earned;
+  updateAllZinos();
+  completeMission(2);
+  const gameArea = document.getElementById('mg-game-area');
+  if (!gameArea) return;
+  gameArea.innerHTML = `
+    <div class="game-result-popup">
+      <div class="grp-emoji">🎉</div>
+      <div class="grp-title">Game Over!</div>
+      <div class="grp-score">Score: ${mgState.score} points</div>
+      <div class="grp-reward"><img src="zino-balloon.png" style="width:24px;" /> +${earned} Zino Balloons Earned!</div>
+      <button class="grp-btn" onclick="closeMiniGame()">Back to Games 🎮</button>
+    </div>`;
+}
+
+// BALLOON POP
+function buildBalloonGame(area) {
+  const emojis = ['🎈','🎈','🎈','🎈','💣','💣','🎈','🎈','🎈','🎈','💣','🎈','🎈','💣','🎈','🎈'];
+  area.innerHTML = '<div class="balloon-grid" id="bgrid"></div><div style="margin-top:16px;font-size:0.85rem;color:var(--text-muted);font-weight:700;">Tap 🎈 to pop! Avoid 💣</div>';
+  const grid = document.getElementById('bgrid');
+  const shuffled = [...emojis].sort(() => Math.random() - 0.5);
+  shuffled.forEach((e, i) => {
+    const cell = document.createElement('div');
+    cell.className = 'balloon-cell';
+    cell.textContent = e;
+    cell.onclick = () => {
+      if (!mgState.running || cell.classList.contains('popped') || cell.classList.contains('wrong')) return;
+      if (e === '🎈') { cell.classList.add('popped'); cell.textContent = '✅'; addMgScore(10); }
+      else { cell.classList.add('wrong'); cell.textContent = '💥'; addMgScore(-5); }
+    };
+    grid.appendChild(cell);
+  });
+}
+
+// CRAZY MATH
+let mathQ = {};
+function buildMathGame(area) {
+  area.innerHTML = '<div id="math-q" class="math-question"></div><div class="math-options" id="math-opts"></div>';
+  nextMathQ();
+}
+function nextMathQ() {
+  if (!mgState.running) return;
+  const ops = ['+','-','×'];
+  const op = ops[Math.floor(Math.random() * ops.length)];
+  let a = Math.floor(Math.random() * 15) + 1;
+  let b = Math.floor(Math.random() * 10) + 1;
+  let ans = op === '+' ? a+b : op === '-' ? a-b : a*b;
+  mathQ = { question: `${a} ${op} ${b} = ?`, answer: ans };
+  const wrong1 = ans + (Math.random() > 0.5 ? 1 : -1) * (Math.floor(Math.random()*5)+1);
+  const wrong2 = ans + (Math.random() > 0.5 ? 2 : -2) * (Math.floor(Math.random()*4)+1);
+  const wrong3 = ans * (Math.random() > 0.5 ? 2 : -1);
+  let opts = [ans, wrong1, wrong2, wrong3].sort(() => Math.random() - 0.5);
+  const qEl = document.getElementById('math-q');
+  const optsEl = document.getElementById('math-opts');
+  if (!qEl || !optsEl) return;
+  qEl.textContent = mathQ.question;
+  optsEl.innerHTML = '';
+  opts.forEach(o => {
+    const btn = document.createElement('button');
+    btn.className = 'math-opt-btn';
+    btn.textContent = o;
+    btn.onclick = () => {
+      if (!mgState.running) return;
+      const allBtns = optsEl.querySelectorAll('.math-opt-btn');
+      allBtns.forEach(b => b.style.pointerEvents = 'none');
+      if (o === mathQ.answer) { btn.classList.add('math-opt-correct'); addMgScore(15); }
+      else { btn.classList.add('math-opt-wrong'); addMgScore(-5); }
+      setTimeout(nextMathQ, 800);
+    };
+    optsEl.appendChild(btn);
+  });
+}
+
+// MEMORY MATCH
+let memFlipped = [], memMatched = 0;
+function buildMemoryGame(area) {
+  const symbols = ['🎈','⚡','🔥','🎯','🏆','🎮','💎','🌟'];
+  const cards = [...symbols, ...symbols].sort(() => Math.random() - 0.5);
+  memFlipped = []; memMatched = 0;
+  area.innerHTML = '<div class="memory-grid" id="memgrid"></div><div style="margin-top:12px;font-size:0.82rem;color:var(--text-muted);font-weight:700;">Match the pairs! 🃏</div>';
+  const grid = document.getElementById('memgrid');
+  cards.forEach((sym, i) => {
+    const card = document.createElement('div');
+    card.className = 'mem-card';
+    card.dataset.sym = sym;
+    card.dataset.idx = i;
+    card.textContent = '❓';
+    card.onclick = () => flipMemCard(card, sym, i);
+    grid.appendChild(card);
+  });
+}
+function flipMemCard(card, sym, idx) {
+  if (!mgState.running) return;
+  if (card.classList.contains('flipped') || card.classList.contains('matched')) return;
+  if (memFlipped.length >= 2) return;
+  card.classList.add('flipped');
+  card.textContent = sym;
+  memFlipped.push({ card, sym, idx });
+  if (memFlipped.length === 2) {
+    if (memFlipped[0].sym === memFlipped[1].sym) {
+      memFlipped.forEach(f => { f.card.classList.add('matched'); f.card.classList.remove('flipped'); });
+      memMatched++;
+      addMgScore(20);
+      memFlipped = [];
+      if (memMatched >= 8) { clearInterval(mgState.timer); endMiniGame(); }
+    } else {
+      setTimeout(() => {
+        memFlipped.forEach(f => { f.card.classList.remove('flipped'); f.card.textContent = '❓'; });
+        memFlipped = [];
+      }, 700);
+    }
+  }
+}
+
+// REFLEX RUSH
+let reflexCount = 0, reflexTarget = null;
+const reflexEmojis = ['🎈','⚡','🔥','🎯','🌟','💎','🎮'];
+function buildReflexGame(area) {
+  reflexCount = 0;
+  area.innerHTML = `
+    <div style="font-size:0.82rem;color:var(--text-muted);font-weight:700;margin-bottom:8px;">Tap the glowing circle as fast as you can!</div>
+    <div class="reflex-area" id="reflex-btn" onclick="reflexTap()">
+      <div class="reflex-ring"></div>
+      <div class="reflex-inner" id="reflex-inner">
+        <div class="reflex-emoji" id="reflex-emoji">⚡</div>
+        <div>TAP!</div>
+      </div>
+    </div>
+    <div style="font-size:0.85rem;font-weight:900;color:var(--crazy-yellow);margin-top:8px;">Taps: <span id="reflex-count">0</span></div>`;
+  const btn = document.getElementById('reflex-btn');
+  if (btn) btn.style.background = 'rgba(255,107,0,0.15)';
+  nextReflex();
+}
+function nextReflex() {
+  const inner = document.getElementById('reflex-inner');
+  const emojiEl = document.getElementById('reflex-emoji');
+  const btn = document.getElementById('reflex-btn');
+  if (!inner || !emojiEl) return;
+  const colors = ['rgba(255,107,0,0.2)','rgba(124,58,237,0.2)','rgba(34,197,94,0.2)','rgba(96,200,255,0.2)'];
+  if (btn) btn.style.background = colors[Math.floor(Math.random() * colors.length)];
+  emojiEl.textContent = reflexEmojis[Math.floor(Math.random() * reflexEmojis.length)];
+}
+function reflexTap() {
+  if (!mgState.running) return;
+  reflexCount++;
+  addMgScore(5);
+  const c = document.getElementById('reflex-count');
+  if (c) c.textContent = reflexCount;
+  nextReflex();
+}
+
+// Show Games FAB on home/play screens
+const _origNavigateTo = navigateTo;
+
+// FAB visibility based on screen
+const origOnScreenEnter = onScreenEnter;
+function onScreenEnter(screenId) {
+  origOnScreenEnter(screenId);
+  const fab = document.getElementById('games-fab');
+  const showFabOn = ['home','play','store','profile','csi'];
+  if (fab) {
+    if (showFabOn.includes(screenId)) fab.classList.add('show');
+    else fab.classList.remove('show');
+  }
+  if (screenId === 'home') {
+    updateHomeStreakStrip();
+  }
+}
+
+// Hook watch videos to mission 1 (watch 2 videos)
+let videosWatchedCount = 0;
+const _origToggleReelPlay = toggleReelPlay;
+function toggleReelPlay(id) {
+  _origToggleReelPlay(id);
+  if (reelState[id] && reelState[id].playing) {
+    // count watch start towards mission
+  }
+}
+
+// Override reelState earned to also track mission
+const _origUpdateZinos = updateAllZinos;
+function updateAllZinos() {
+  _origUpdateZinos();
+  // track watch mission
+  if (state.currentScreen === 'watch') {
+    videosWatchedCount++;
+    if (videosWatchedCount <= 2) completeMission(1);
+  }
+}
