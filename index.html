@@ -149,6 +149,33 @@
       </div>
     </div>
 
+    <!-- ====== ZINO LOOP WIDGET ====== -->
+    <div id="zino-loop-widget" class="zl-widget">
+      <!-- Streak + Balloon bar -->
+      <div class="zl-stats-bar">
+        <div class="zl-streak-pill">
+          <span class="zl-fire">🔥</span>
+          <span id="zl-streak-count">0</span>
+          <span class="zl-streak-label">Day Streak</span>
+        </div>
+        <div class="zl-balloon-pill">
+          <img src="zino-balloon.png" alt="🎈" class="zl-balloon-icon" />
+          <span id="zl-balloon-count">0</span>
+        </div>
+      </div>
+      <!-- CTA -->
+      <button id="zl-cta-btn" class="zl-cta" onclick="openLoopBuilder()">
+        <span>Aaj ka Scene Set Karein 🎮</span>
+        <span class="zl-cta-arrow">→</span>
+      </button>
+      <!-- Today's activity scroll (shown when tasks exist) -->
+      <div id="zl-activity-scroll" class="zl-activity-scroll hidden">
+        <!-- Populated by JS -->
+      </div>
+      <!-- Empty hint (shown when no tasks) -->
+      <div id="zl-empty-hint" class="zl-empty-hint">Aaj kya scene hai? Level bana le 🔥</div>
+    </div>
+
     <!-- Quick Actions Row -->
     <div class="quick-actions">
       <button class="quick-btn play-btn" onclick="navigateTo('play')">
@@ -1695,6 +1722,79 @@
     <div class="modal-actions">
       <button class="modal-cancel" onclick="closeModal()">Cancel</button>
       <button class="modal-confirm" id="modal-confirm-btn" onclick="confirmRequest()">Confirm Request</button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== ZINO LOOP BOTTOM SHEET ====== -->
+<div id="zl-backdrop" class="zl-backdrop hidden" onclick="closeLoopBuilder()"></div>
+<div id="zl-sheet" class="zl-sheet hidden" role="dialog" aria-modal="true">
+  <div class="zl-sheet-handle"></div>
+  <div class="zl-sheet-header">
+    <div class="zl-sheet-title">🧩 Aaj ka Level</div>
+    <div class="zl-sheet-subtitle" id="zl-activity-count-label">0 activities planned</div>
+  </div>
+
+  <!-- Draggable activity list -->
+  <div id="zl-activity-list" class="zl-activity-list">
+    <!-- JS renders draggable cards here -->
+  </div>
+
+  <!-- Separator -->
+  <div class="zl-divider">
+    <span>+ Add Activity</span>
+  </div>
+
+  <!-- Predefined picker grid -->
+  <div id="zl-predefined-grid" class="zl-predefined-grid">
+    <!-- JS renders pills here -->
+  </div>
+
+  <!-- Custom activity input -->
+  <div class="zl-custom-row">
+    <input id="zl-custom-input" class="zl-custom-input" placeholder="🖊️ Custom activity naam likho..." maxlength="30" />
+    <button class="zl-custom-add-btn" onclick="addCustomActivity()" id="zl-custom-add-btn">Add</button>
+  </div>
+
+  <!-- Save button -->
+  <button id="zl-save-btn" class="zl-save-btn" onclick="saveLoopPlan()">
+    <i class="fa-solid fa-check"></i> Save & Go 🚀
+  </button>
+</div>
+
+<!-- ====== ZINO LOOP SHARE CARD MODAL ====== -->
+<div id="zl-share-modal" class="zl-share-modal hidden">
+  <div class="zl-share-backdrop" onclick="closeShareCard()"></div>
+  <div class="zl-share-wrapper">
+    <div class="zl-share-card-box">
+      <div class="zl-sc-badge">🔥 ZINO LOOP</div>
+      <div class="zl-sc-streak-row">
+        <div class="zl-sc-fire">🔥</div>
+        <div>
+          <div class="zl-sc-streak-num" id="zl-sc-streak"></div>
+          <div class="zl-sc-streak-lbl">Day Streak</div>
+        </div>
+      </div>
+      <div class="zl-sc-stats-row">
+        <div class="zl-sc-stat">
+          <img src="zino-balloon.png" class="zl-sc-balloon" />
+          <div class="zl-sc-stat-val" id="zl-sc-balloons"></div>
+          <div class="zl-sc-stat-lbl">Balloons</div>
+        </div>
+        <div class="zl-sc-stat-div"></div>
+        <div class="zl-sc-stat">
+          <div class="zl-sc-stat-emoji" id="zl-sc-level-emoji">⚡</div>
+          <div class="zl-sc-stat-val" id="zl-sc-level"></div>
+          <div class="zl-sc-stat-lbl">Level</div>
+        </div>
+      </div>
+      <div class="zl-sc-label" id="zl-sc-label">Consistent Player</div>
+      <div class="zl-sc-brand">Kidzinos × Crazy XYZ</div>
+    </div>
+    <div class="zl-share-actions">
+      <button class="zl-share-btn-dl" onclick="downloadShareCard()">💾 Save Card</button>
+      <button class="zl-share-btn-sh" onclick="shareZinoCard()">📤 Share</button>
+      <button class="zl-share-btn-close" onclick="closeShareCard()">✕</button>
     </div>
   </div>
 </div>

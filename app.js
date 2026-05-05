@@ -855,6 +855,11 @@ function challengeFriend() {
 function updateAllZinos() {
   const zinoEls = document.querySelectorAll('#zino-count, #play-zino, #store-zino, .profile-zino-count');
   zinoEls.forEach(el => el && (el.textContent = state.user.zinoCoins));
+  // Also sync Zino Loop widget
+  const zlBall = document.getElementById('zl-balloon-count');
+  if (zlBall) zlBall.textContent = state.user.zinoCoins;
+  const zlStreak = document.getElementById('zl-streak-count');
+  if (zlStreak) zlStreak.textContent = state.user.streak || 0;
 }
 
 function showToast(msg) {
@@ -1276,5 +1281,503 @@ function updateAllZinos() {
   if (state.currentScreen === 'watch') {
     videosWatchedCount++;
     if (videosWatchedCount <= 2) completeMission(1);
+  }
+}
+
+/* ========================================
+   ZINO LOOP — HOME ROUTINE LAYER
+   Daily gamified routine builder
+======================================== */
+
+// ── Activity Master List ──
+const activityMaster = [
+  { id: 'school',   icon: '🎒', name: 'School'     },
+  { id: 'homework', icon: '📚', name: 'Homework'   },
+  { id: 'study',    icon: '📖', name: 'Study'      },
+  { id: 'exercise', icon: '🏃', name: 'Exercise'   },
+  { id: 'reading',  icon: '📕', name: 'Reading'    },
+  { id: 'gaming',   icon: '🎮', name: 'Gaming'     },
+  { id: 'art',      icon: '🎨', name: 'Art'        },
+  { id: 'music',    icon: '🎵', name: 'Music'      },
+  { id: 'cricket',  icon: '🏏', name: 'Cricket'    },
+  { id: 'cooking',  icon: '🍳', name: 'Cooking'    },
+  { id: 'friends',  icon: '👫', name: 'Hangout'    },
+  { id: 'youtube',  icon: '📺', name: 'YouTube'    },
+  { id: 'sleep',    icon: '😴', name: 'Sleep'      },
+  { id: 'prayer',   icon: '🙏', name: 'Prayer'     },
+];
+
+// ── Zino Loop State (extends main state) ──
+state.zinoLoop = {
+  dailyPlan: {           // today's plan keyed by date
+    date: '',
+    activities: [],      // { id, icon, name, completed, order, isCustom }
+  },
+};
+
+// ── localStorage helpers ──
+const ZL_KEY = 'kidzinos_zl_v1';
+
+function zlSave() {
+  try {
+    const payload = {
+      streak: state.user.streak,
+      zinoCoins: state.user.zinoCoins,
+      lastActiveDate: state.user.lastActiveDate || '',
+      dailyPlan: state.zinoLoop.dailyPlan,
+    };
+    localStorage.setItem(ZL_KEY, JSON.stringify(payload));
+  } catch(e) {}
+}
+
+function zlLoad() {
+  try {
+    const raw = localStorage.getItem(ZL_KEY);
+    if (!raw) return;
+    const d = JSON.parse(raw);
+    if (d.streak !== undefined) state.user.streak = d.streak;
+    if (d.zinoCoins !== undefined) state.user.zinoCoins = d.zinoCoins;
+    if (d.lastActiveDate) state.user.lastActiveDate = d.lastActiveDate;
+    if (d.dailyPlan) state.zinoLoop.dailyPlan = d.dailyPlan;
+  } catch(e) {}
+}
+
+// ── Date helper ──
+function zlTodayStr() {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
+}
+
+// ── INIT ── called every time home screen is entered ──
+function initZinoLoop() {
+  zlLoad();
+  const today = zlTodayStr();
+  const plan = state.zinoLoop.dailyPlan;
+
+  if (plan.date !== today) {
+    // Date has rolled over — handle streak
+    const yesterday = (() => {
+      const d = new Date(); d.setDate(d.getDate()-1);
+      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    })();
+    const lastActive = state.user.lastActiveDate || '';
+
+    if (lastActive === yesterday) {
+      // User was active yesterday — check if they completed ≥1 task
+      const prevCompleted = plan.activities.filter(a => a.completed).length;
+      if (prevCompleted >= 1) {
+        state.user.streak = (state.user.streak || 0) + 1;
+        checkStreakMilestone();
+      }
+      // else: soft reset (no punishment — PRD says warning not punishment)
+    } else if (lastActive && lastActive !== yesterday && lastActive !== today) {
+      // Missed a day
+      showToast('🔥 Streak paused! Aaj ek bhi complete kar — wapas aa jao!');
+    }
+
+    // New day — fresh plan
+    state.zinoLoop.dailyPlan = { date: today, activities: [] };
+    state.user.lastActiveDate = today;
+    zlSave();
+  }
+
+  zlRenderWidget();
+  updateAllZinos();
+}
+
+// ── Check streak milestones ──
+function checkStreakMilestone() {
+  const s = state.user.streak;
+  const milestones = [3, 7, 14, 30];
+  if (milestones.includes(s)) {
+    state.user.zinoCoins += 20;
+    updateAllZinos();
+    zlSave();
+    showToast(`🔥 ${s} Day Streak! +20 Bonus Balloons! OP consistency 😎`);
+  }
+}
+
+// ── Render the home widget ──
+function zlRenderWidget() {
+  // Streak
+  const streakEl = document.getElementById('zl-streak-count');
+  if (streakEl) streakEl.textContent = state.user.streak || 0;
+  // Balloons
+  const ballEl = document.getElementById('zl-balloon-count');
+  if (ballEl) ballEl.textContent = state.user.zinoCoins || 0;
+
+  const activities = state.zinoLoop.dailyPlan.activities;
+  const scroll = document.getElementById('zl-activity-scroll');
+  const hint = document.getElementById('zl-empty-hint');
+
+  if (activities.length === 0) {
+    scroll && scroll.classList.add('hidden');
+    hint && hint.classList.remove('hidden');
+    return;
+  }
+
+  hint && hint.classList.add('hidden');
+  scroll && scroll.classList.remove('hidden');
+
+  // Render mini home cards
+  scroll.innerHTML = '';
+  activities.forEach(act => {
+    const card = document.createElement('div');
+    card.className = 'zl-home-card' + (act.completed ? ' done' : '');
+    card.id = `zl-home-card-${act.id}`;
+    card.innerHTML = `
+      <div class="zl-hc-icon">${act.icon}</div>
+      <div class="zl-hc-name">${act.name}</div>
+    `;
+    card.onclick = () => zlToggleComplete(act.id, card);
+    scroll.appendChild(card);
+  });
+
+  // Progress bar
+  zlRenderProgressBar();
+}
+
+// ── Progress bar in widget ──
+function zlRenderProgressBar() {
+  const acts = state.zinoLoop.dailyPlan.activities;
+  if (!acts.length) return;
+  let row = document.getElementById('zl-progress-row');
+  if (!row) {
+    row = document.createElement('div');
+    row.id = 'zl-progress-row';
+    row.className = 'zl-progress-row';
+    row.innerHTML = `
+      <div class="zl-progress-bar"><div class="zl-progress-fill" id="zl-progress-fill" style="width:0%"></div></div>
+      <div class="zl-progress-label" id="zl-progress-label">0/${acts.length}</div>
+    `;
+    document.getElementById('zino-loop-widget').appendChild(row);
+  }
+  const done = acts.filter(a => a.completed).length;
+  const pct = Math.round((done / acts.length) * 100);
+  const fill = document.getElementById('zl-progress-fill');
+  const lbl = document.getElementById('zl-progress-label');
+  if (fill) fill.style.width = pct + '%';
+  if (lbl) lbl.textContent = `${done}/${acts.length}`;
+}
+
+// ── Tap to toggle complete (home card) ──
+function zlToggleComplete(actId, cardEl) {
+  const acts = state.zinoLoop.dailyPlan.activities;
+  const act = acts.find(a => a.id === actId);
+  if (!act) return;
+
+  if (act.completed) return; // Already done — no undo
+
+  act.completed = true;
+  cardEl.classList.add('done');
+
+  // +5 Balloons
+  state.user.zinoCoins += 5;
+  updateAllZinos();
+  zlSave();
+
+  // Coin burst animation
+  const burst = document.createElement('div');
+  burst.className = 'zl-coin-burst';
+  burst.textContent = '+5 🎈';
+  cardEl.appendChild(burst);
+  setTimeout(() => burst.remove(), 750);
+
+  // Update progress
+  zlRenderProgressBar();
+
+  // Check if all done
+  const allDone = acts.every(a => a.completed);
+  if (allDone) {
+    setTimeout(() => {
+      state.user.zinoCoins += 10;
+      updateAllZinos();
+      zlSave();
+      state.user.lastActiveDate = zlTodayStr();
+      showToast('⚡ SABHI done! +10 Bonus Balloons! OP consistency 😎');
+      setTimeout(() => showShareCard(), 1400);
+    }, 600);
+  } else {
+    showToast('✅ +5 Zino Balloons! Level bana le 🔥');
+  }
+}
+
+// ── OPEN BOTTOM SHEET ──
+function openLoopBuilder() {
+  const backdrop = document.getElementById('zl-backdrop');
+  const sheet = document.getElementById('zl-sheet');
+  backdrop.classList.remove('hidden');
+  sheet.classList.remove('hidden');
+  zlRenderSheet();
+  // Prevent body scroll
+  document.body.style.overflow = 'hidden';
+}
+
+// ── CLOSE BOTTOM SHEET ──
+function closeLoopBuilder() {
+  const backdrop = document.getElementById('zl-backdrop');
+  const sheet = document.getElementById('zl-sheet');
+  backdrop.classList.add('hidden');
+  sheet.classList.add('hidden');
+  document.body.style.overflow = '';
+}
+
+// ── Render sheet contents ──
+function zlRenderSheet() {
+  zlRenderSheetList();
+  zlRenderPredefinedGrid();
+  zlUpdateCountLabel();
+}
+
+function zlUpdateCountLabel() {
+  const count = state.zinoLoop.dailyPlan.activities.length;
+  const el = document.getElementById('zl-activity-count-label');
+  if (el) {
+    if (count === 0) el.textContent = 'Koi nahi abhi — add kar!';
+    else el.textContent = `${count} activit${count === 1 ? 'y' : 'ies'} planned`;
+  }
+}
+
+// ── Render draggable activity list inside sheet ──
+function zlRenderSheetList() {
+  const list = document.getElementById('zl-activity-list');
+  if (!list) return;
+  const acts = state.zinoLoop.dailyPlan.activities;
+  list.innerHTML = '';
+
+  if (acts.length === 0) {
+    list.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.3);font-size:0.85rem;font-weight:700;padding:12px 0;">Bas itna? Aur add kare? 😏</div>`;
+    return;
+  }
+
+  acts.forEach((act, idx) => {
+    const item = document.createElement('div');
+    item.className = 'zl-list-item';
+    item.dataset.id = act.id;
+    item.draggable = true;
+    item.innerHTML = `
+      <span class="zl-item-icon">${act.icon}</span>
+      <span class="zl-item-name">${act.name}</span>
+      <span class="zl-item-drag"><i class="fa-solid fa-grip-lines"></i></span>
+      <button class="zl-item-remove" onclick="zlRemoveActivity('${act.id}')" title="Remove">
+        <i class="fa-solid fa-xmark"></i>
+      </button>
+    `;
+    // Drag events
+    item.addEventListener('dragstart', zlDragStart);
+    item.addEventListener('dragover', zlDragOver);
+    item.addEventListener('drop', zlDrop);
+    item.addEventListener('dragend', zlDragEnd);
+    // Touch drag (mobile)
+    item.addEventListener('touchstart', zlTouchStart, { passive: true });
+    item.addEventListener('touchmove', zlTouchMove, { passive: false });
+    item.addEventListener('touchend', zlTouchEnd, { passive: true });
+    list.appendChild(item);
+  });
+}
+
+// ── Drag-and-drop reorder ──
+let zlDragIdx = null;
+let zlDragEl = null;
+let zlTouchY = 0;
+let zlTouchDragEl = null;
+
+function zlDragStart(e) {
+  const list = document.getElementById('zl-activity-list');
+  zlDragEl = e.currentTarget;
+  zlDragIdx = Array.from(list.children).indexOf(zlDragEl);
+  setTimeout(() => zlDragEl.classList.add('dragging'), 0);
+}
+function zlDragOver(e) {
+  e.preventDefault();
+  const list = document.getElementById('zl-activity-list');
+  const overEl = e.currentTarget;
+  const overIdx = Array.from(list.children).indexOf(overEl);
+  if (overIdx !== zlDragIdx) {
+    const acts = state.zinoLoop.dailyPlan.activities;
+    const [moved] = acts.splice(zlDragIdx, 1);
+    acts.splice(overIdx, 0, moved);
+    zlDragIdx = overIdx;
+    zlRenderSheetList();
+  }
+}
+function zlDrop(e) { e.preventDefault(); }
+function zlDragEnd() {
+  if (zlDragEl) zlDragEl.classList.remove('dragging');
+  zlDragEl = null; zlDragIdx = null;
+}
+
+// Touch drag
+function zlTouchStart(e) {
+  zlTouchY = e.touches[0].clientY;
+  zlTouchDragEl = e.currentTarget;
+}
+function zlTouchMove(e) {
+  if (!zlTouchDragEl) return;
+  e.preventDefault();
+  const dy = e.touches[0].clientY - zlTouchY;
+  zlTouchDragEl.style.transform = `translateY(${dy}px)`;
+  zlTouchDragEl.style.zIndex = '999';
+  zlTouchDragEl.style.opacity = '0.8';
+}
+function zlTouchEnd(e) {
+  if (!zlTouchDragEl) return;
+  zlTouchDragEl.style.transform = '';
+  zlTouchDragEl.style.zIndex = '';
+  zlTouchDragEl.style.opacity = '';
+  // Simple reorder by final touch position
+  const list = document.getElementById('zl-activity-list');
+  const items = Array.from(list.querySelectorAll('.zl-list-item'));
+  const fromIdx = items.indexOf(zlTouchDragEl);
+  const endY = e.changedTouches[0].clientY;
+  let toIdx = fromIdx;
+  items.forEach((item, i) => {
+    const rect = item.getBoundingClientRect();
+    if (endY > rect.top && endY < rect.bottom) toIdx = i;
+  });
+  if (toIdx !== fromIdx) {
+    const acts = state.zinoLoop.dailyPlan.activities;
+    const [moved] = acts.splice(fromIdx, 1);
+    acts.splice(toIdx, 0, moved);
+    zlRenderSheetList();
+  }
+  zlTouchDragEl = null;
+}
+
+// ── Render predefined activity pills ──
+function zlRenderPredefinedGrid() {
+  const grid = document.getElementById('zl-predefined-grid');
+  if (!grid) return;
+  const addedIds = state.zinoLoop.dailyPlan.activities.map(a => a.id);
+  grid.innerHTML = '';
+  activityMaster.forEach(act => {
+    const pill = document.createElement('button');
+    const isAdded = addedIds.includes(act.id);
+    pill.className = 'zl-pill' + (isAdded ? ' added' : '');
+    pill.id = `zl-pill-${act.id}`;
+    pill.innerHTML = `<span class="zl-pill-icon">${act.icon}</span>${act.name}`;
+    pill.onclick = () => zlAddActivity(act);
+    grid.appendChild(pill);
+  });
+}
+
+// ── Add predefined activity ──
+function zlAddActivity(act) {
+  const acts = state.zinoLoop.dailyPlan.activities;
+  if (acts.find(a => a.id === act.id)) {
+    showToast(`${act.icon} Already added!`);
+    return;
+  }
+  if (acts.length >= 6) {
+    showToast('😎 Max 6! Bas itna enough hai.');
+    return;
+  }
+  acts.push({ id: act.id, icon: act.icon, name: act.name, completed: false, order: acts.length, isCustom: false });
+  zlRenderSheet();
+}
+
+// ── Add custom activity ──
+function addCustomActivity() {
+  const input = document.getElementById('zl-custom-input');
+  if (!input) return;
+  const name = input.value.trim();
+  if (!name) {
+    shakeElement(input);
+    showToast('🖊️ Kuch naam toh likho!');
+    return;
+  }
+  const acts = state.zinoLoop.dailyPlan.activities;
+  if (acts.length >= 6) {
+    showToast('😎 Max 6 activities — bas itna karo pehle!');
+    return;
+  }
+  const id = 'custom_' + Date.now();
+  const icons = ['⭐','🔆','🎯','💫','🌟','🚀','🎪','🎭'];
+  const icon = icons[Math.floor(Math.random() * icons.length)];
+  acts.push({ id, icon, name, completed: false, order: acts.length, isCustom: true });
+  input.value = '';
+  zlRenderSheetList();
+  zlUpdateCountLabel();
+  showToast(`${icon} "${name}" added!`);
+}
+
+// ── Remove activity from sheet ──
+function zlRemoveActivity(actId) {
+  const acts = state.zinoLoop.dailyPlan.activities;
+  const idx = acts.findIndex(a => a.id === actId);
+  if (idx !== -1) acts.splice(idx, 1);
+  zlRenderSheet();
+}
+
+// ── Save plan & close sheet ──
+function saveLoopPlan() {
+  const acts = state.zinoLoop.dailyPlan.activities;
+  state.user.lastActiveDate = zlTodayStr();
+  zlSave();
+  closeLoopBuilder();
+  zlRenderWidget();
+  const count = acts.length;
+  if (count === 0) {
+    showToast('📝 Plan khali hai — add some activities!');
+  } else {
+    showToast(`✅ ${count} activit${count===1?'y':'ies'} locked in! Level bana le 🔥`);
+  }
+}
+
+// ── SHARE CARD ──
+function showShareCard() {
+  const s = state.user.streak || 0;
+  const b = state.user.zinoCoins || 0;
+
+  // Determine level
+  const levels = [
+    { min: 0,    label: 'Beginner',          emoji: '🌱' },
+    { min: 3,    label: 'Challenger',         emoji: '⚡' },
+    { min: 7,    label: 'Consistent Player',  emoji: '🔥' },
+    { min: 14,   label: 'Beast Mode',         emoji: '💥' },
+    { min: 30,   label: 'Crazy Legend',       emoji: '👑' },
+  ];
+  let lvl = levels[0];
+  levels.forEach(l => { if (s >= l.min) lvl = l; });
+
+  document.getElementById('zl-sc-streak').textContent = s;
+  document.getElementById('zl-sc-balloons').textContent = b;
+  document.getElementById('zl-sc-level').textContent = lvl.label;
+  document.getElementById('zl-sc-level-emoji').textContent = lvl.emoji;
+  document.getElementById('zl-sc-label').textContent = lvl.label;
+
+  document.getElementById('zl-share-modal').classList.remove('hidden');
+}
+
+function closeShareCard() {
+  document.getElementById('zl-share-modal').classList.add('hidden');
+}
+
+function downloadShareCard() {
+  showToast('💾 Card saving… (screenshot mode!)');
+  // For mobile demo: just prompt screenshot
+  closeShareCard();
+}
+
+function shareZinoCard() {
+  const s = state.user.streak || 0;
+  const b = state.user.zinoCoins || 0;
+  const text = `🔥 ${s} Day Streak on Kidzinos!\n🎈 ${b} Zino Balloons earned!\n\nLevel bana le 🚀 #Kidzinos #CrazyXYZ`;
+  if (navigator.share) {
+    navigator.share({ title: 'Mera Zino Loop Card! 🔥', text, url: 'https://kidzinos.com' }).catch(()=>{});
+  } else {
+    navigator.clipboard?.writeText(text);
+    showToast('📋 Card details copied!');
+  }
+  closeShareCard();
+}
+
+// ── Hook initZinoLoop into home screen enter ──
+// (We extend the existing onScreenEnter override at bottom of file)
+const _zlOrigOnScreenEnter = onScreenEnter;
+function onScreenEnter(screenId) {
+  _zlOrigOnScreenEnter(screenId);
+  if (screenId === 'home') {
+    initZinoLoop();
   }
 }
