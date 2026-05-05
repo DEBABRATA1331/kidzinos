@@ -151,6 +151,7 @@
 
     <!-- ====== ZINO LOOP WIDGET ====== -->
     <div id="zino-loop-widget" class="zl-widget">
+      <div class="zl-widget-title">TODAY'S QUESTS</div>
       <!-- Streak + Balloon bar -->
       <div class="zl-stats-bar">
         <div class="zl-streak-pill">
@@ -1767,7 +1768,7 @@
   <div class="zl-share-backdrop" onclick="closeShareCard()"></div>
   <div class="zl-share-wrapper">
     <div class="zl-share-card-box">
-      <div class="zl-sc-badge">🔥 ZINO LOOP</div>
+      <div class="zl-sc-badge" id="zl-sc-title">🔥 ZINO LOOP</div>
       <div class="zl-sc-streak-row">
         <div class="zl-sc-fire">🔥</div>
         <div>
@@ -1792,9 +1793,13 @@
       <div class="zl-sc-brand">Kidzinos × Crazy XYZ</div>
     </div>
     <div class="zl-share-actions">
-      <button class="zl-share-btn-dl" onclick="downloadShareCard()">💾 Save Card</button>
-      <button class="zl-share-btn-sh" onclick="shareZinoCard()">📤 Share</button>
-      <button class="zl-share-btn-close" onclick="closeShareCard()">✕</button>
+      <button class="zl-wa-btn" onclick="shareZinoWhatsApp()">
+        <i class="fa-brands fa-whatsapp zl-wa-icon"></i> Share on WhatsApp
+      </button>
+      <div class="zl-share-row">
+        <button class="zl-share-btn-sh" onclick="shareZinoCard()">📤 Other Apps</button>
+      </div>
+      <button class="zl-share-btn-close" onclick="closeShareCard()">✕ Close</button>
     </div>
   </div>
 </div>

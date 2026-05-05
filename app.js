@@ -1284,500 +1284,644 @@ function updateAllZinos() {
   }
 }
 
+
 /* ========================================
-   ZINO LOOP — HOME ROUTINE LAYER
-   Daily gamified routine builder
+   ZINO LOOP v2.0 - PART 1
+   Activity Master + State + Init + Widget
 ======================================== */
 
-// ── Activity Master List ──
 const activityMaster = [
-  { id: 'school',   icon: '🎒', name: 'School'     },
-  { id: 'homework', icon: '📚', name: 'Homework'   },
-  { id: 'study',    icon: '📖', name: 'Study'      },
-  { id: 'exercise', icon: '🏃', name: 'Exercise'   },
-  { id: 'reading',  icon: '📕', name: 'Reading'    },
-  { id: 'gaming',   icon: '🎮', name: 'Gaming'     },
-  { id: 'art',      icon: '🎨', name: 'Art'        },
-  { id: 'music',    icon: '🎵', name: 'Music'      },
-  { id: 'cricket',  icon: '🏏', name: 'Cricket'    },
-  { id: 'cooking',  icon: '🍳', name: 'Cooking'    },
-  { id: 'friends',  icon: '👫', name: 'Hangout'    },
-  { id: 'youtube',  icon: '📺', name: 'YouTube'    },
-  { id: 'sleep',    icon: '😴', name: 'Sleep'      },
-  { id: 'prayer',   icon: '🙏', name: 'Prayer'     },
+  { id:'school', icon:'🎒', name:'School', color:'#FF6B35', gradient:'linear-gradient(135deg,#FF6B35,#FF4500)', desc:'Aaj school mein kya karoge?',
+    subOptions:[
+      {id:'attend', icon:'📋', name:'Attend Class', balloons:5},
+      {id:'notes',  icon:'✍️', name:'Make Notes',   balloons:5},
+      {id:'submit', icon:'📝', name:'Submit HW',    balloons:8},
+      {id:'sports', icon:'⚽', name:'Sports Period', balloons:5},
+      {id:'exam',   icon:'📊', name:'Exam Prep',    balloons:10}
+    ]
+  },
+  { id:'homework', icon:'📚', name:'Homework', color:'#7C3AED', gradient:'linear-gradient(135deg,#7C3AED,#5B21B6)', desc:'Kaunsa homework karoge aaj?',
+    subOptions:[
+      {id:'math',    icon:'🔢', name:'Maths',         balloons:8},
+      {id:'science', icon:'🔬', name:'Science',       balloons:8},
+      {id:'english', icon:'📖', name:'English',       balloons:6},
+      {id:'hindi',   icon:'📜', name:'Hindi',         balloons:6},
+      {id:'social',  icon:'🌍', name:'Social Studies',balloons:6}
+    ]
+  },
+  { id:'gaming', icon:'🎮', name:'Gaming', color:'#10B981', gradient:'linear-gradient(135deg,#10B981,#059669)', desc:'Kaunsa game kheloge?',
+    subOptions:[
+      {id:'pubg',      icon:'🔫', name:'PUBG / BGMI',   balloons:5},
+      {id:'freefire',  icon:'🔥', name:'Free Fire',     balloons:5},
+      {id:'chess',     icon:'♟️', name:'Chess',         balloons:10},
+      {id:'minecraft', icon:'⛏️', name:'Minecraft',    balloons:8},
+      {id:'fifa',      icon:'⚽', name:'FIFA / Football',balloons:5}
+    ]
+  },
+  { id:'exercise', icon:'🏃', name:'Exercise', color:'#F59E0B', gradient:'linear-gradient(135deg,#F59E0B,#D97706)', desc:'Aaj body fit karoge?',
+    subOptions:[
+      {id:'run',    icon:'🏃', name:'Running',     balloons:10},
+      {id:'pushup', icon:'💪', name:'Push-ups',    balloons:8},
+      {id:'yoga',   icon:'🧘', name:'Yoga',        balloons:8},
+      {id:'cycle',  icon:'🚴', name:'Cycling',     balloons:8},
+      {id:'sport',  icon:'🏏', name:'Outdoor Sport',balloons:10}
+    ]
+  },
+  { id:'reading', icon:'📕', name:'Reading', color:'#60C8FF', gradient:'linear-gradient(135deg,#60C8FF,#0070CC)', desc:'Kya padhoge aaj?',
+    subOptions:[
+      {id:'novel',   icon:'📗', name:'Story / Novel',  balloons:8},
+      {id:'news',    icon:'📰', name:'News',            balloons:5},
+      {id:'comic',   icon:'🦸', name:'Comics',          balloons:5},
+      {id:'textbook',icon:'📘', name:'Textbook',        balloons:10},
+      {id:'gk',      icon:'❓', name:'GK / Quiz Prep', balloons:8}
+    ]
+  },
+  { id:'music', icon:'🎵', name:'Music', color:'#EC4899', gradient:'linear-gradient(135deg,#EC4899,#BE185D)', desc:'Aaj music time!',
+    subOptions:[
+      {id:'practice', icon:'🎸', name:'Instrument Practice', balloons:10},
+      {id:'listen',   icon:'🎧', name:'Listen Music',        balloons:5},
+      {id:'sing',     icon:'🎤', name:'Singing',             balloons:8},
+      {id:'compose',  icon:'🎼', name:'Compose / Write',     balloons:12}
+    ]
+  },
+  { id:'cricket', icon:'🏏', name:'Cricket', color:'#F59E0B', gradient:'linear-gradient(135deg,#F59E0B,#92400E)', desc:'Cricket ka scene kya hai?',
+    subOptions:[
+      {id:'bat',   icon:'🏏', name:'Batting Practice', balloons:10},
+      {id:'bowl',  icon:'🎳', name:'Bowling Practice', balloons:10},
+      {id:'watch', icon:'📺', name:'Watch Match',      balloons:5},
+      {id:'team',  icon:'👥', name:'Team Game',        balloons:12}
+    ]
+  },
+  { id:'art', icon:'🎨', name:'Art', color:'#8B5CF6', gradient:'linear-gradient(135deg,#8B5CF6,#6D28D9)', desc:'Creativity time!',
+    subOptions:[
+      {id:'draw',  icon:'✏️', name:'Drawing', balloons:8},
+      {id:'paint', icon:'🎨', name:'Painting',balloons:10},
+      {id:'craft', icon:'✂️', name:'Craft',   balloons:10},
+      {id:'doodle',icon:'🖊️', name:'Doodle',  balloons:5}
+    ]
+  },
+  { id:'youtube', icon:'📺', name:'YouTube', color:'#EF4444', gradient:'linear-gradient(135deg,#EF4444,#B91C1C)', desc:'Kya dekhoge aaj?',
+    subOptions:[
+      {id:'crazyx',   icon:'⭐', name:'Crazy XYZ Videos',balloons:8},
+      {id:'learn_yt', icon:'📚', name:'Learn Something', balloons:10},
+      {id:'gaming_yt',icon:'🎮', name:'Gaming Videos',   balloons:5},
+      {id:'comedy',   icon:'😂', name:'Comedy / Meme',   balloons:5},
+      {id:'shorts',   icon:'⚡', name:'Shorts Binge',    balloons:3}
+    ]
+  },
+  { id:'cooking', icon:'🍳', name:'Cooking', color:'#F97316', gradient:'linear-gradient(135deg,#F97316,#EA580C)', desc:'Aaj kya banayenge?',
+    subOptions:[
+      {id:'help',      icon:'🤝', name:'Help in Kitchen',balloons:5},
+      {id:'snack',     icon:'🍕', name:'Make a Snack',   balloons:8},
+      {id:'learn_cook',icon:'👨‍🍳', name:'Learn a Recipe', balloons:10},
+      {id:'chai',      icon:'☕', name:'Chai Banao',      balloons:5}
+    ]
+  },
+  { id:'friends', icon:'👫', name:'Hangout', color:'#06B6D4', gradient:'linear-gradient(135deg,#06B6D4,#0891B2)', desc:'Dosto ke saath kya?',
+    subOptions:[
+      {id:'meet',   icon:'🤝', name:'Meet Friends',     balloons:8},
+      {id:'call',   icon:'📞', name:'Call / Video Call',balloons:5},
+      {id:'game_f', icon:'🎲', name:'Play Together',    balloons:10},
+      {id:'outing', icon:'🚶', name:'Go Out',           balloons:10}
+    ]
+  },
+  { id:'sleep', icon:'😴', name:'Sleep', color:'#6366F1', gradient:'linear-gradient(135deg,#6366F1,#4F46E5)', desc:'Rest mode on!',
+    subOptions:[
+      {id:'nap',   icon:'💤', name:'Power Nap (20min)',balloons:5},
+      {id:'night', icon:'🌙', name:'Night Sleep',      balloons:8},
+      {id:'rest',  icon:'🛋️', name:'Relax / Chill',   balloons:5}
+    ]
+  },
+  { id:'prayer', icon:'🙏', name:'Prayer', color:'#F59E0B', gradient:'linear-gradient(135deg,#F59E0B,#B45309)', desc:'Spiritual time 🙏',
+    subOptions:[
+      {id:'morning_p', icon:'🌅', name:'Morning Prayer',   balloons:8},
+      {id:'evening_p', icon:'🌆', name:'Evening Prayer',   balloons:8},
+      {id:'meditate',  icon:'🧘', name:'Meditation',       balloons:10},
+      {id:'gratitude', icon:'💝', name:'Gratitude Journal',balloons:8}
+    ]
+  },
+  { id:'study', icon:'📖', name:'Self Study', color:'#34D399', gradient:'linear-gradient(135deg,#34D399,#059669)', desc:'Apne aap padho!',
+    subOptions:[
+      {id:'revision',icon:'🔄', name:'Revision',    balloons:10},
+      {id:'new_ch',  icon:'📑', name:'New Chapter', balloons:12},
+      {id:'notes_s', icon:'📓', name:'Make Notes',  balloons:8},
+      {id:'mock',    icon:'📊', name:'Mock Test',   balloons:15}
+    ]
+  }
 ];
 
-// ── Zino Loop State (extends main state) ──
-state.zinoLoop = {
-  dailyPlan: {           // today's plan keyed by date
-    date: '',
-    activities: [],      // { id, icon, name, completed, order, isCustom }
-  },
-};
+// ── State ──
+state.zinoLoop = { dailyPlan:{ date:'', activities:[] } };
 
-// ── localStorage helpers ──
-const ZL_KEY = 'kidzinos_zl_v1';
-
-function zlSave() {
-  try {
-    const payload = {
+// ── LocalStorage ──
+const ZL_KEY = 'kidzinos_zl_v2';
+function zlSave(){
+  try{
+    localStorage.setItem(ZL_KEY, JSON.stringify({
       streak: state.user.streak,
       zinoCoins: state.user.zinoCoins,
-      lastActiveDate: state.user.lastActiveDate || '',
-      dailyPlan: state.zinoLoop.dailyPlan,
-    };
-    localStorage.setItem(ZL_KEY, JSON.stringify(payload));
-  } catch(e) {}
+      lastActiveDate: state.user.lastActiveDate||'',
+      dailyPlan: state.zinoLoop.dailyPlan
+    }));
+  }catch(e){}
+}
+function zlLoad(){
+  try{
+    const d = JSON.parse(localStorage.getItem(ZL_KEY)||'null');
+    if(!d) return;
+    if(d.streak!==undefined) state.user.streak=d.streak;
+    if(d.zinoCoins!==undefined) state.user.zinoCoins=d.zinoCoins;
+    if(d.lastActiveDate) state.user.lastActiveDate=d.lastActiveDate;
+    if(d.dailyPlan) state.zinoLoop.dailyPlan=d.dailyPlan;
+  }catch(e){}
+}
+function zlTodayStr(){
+  const n=new Date();
+  return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
 }
 
-function zlLoad() {
-  try {
-    const raw = localStorage.getItem(ZL_KEY);
-    if (!raw) return;
-    const d = JSON.parse(raw);
-    if (d.streak !== undefined) state.user.streak = d.streak;
-    if (d.zinoCoins !== undefined) state.user.zinoCoins = d.zinoCoins;
-    if (d.lastActiveDate) state.user.lastActiveDate = d.lastActiveDate;
-    if (d.dailyPlan) state.zinoLoop.dailyPlan = d.dailyPlan;
-  } catch(e) {}
-}
-
-// ── Date helper ──
-function zlTodayStr() {
-  const now = new Date();
-  return `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}-${String(now.getDate()).padStart(2,'0')}`;
-}
-
-// ── INIT ── called every time home screen is entered ──
-function initZinoLoop() {
+// ── INIT ──
+function initZinoLoop(){
   zlLoad();
-  const today = zlTodayStr();
-  const plan = state.zinoLoop.dailyPlan;
-
-  if (plan.date !== today) {
-    // Date has rolled over — handle streak
-    const yesterday = (() => {
-      const d = new Date(); d.setDate(d.getDate()-1);
-      return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    })();
-    const lastActive = state.user.lastActiveDate || '';
-
-    if (lastActive === yesterday) {
-      // User was active yesterday — check if they completed ≥1 task
-      const prevCompleted = plan.activities.filter(a => a.completed).length;
-      if (prevCompleted >= 1) {
-        state.user.streak = (state.user.streak || 0) + 1;
+  const today=zlTodayStr();
+  const plan=state.zinoLoop.dailyPlan;
+  if(plan.date!==today){
+    const d=new Date(); d.setDate(d.getDate()-1);
+    const yesterday=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    const last=state.user.lastActiveDate||'';
+    if(last===yesterday){
+      if(plan.activities.filter(a=>a.completed).length>=1){
+        state.user.streak=(state.user.streak||0)+1;
         checkStreakMilestone();
       }
-      // else: soft reset (no punishment — PRD says warning not punishment)
-    } else if (lastActive && lastActive !== yesterday && lastActive !== today) {
-      // Missed a day
-      showToast('🔥 Streak paused! Aaj ek bhi complete kar — wapas aa jao!');
+    } else if(last&&last!==yesterday&&last!==today){
+      showToast('🔥 Streak paused! Aaj complete kar — wapas aa jao!');
     }
-
-    // New day — fresh plan
-    state.zinoLoop.dailyPlan = { date: today, activities: [] };
-    state.user.lastActiveDate = today;
+    state.zinoLoop.dailyPlan={date:today,activities:[]};
+    state.user.lastActiveDate=today;
     zlSave();
   }
-
   zlRenderWidget();
   updateAllZinos();
 }
 
-// ── Check streak milestones ──
-function checkStreakMilestone() {
-  const s = state.user.streak;
-  const milestones = [3, 7, 14, 30];
-  if (milestones.includes(s)) {
-    state.user.zinoCoins += 20;
-    updateAllZinos();
-    zlSave();
+function checkStreakMilestone(){
+  const s=state.user.streak;
+  if([3,7,14,30].includes(s)){
+    state.user.zinoCoins+=20;
+    updateAllZinos(); zlSave();
     showToast(`🔥 ${s} Day Streak! +20 Bonus Balloons! OP consistency 😎`);
+    setTimeout(()=>showShareCard('milestone'),1000);
   }
 }
 
-// ── Render the home widget ──
-function zlRenderWidget() {
-  // Streak
-  const streakEl = document.getElementById('zl-streak-count');
-  if (streakEl) streakEl.textContent = state.user.streak || 0;
-  // Balloons
-  const ballEl = document.getElementById('zl-balloon-count');
-  if (ballEl) ballEl.textContent = state.user.zinoCoins || 0;
+// ── Widget Render ──
+function zlRenderWidget(){
+  const el=document.getElementById('zl-streak-count');
+  if(el) el.textContent=state.user.streak||0;
+  const bl=document.getElementById('zl-balloon-count');
+  if(bl) bl.textContent=state.user.zinoCoins||0;
 
-  const activities = state.zinoLoop.dailyPlan.activities;
-  const scroll = document.getElementById('zl-activity-scroll');
-  const hint = document.getElementById('zl-empty-hint');
+  const acts=state.zinoLoop.dailyPlan.activities;
+  const scroll=document.getElementById('zl-activity-scroll');
+  const hint=document.getElementById('zl-empty-hint');
 
-  if (activities.length === 0) {
-    scroll && scroll.classList.add('hidden');
-    hint && hint.classList.remove('hidden');
-    return;
-  }
-
-  hint && hint.classList.add('hidden');
-  scroll && scroll.classList.remove('hidden');
-
-  // Render mini home cards
-  scroll.innerHTML = '';
-  activities.forEach(act => {
-    const card = document.createElement('div');
-    card.className = 'zl-home-card' + (act.completed ? ' done' : '');
-    card.id = `zl-home-card-${act.id}`;
-    card.innerHTML = `
+  if(!acts.length){ scroll&&scroll.classList.add('hidden'); hint&&hint.classList.remove('hidden'); return; }
+  hint&&hint.classList.add('hidden');
+  scroll&&scroll.classList.remove('hidden');
+  scroll.innerHTML='';
+  acts.forEach(act=>{
+    const master=activityMaster.find(a=>a.id===act.id)||{color:'#7C3AED',gradient:'linear-gradient(135deg,#7C3AED,#5B21B6)'};
+    const done=act.completedSubs?act.completedSubs.length:0;
+    const total=act.selectedSubs?act.selectedSubs.length:0;
+    const isAllDone=act.completed;
+    const card=document.createElement('div');
+    card.className='zl-home-card'+(isAllDone?' done':'');
+    card.style.setProperty('--card-color', master.color);
+    card.innerHTML=`
       <div class="zl-hc-icon">${act.icon}</div>
       <div class="zl-hc-name">${act.name}</div>
+      ${total>0?`<div class="zl-hc-sub">${done}/${total}</div>`:''}
     `;
-    card.onclick = () => zlToggleComplete(act.id, card);
+    card.onclick=()=>openActivityDetail(act.id);
     scroll.appendChild(card);
   });
-
-  // Progress bar
   zlRenderProgressBar();
 }
 
-// ── Progress bar in widget ──
-function zlRenderProgressBar() {
-  const acts = state.zinoLoop.dailyPlan.activities;
-  if (!acts.length) return;
-  let row = document.getElementById('zl-progress-row');
-  if (!row) {
-    row = document.createElement('div');
-    row.id = 'zl-progress-row';
-    row.className = 'zl-progress-row';
-    row.innerHTML = `
-      <div class="zl-progress-bar"><div class="zl-progress-fill" id="zl-progress-fill" style="width:0%"></div></div>
-      <div class="zl-progress-label" id="zl-progress-label">0/${acts.length}</div>
-    `;
+function zlRenderProgressBar(){
+  const acts=state.zinoLoop.dailyPlan.activities;
+  if(!acts.length) return;
+  let row=document.getElementById('zl-progress-row');
+  if(!row){
+    row=document.createElement('div');
+    row.id='zl-progress-row'; row.className='zl-progress-row';
+    row.innerHTML=`<div class="zl-progress-bar"><div class="zl-progress-fill" id="zl-progress-fill" style="width:0%"></div></div><div class="zl-progress-label" id="zl-progress-label">0/${acts.length}</div>`;
     document.getElementById('zino-loop-widget').appendChild(row);
   }
-  const done = acts.filter(a => a.completed).length;
-  const pct = Math.round((done / acts.length) * 100);
-  const fill = document.getElementById('zl-progress-fill');
-  const lbl = document.getElementById('zl-progress-label');
-  if (fill) fill.style.width = pct + '%';
-  if (lbl) lbl.textContent = `${done}/${acts.length}`;
+  const done=acts.filter(a=>a.completed).length;
+  const pct=Math.round((done/acts.length)*100);
+  const f=document.getElementById('zl-progress-fill');
+  const l=document.getElementById('zl-progress-label');
+  if(f) f.style.width=pct+'%';
+  if(l) l.textContent=`${done}/${acts.length}`;
 }
 
-// ── Tap to toggle complete (home card) ──
-function zlToggleComplete(actId, cardEl) {
-  const acts = state.zinoLoop.dailyPlan.activities;
-  const act = acts.find(a => a.id === actId);
-  if (!act) return;
+/* ========================================
+   ZINO LOOP v2.0 - PART 2
+   Bottom Sheet Builder & Sub-Option Picker
+======================================== */
 
-  if (act.completed) return; // Already done — no undo
-
-  act.completed = true;
-  cardEl.classList.add('done');
-
-  // +5 Balloons
-  state.user.zinoCoins += 5;
-  updateAllZinos();
-  zlSave();
-
-  // Coin burst animation
-  const burst = document.createElement('div');
-  burst.className = 'zl-coin-burst';
-  burst.textContent = '+5 🎈';
-  cardEl.appendChild(burst);
-  setTimeout(() => burst.remove(), 750);
-
-  // Update progress
-  zlRenderProgressBar();
-
-  // Check if all done
-  const allDone = acts.every(a => a.completed);
-  if (allDone) {
-    setTimeout(() => {
-      state.user.zinoCoins += 10;
-      updateAllZinos();
-      zlSave();
-      state.user.lastActiveDate = zlTodayStr();
-      showToast('⚡ SABHI done! +10 Bonus Balloons! OP consistency 😎');
-      setTimeout(() => showShareCard(), 1400);
-    }, 600);
-  } else {
-    showToast('✅ +5 Zino Balloons! Level bana le 🔥');
-  }
-}
-
-// ── OPEN BOTTOM SHEET ──
-function openLoopBuilder() {
-  const backdrop = document.getElementById('zl-backdrop');
-  const sheet = document.getElementById('zl-sheet');
+// ── BOTTOM SHEET ──
+function openLoopBuilder(){
+  const backdrop=document.getElementById('zl-backdrop');
+  const sheet=document.getElementById('zl-sheet');
   backdrop.classList.remove('hidden');
   sheet.classList.remove('hidden');
   zlRenderSheet();
-  // Prevent body scroll
-  document.body.style.overflow = 'hidden';
+  document.body.style.overflow='hidden';
 }
-
-// ── CLOSE BOTTOM SHEET ──
-function closeLoopBuilder() {
-  const backdrop = document.getElementById('zl-backdrop');
-  const sheet = document.getElementById('zl-sheet');
+function closeLoopBuilder(){
+  const backdrop=document.getElementById('zl-backdrop');
+  const sheet=document.getElementById('zl-sheet');
   backdrop.classList.add('hidden');
   sheet.classList.add('hidden');
-  document.body.style.overflow = '';
+  document.body.style.overflow='';
 }
 
-// ── Render sheet contents ──
-function zlRenderSheet() {
+function zlRenderSheet(){
   zlRenderSheetList();
   zlRenderPredefinedGrid();
   zlUpdateCountLabel();
 }
 
-function zlUpdateCountLabel() {
-  const count = state.zinoLoop.dailyPlan.activities.length;
-  const el = document.getElementById('zl-activity-count-label');
-  if (el) {
-    if (count === 0) el.textContent = 'Koi nahi abhi — add kar!';
-    else el.textContent = `${count} activit${count === 1 ? 'y' : 'ies'} planned`;
+function zlUpdateCountLabel(){
+  const c=state.zinoLoop.dailyPlan.activities.length;
+  const el=document.getElementById('zl-activity-count-label');
+  if(el){
+    if(c===0) el.textContent='Abhi kuch select nahi kiya';
+    else el.textContent=`${c}/6 Quests Selected`;
   }
 }
 
-// ── Render draggable activity list inside sheet ──
-function zlRenderSheetList() {
-  const list = document.getElementById('zl-activity-list');
-  if (!list) return;
-  const acts = state.zinoLoop.dailyPlan.activities;
-  list.innerHTML = '';
-
-  if (acts.length === 0) {
-    list.innerHTML = `<div style="text-align:center;color:rgba(255,255,255,0.3);font-size:0.85rem;font-weight:700;padding:12px 0;">Bas itna? Aur add kare? 😏</div>`;
+// ── Selected Activities List in Sheet ──
+function zlRenderSheetList(){
+  const list=document.getElementById('zl-activity-list');
+  if(!list) return;
+  const acts=state.zinoLoop.dailyPlan.activities;
+  list.innerHTML='';
+  if(acts.length===0){
+    list.innerHTML=`<div style="text-align:center;color:rgba(255,255,255,0.3);font-size:0.85rem;font-weight:700;padding:12px 0;">Niche se option select karo 👇</div>`;
     return;
   }
-
-  acts.forEach((act, idx) => {
-    const item = document.createElement('div');
-    item.className = 'zl-list-item';
-    item.dataset.id = act.id;
-    item.draggable = true;
-    item.innerHTML = `
+  acts.forEach((act,idx)=>{
+    const master=activityMaster.find(a=>a.id===act.id)||{color:'#7C3AED'};
+    const total=act.selectedSubs?act.selectedSubs.length:0;
+    const item=document.createElement('div');
+    item.className='zl-list-item';
+    item.dataset.id=act.id;
+    item.draggable=true;
+    item.style.borderColor=master.color;
+    item.innerHTML=`
       <span class="zl-item-icon">${act.icon}</span>
-      <span class="zl-item-name">${act.name}</span>
+      <div class="zl-item-details">
+        <div class="zl-item-name">${act.name}</div>
+        ${total>0?`<div class="zl-item-subcount">${total} Tasks</div>`:''}
+      </div>
       <span class="zl-item-drag"><i class="fa-solid fa-grip-lines"></i></span>
-      <button class="zl-item-remove" onclick="zlRemoveActivity('${act.id}')" title="Remove">
-        <i class="fa-solid fa-xmark"></i>
-      </button>
+      <button class="zl-item-remove" onclick="zlRemoveActivity('${act.id}')"><i class="fa-solid fa-xmark"></i></button>
     `;
-    // Drag events
-    item.addEventListener('dragstart', zlDragStart);
-    item.addEventListener('dragover', zlDragOver);
-    item.addEventListener('drop', zlDrop);
-    item.addEventListener('dragend', zlDragEnd);
-    // Touch drag (mobile)
-    item.addEventListener('touchstart', zlTouchStart, { passive: true });
-    item.addEventListener('touchmove', zlTouchMove, { passive: false });
-    item.addEventListener('touchend', zlTouchEnd, { passive: true });
+    item.addEventListener('dragstart',zlDragStart);
+    item.addEventListener('dragover',zlDragOver);
+    item.addEventListener('drop',zlDrop);
+    item.addEventListener('dragend',zlDragEnd);
+    item.addEventListener('touchstart',zlTouchStart,{passive:true});
+    item.addEventListener('touchmove',zlTouchMove,{passive:false});
+    item.addEventListener('touchend',zlTouchEnd,{passive:true});
     list.appendChild(item);
   });
 }
 
-// ── Drag-and-drop reorder ──
-let zlDragIdx = null;
-let zlDragEl = null;
-let zlTouchY = 0;
-let zlTouchDragEl = null;
-
-function zlDragStart(e) {
-  const list = document.getElementById('zl-activity-list');
-  zlDragEl = e.currentTarget;
-  zlDragIdx = Array.from(list.children).indexOf(zlDragEl);
-  setTimeout(() => zlDragEl.classList.add('dragging'), 0);
+// Drag & Drop
+let zlDragIdx=null, zlDragEl=null, zlTouchY=0, zlTouchDragEl=null;
+function zlDragStart(e){
+  const list=document.getElementById('zl-activity-list');
+  zlDragEl=e.currentTarget; zlDragIdx=Array.from(list.children).indexOf(zlDragEl);
+  setTimeout(()=>zlDragEl.classList.add('dragging'),0);
 }
-function zlDragOver(e) {
+function zlDragOver(e){
   e.preventDefault();
-  const list = document.getElementById('zl-activity-list');
-  const overEl = e.currentTarget;
-  const overIdx = Array.from(list.children).indexOf(overEl);
-  if (overIdx !== zlDragIdx) {
-    const acts = state.zinoLoop.dailyPlan.activities;
-    const [moved] = acts.splice(zlDragIdx, 1);
-    acts.splice(overIdx, 0, moved);
-    zlDragIdx = overIdx;
+  const list=document.getElementById('zl-activity-list');
+  const overEl=e.currentTarget; const overIdx=Array.from(list.children).indexOf(overEl);
+  if(overIdx!==zlDragIdx){
+    const acts=state.zinoLoop.dailyPlan.activities;
+    const [moved]=acts.splice(zlDragIdx,1);
+    acts.splice(overIdx,0,moved);
+    zlDragIdx=overIdx; zlRenderSheetList();
+  }
+}
+function zlDrop(e){e.preventDefault();}
+function zlDragEnd(){ if(zlDragEl) zlDragEl.classList.remove('dragging'); zlDragEl=null; zlDragIdx=null; }
+function zlTouchStart(e){ zlTouchY=e.touches[0].clientY; zlTouchDragEl=e.currentTarget; }
+function zlTouchMove(e){
+  if(!zlTouchDragEl) return; e.preventDefault();
+  const dy=e.touches[0].clientY-zlTouchY;
+  zlTouchDragEl.style.transform=`translateY(${dy}px)`;
+  zlTouchDragEl.style.zIndex='999'; zlTouchDragEl.style.opacity='0.8';
+}
+function zlTouchEnd(e){
+  if(!zlTouchDragEl) return;
+  zlTouchDragEl.style.transform=''; zlTouchDragEl.style.zIndex=''; zlTouchDragEl.style.opacity='';
+  const list=document.getElementById('zl-activity-list');
+  const items=Array.from(list.querySelectorAll('.zl-list-item'));
+  const fromIdx=items.indexOf(zlTouchDragEl);
+  const endY=e.changedTouches[0].clientY;
+  let toIdx=fromIdx;
+  items.forEach((item,i)=>{ const r=item.getBoundingClientRect(); if(endY>r.top&&endY<r.bottom) toIdx=i; });
+  if(toIdx!==fromIdx){
+    const acts=state.zinoLoop.dailyPlan.activities;
+    const [moved]=acts.splice(fromIdx,1); acts.splice(toIdx,0,moved);
     zlRenderSheetList();
   }
-}
-function zlDrop(e) { e.preventDefault(); }
-function zlDragEnd() {
-  if (zlDragEl) zlDragEl.classList.remove('dragging');
-  zlDragEl = null; zlDragIdx = null;
+  zlTouchDragEl=null;
 }
 
-// Touch drag
-function zlTouchStart(e) {
-  zlTouchY = e.touches[0].clientY;
-  zlTouchDragEl = e.currentTarget;
-}
-function zlTouchMove(e) {
-  if (!zlTouchDragEl) return;
-  e.preventDefault();
-  const dy = e.touches[0].clientY - zlTouchY;
-  zlTouchDragEl.style.transform = `translateY(${dy}px)`;
-  zlTouchDragEl.style.zIndex = '999';
-  zlTouchDragEl.style.opacity = '0.8';
-}
-function zlTouchEnd(e) {
-  if (!zlTouchDragEl) return;
-  zlTouchDragEl.style.transform = '';
-  zlTouchDragEl.style.zIndex = '';
-  zlTouchDragEl.style.opacity = '';
-  // Simple reorder by final touch position
-  const list = document.getElementById('zl-activity-list');
-  const items = Array.from(list.querySelectorAll('.zl-list-item'));
-  const fromIdx = items.indexOf(zlTouchDragEl);
-  const endY = e.changedTouches[0].clientY;
-  let toIdx = fromIdx;
-  items.forEach((item, i) => {
-    const rect = item.getBoundingClientRect();
-    if (endY > rect.top && endY < rect.bottom) toIdx = i;
+// ── Predefined Grid & Sub-Option Selector ──
+let expandedActId=null;
+
+function zlRenderPredefinedGrid(){
+  const grid=document.getElementById('zl-predefined-grid');
+  if(!grid) return;
+  const addedIds=state.zinoLoop.dailyPlan.activities.map(a=>a.id);
+  grid.innerHTML='';
+  activityMaster.forEach(act=>{
+    const isAdded=addedIds.includes(act.id);
+    const wrap=document.createElement('div');
+    wrap.className='zl-pill-wrap';
+    
+    const pill=document.createElement('button');
+    pill.className='zl-pill'+(isAdded?' added':'')+(expandedActId===act.id?' expanded':'');
+    pill.innerHTML=`<span class="zl-pill-icon">${act.icon}</span>${act.name}`;
+    pill.onclick=()=>{
+      if(isAdded) return showToast('Pehle se added hai!');
+      expandedActId=(expandedActId===act.id)?null:act.id;
+      zlRenderPredefinedGrid();
+    };
+    wrap.appendChild(pill);
+
+    if(expandedActId===act.id && !isAdded){
+      const subBox=document.createElement('div');
+      subBox.className='zl-suboptions-box';
+      subBox.style.borderColor=act.color;
+      subBox.innerHTML=`<div class="zl-sub-title">${act.desc} (Select mulitple)</div>`;
+      
+      const chips=document.createElement('div');
+      chips.className='zl-sub-chips';
+      const selectedSubs=new Set();
+      
+      act.subOptions.forEach(sub=>{
+        const c=document.createElement('div');
+        c.className='zl-sub-chip';
+        c.innerHTML=`${sub.icon} ${sub.name} <span class="zl-sub-bal">+${sub.balloons}</span>`;
+        c.onclick=()=>{
+          c.classList.toggle('selected');
+          if(c.classList.contains('selected')) selectedSubs.add(sub);
+          else selectedSubs.delete(sub);
+        };
+        chips.appendChild(c);
+      });
+      subBox.appendChild(chips);
+
+      const addBtn=document.createElement('button');
+      addBtn.className='zl-sub-add-btn';
+      addBtn.style.background=act.gradient;
+      addBtn.textContent='Add to Plan';
+      addBtn.onclick=()=>{
+        if(selectedSubs.size===0) return showToast('At least 1 task select karo!');
+        zlConfirmAddActivity(act, Array.from(selectedSubs));
+      };
+      subBox.appendChild(addBtn);
+      wrap.appendChild(subBox);
+    }
+    grid.appendChild(wrap);
   });
-  if (toIdx !== fromIdx) {
-    const acts = state.zinoLoop.dailyPlan.activities;
-    const [moved] = acts.splice(fromIdx, 1);
-    acts.splice(toIdx, 0, moved);
-    zlRenderSheetList();
-  }
-  zlTouchDragEl = null;
 }
 
-// ── Render predefined activity pills ──
-function zlRenderPredefinedGrid() {
-  const grid = document.getElementById('zl-predefined-grid');
-  if (!grid) return;
-  const addedIds = state.zinoLoop.dailyPlan.activities.map(a => a.id);
-  grid.innerHTML = '';
-  activityMaster.forEach(act => {
-    const pill = document.createElement('button');
-    const isAdded = addedIds.includes(act.id);
-    pill.className = 'zl-pill' + (isAdded ? ' added' : '');
-    pill.id = `zl-pill-${act.id}`;
-    pill.innerHTML = `<span class="zl-pill-icon">${act.icon}</span>${act.name}`;
-    pill.onclick = () => zlAddActivity(act);
-    grid.appendChild(pill);
+function zlConfirmAddActivity(act, selectedSubs){
+  const acts=state.zinoLoop.dailyPlan.activities;
+  if(acts.length>=6){ showToast('😎 Max 6 Quests allowed!'); return; }
+  acts.push({
+    id: act.id,
+    icon: act.icon,
+    name: act.name,
+    completed: false,
+    order: acts.length,
+    isCustom: false,
+    selectedSubs: selectedSubs.map(s=>({id:s.id, name:s.name, icon:s.icon, balloons:s.balloons})),
+    completedSubs: []
   });
-}
-
-// ── Add predefined activity ──
-function zlAddActivity(act) {
-  const acts = state.zinoLoop.dailyPlan.activities;
-  if (acts.find(a => a.id === act.id)) {
-    showToast(`${act.icon} Already added!`);
-    return;
-  }
-  if (acts.length >= 6) {
-    showToast('😎 Max 6! Bas itna enough hai.');
-    return;
-  }
-  acts.push({ id: act.id, icon: act.icon, name: act.name, completed: false, order: acts.length, isCustom: false });
+  expandedActId=null;
   zlRenderSheet();
 }
 
-// ── Add custom activity ──
-function addCustomActivity() {
-  const input = document.getElementById('zl-custom-input');
-  if (!input) return;
-  const name = input.value.trim();
-  if (!name) {
-    shakeElement(input);
-    showToast('🖊️ Kuch naam toh likho!');
-    return;
-  }
-  const acts = state.zinoLoop.dailyPlan.activities;
-  if (acts.length >= 6) {
-    showToast('😎 Max 6 activities — bas itna karo pehle!');
-    return;
-  }
-  const id = 'custom_' + Date.now();
-  const icons = ['⭐','🔆','🎯','💫','🌟','🚀','🎪','🎭'];
-  const icon = icons[Math.floor(Math.random() * icons.length)];
-  acts.push({ id, icon, name, completed: false, order: acts.length, isCustom: true });
-  input.value = '';
-  zlRenderSheetList();
-  zlUpdateCountLabel();
+function addCustomActivity(){
+  const input=document.getElementById('zl-custom-input');
+  if(!input) return;
+  const name=input.value.trim();
+  if(!name){ showToast('🖊️ Kuch naam toh likho!'); return; }
+  const acts=state.zinoLoop.dailyPlan.activities;
+  if(acts.length>=6){ showToast('😎 Max 6 Quests!'); return; }
+  const id='custom_'+Date.now();
+  const icons=['⭐','🔆','🎯','💫','🌟','🚀','🎪','🎭'];
+  const icon=icons[Math.floor(Math.random()*icons.length)];
+  acts.push({
+    id, icon, name, completed:false, order:acts.length, isCustom:true,
+    selectedSubs: [{id:'c1', icon:'⭐', name:'Complete Task', balloons:10}],
+    completedSubs: []
+  });
+  input.value='';
+  zlRenderSheet();
   showToast(`${icon} "${name}" added!`);
 }
 
-// ── Remove activity from sheet ──
-function zlRemoveActivity(actId) {
-  const acts = state.zinoLoop.dailyPlan.activities;
-  const idx = acts.findIndex(a => a.id === actId);
-  if (idx !== -1) acts.splice(idx, 1);
+function zlRemoveActivity(actId){
+  const acts=state.zinoLoop.dailyPlan.activities;
+  const idx=acts.findIndex(a=>a.id===actId);
+  if(idx!==-1) acts.splice(idx,1);
   zlRenderSheet();
 }
 
-// ── Save plan & close sheet ──
-function saveLoopPlan() {
-  const acts = state.zinoLoop.dailyPlan.activities;
-  state.user.lastActiveDate = zlTodayStr();
-  zlSave();
-  closeLoopBuilder();
-  zlRenderWidget();
-  const count = acts.length;
-  if (count === 0) {
-    showToast('📝 Plan khali hai — add some activities!');
+function saveLoopPlan(){
+  const acts=state.zinoLoop.dailyPlan.activities;
+  state.user.lastActiveDate=zlTodayStr();
+  zlSave(); closeLoopBuilder(); zlRenderWidget();
+  if(acts.length===0) showToast('📝 Plan khali hai!');
+  else showToast(`✅ ${acts.length} Quests locked in! Level bana le 🔥`);
+}
+
+/* ========================================
+   ZINO LOOP v2.0 - PART 3
+   Activity Quests Modal & Share Card v2
+======================================== */
+
+// ── Activity Detail Modal (Quest Screen) ──
+let currentDetailActId=null;
+
+function openActivityDetail(actId){
+  const act=state.zinoLoop.dailyPlan.activities.find(a=>a.id===actId);
+  if(!act) return;
+  currentDetailActId=actId;
+  const master=activityMaster.find(a=>a.id===act.id)||{color:'#7C3AED',gradient:'linear-gradient(135deg,#7C3AED,#5B21B6)'};
+  
+  let modal=document.getElementById('zl-quest-modal');
+  if(!modal){
+    modal=document.createElement('div');
+    modal.id='zl-quest-modal'; modal.className='zl-quest-modal hidden';
+    document.body.appendChild(modal);
+  }
+  
+  const isAllDone=act.completed;
+  
+  modal.innerHTML=`
+    <div class="zl-qm-backdrop" onclick="closeActivityDetail()"></div>
+    <div class="zl-qm-card">
+      <button class="zl-qm-close" onclick="closeActivityDetail()">✕</button>
+      <div class="zl-qm-header" style="background:${master.gradient}">
+        <div class="zl-qm-icon">${act.icon}</div>
+        <div class="zl-qm-title">${act.name}</div>
+        <div class="zl-qm-sub">Complete tasks to earn balloons!</div>
+      </div>
+      <div class="zl-qm-body" id="zl-qm-body"></div>
+      ${isAllDone?`<div class="zl-qm-footer"><button class="zl-qm-btn-done" onclick="closeActivityDetail()">Awesome! 🔥</button></div>`:''}
+    </div>
+  `;
+  modal.classList.remove('hidden');
+  document.body.style.overflow='hidden';
+  zlRenderQuestList();
+}
+
+function closeActivityDetail(){
+  const modal=document.getElementById('zl-quest-modal');
+  if(modal) modal.classList.add('hidden');
+  document.body.style.overflow='';
+  currentDetailActId=null;
+}
+
+function zlRenderQuestList(){
+  const act=state.zinoLoop.dailyPlan.activities.find(a=>a.id===currentDetailActId);
+  if(!act) return;
+  const body=document.getElementById('zl-qm-body');
+  if(!body) return;
+  
+  body.innerHTML='';
+  act.selectedSubs.forEach(sub=>{
+    const isDone=act.completedSubs.includes(sub.id);
+    const row=document.createElement('div');
+    row.className='zl-q-row'+(isDone?' done':'');
+    row.innerHTML=`
+      <div class="zl-q-icon">${sub.icon}</div>
+      <div class="zl-q-name">${sub.name}</div>
+      <div class="zl-q-reward">
+        <img src="zino-balloon.png" class="zl-q-bal"><span>+${sub.balloons}</span>
+      </div>
+      <div class="zl-q-check">${isDone?'<i class="fa-solid fa-check"></i>':''}</div>
+    `;
+    if(!isDone) row.onclick=(e)=>zlCompleteSubTask(sub, e.currentTarget);
+    body.appendChild(row);
+  });
+}
+
+function zlCompleteSubTask(sub, el){
+  const act=state.zinoLoop.dailyPlan.activities.find(a=>a.id===currentDetailActId);
+  if(!act||act.completedSubs.includes(sub.id)) return;
+  
+  act.completedSubs.push(sub.id);
+  el.classList.add('done');
+  el.querySelector('.zl-q-check').innerHTML='<i class="fa-solid fa-check"></i>';
+  
+  // Reward
+  state.user.zinoCoins+=sub.balloons;
+  updateAllZinos(); zlSave();
+  
+  // Coin burst
+  const burst=document.createElement('div');
+  burst.className='zl-coin-burst'; burst.textContent=`+${sub.balloons} 🎈`;
+  el.appendChild(burst);
+  setTimeout(()=>burst.remove(),750);
+  
+  // Check if all subtasks in this activity are done
+  if(act.completedSubs.length===act.selectedSubs.length){
+    act.completed=true;
+    setTimeout(()=>{
+      showToast(`✅ ${act.icon} ${act.name} Completed!`);
+      closeActivityDetail();
+      zlRenderWidget();
+      checkAllActivitiesDone();
+    },800);
   } else {
-    showToast(`✅ ${count} activit${count===1?'y':'ies'} locked in! Level bana le 🔥`);
+    zlRenderWidget(); // Update progress bar
   }
 }
 
-// ── SHARE CARD ──
-function showShareCard() {
-  const s = state.user.streak || 0;
-  const b = state.user.zinoCoins || 0;
+function checkAllActivitiesDone(){
+  const acts=state.zinoLoop.dailyPlan.activities;
+  const allDone=acts.every(a=>a.completed);
+  if(allDone && acts.length>0){
+    setTimeout(()=>{
+      state.user.zinoCoins+=15; // All done bonus
+      updateAllZinos(); zlSave();
+      state.user.lastActiveDate=zlTodayStr();
+      showToast('⚡ SABHI QUESTS DONE! +15 Bonus Balloons! OP! 😎');
+      setTimeout(()=>showShareCard('alldone'),1400);
+    },600);
+  }
+}
 
-  // Determine level
-  const levels = [
-    { min: 0,    label: 'Beginner',          emoji: '🌱' },
-    { min: 3,    label: 'Challenger',         emoji: '⚡' },
-    { min: 7,    label: 'Consistent Player',  emoji: '🔥' },
-    { min: 14,   label: 'Beast Mode',         emoji: '💥' },
-    { min: 30,   label: 'Crazy Legend',       emoji: '👑' },
+// ── SHARE CARD v2 ──
+function showShareCard(triggerType='manual'){
+  const s=state.user.streak||0;
+  const b=state.user.zinoCoins||0;
+  const levels=[
+    {min:0, label:'Beginner', emoji:'🌱'}, {min:3, label:'Challenger', emoji:'⚡'},
+    {min:7, label:'Consistent Player', emoji:'🔥'}, {min:14, label:'Beast Mode', emoji:'💥'},
+    {min:30, label:'Crazy Legend', emoji:'👑'}
   ];
-  let lvl = levels[0];
-  levels.forEach(l => { if (s >= l.min) lvl = l; });
+  let lvl=levels[0]; levels.forEach(l=>{if(s>=l.min) lvl=l;});
 
-  document.getElementById('zl-sc-streak').textContent = s;
-  document.getElementById('zl-sc-balloons').textContent = b;
-  document.getElementById('zl-sc-level').textContent = lvl.label;
-  document.getElementById('zl-sc-level-emoji').textContent = lvl.emoji;
-  document.getElementById('zl-sc-label').textContent = lvl.label;
+  let title="ZINO LOOP";
+  if(triggerType==='milestone') title="🔥 STREAK MILESTONE!";
+  if(triggerType==='alldone') title="🎯 DAILY QUESTS DONE!";
 
+  document.getElementById('zl-sc-title').textContent=title;
+  document.getElementById('zl-sc-streak').textContent=s;
+  document.getElementById('zl-sc-balloons').textContent=b;
+  document.getElementById('zl-sc-level').textContent=lvl.label;
+  document.getElementById('zl-sc-level-emoji').textContent=lvl.emoji;
+  document.getElementById('zl-sc-label').textContent=lvl.label;
   document.getElementById('zl-share-modal').classList.remove('hidden');
 }
 
-function closeShareCard() {
-  document.getElementById('zl-share-modal').classList.add('hidden');
-}
+function closeShareCard(){ document.getElementById('zl-share-modal').classList.add('hidden'); }
 
-function downloadShareCard() {
-  showToast('💾 Card saving… (screenshot mode!)');
-  // For mobile demo: just prompt screenshot
+function shareZinoWhatsApp(){
+  const s=state.user.streak||0; const b=state.user.zinoCoins||0;
+  const text=`🔥 I'm on a ${s} Day Streak on Kidzinos!\n🎈 Collected ${b} Zino Balloons!\n\nJoin me and complete daily quests 🚀 #Kidzinos #CrazyXYZ`;
+  window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`,'_blank');
   closeShareCard();
 }
 
-function shareZinoCard() {
-  const s = state.user.streak || 0;
-  const b = state.user.zinoCoins || 0;
-  const text = `🔥 ${s} Day Streak on Kidzinos!\n🎈 ${b} Zino Balloons earned!\n\nLevel bana le 🚀 #Kidzinos #CrazyXYZ`;
-  if (navigator.share) {
-    navigator.share({ title: 'Mera Zino Loop Card! 🔥', text, url: 'https://kidzinos.com' }).catch(()=>{});
-  } else {
-    navigator.clipboard?.writeText(text);
-    showToast('📋 Card details copied!');
-  }
+function shareZinoCard(){
+  const s=state.user.streak||0; const b=state.user.zinoCoins||0;
+  const text=`🔥 I'm on a ${s} Day Streak on Kidzinos!\n🎈 Collected ${b} Zino Balloons!\n\nJoin me and complete daily quests 🚀 #Kidzinos #CrazyXYZ`;
+  if(navigator.share) navigator.share({title:'Mera Zino Loop Card! 🔥',text,url:'https://kidzinos.com'}).catch(()=>{});
+  else { navigator.clipboard?.writeText(text); showToast('📋 Card details copied!'); }
   closeShareCard();
 }
 
-// ── Hook initZinoLoop into home screen enter ──
-// (We extend the existing onScreenEnter override at bottom of file)
-const _zlOrigOnScreenEnter = onScreenEnter;
-function onScreenEnter(screenId) {
+// ── Hook initZinoLoop ──
+const _zlOrigOnScreenEnter=onScreenEnter;
+function onScreenEnter(screenId){
   _zlOrigOnScreenEnter(screenId);
-  if (screenId === 'home') {
-    initZinoLoop();
-  }
+  if(screenId==='home') initZinoLoop();
 }
+
