@@ -41,23 +41,39 @@ const questionBank = {
     { q: "Which planet is known as the Red Planet?", cat: "Science", opts: ["Earth", "Mars", "Venus", "Jupiter"], ans: 1 },
     { q: "What is the chemical symbol for Water?", cat: "Chemistry", opts: ["H2O", "CO2", "NaCl", "O2"], ans: 0 },
     { q: "Who invented the telephone?", cat: "History", opts: ["Edison", "Tesla", "Bell", "Marconi"], ans: 2 },
-    { q: "What is 15  8?", cat: "Mathematics", opts: ["100", "115", "120", "130"], ans: 2 },
+    { q: "What is 15 x 8?", cat: "Mathematics", opts: ["100", "115", "120", "130"], ans: 2 },
     { q: "Which is the largest ocean?", cat: "Geography", opts: ["Atlantic", "Indian", "Arctic", "Pacific"], ans: 3 },
     { q: "How many bones are in the human body?", cat: "Biology", opts: ["196", "206", "216", "226"], ans: 1 },
     { q: "What does DNA stand for?", cat: "Biology", opts: ["Deoxyribonucleic Acid", "Dynamic New Atom", "Double Neural Acid", "None"], ans: 0 },
     { q: "Who wrote 'Romeo and Juliet'?", cat: "Literature", opts: ["Dickens", "Austen", "Shakespeare", "Twain"], ans: 2 },
     { q: "What is the capital of India?", cat: "Geography", opts: ["Mumbai", "Delhi", "Kolkata", "Chennai"], ans: 1 },
     { q: "Which gas do plants absorb?", cat: "Science", opts: ["Oxygen", "Nitrogen", "Carbon Dioxide", "Hydrogen"], ans: 2 },
+    { q: "What is the hardest natural substance on Earth?", cat: "Science", opts: ["Gold", "Iron", "Diamond", "Platinum"], ans: 2 },
+    { q: "Who painted the Mona Lisa?", cat: "Art", opts: ["Van Gogh", "Da Vinci", "Picasso", "Michelangelo"], ans: 1 },
+    { q: "Which programming language is known as the web language?", cat: "Technology", opts: ["Python", "Java", "C++", "JavaScript"], ans: 3 },
+    { q: "What is the square root of 144?", cat: "Mathematics", opts: ["10", "12", "14", "16"], ans: 1 },
+    { q: "Which gas makes up most of Earth's atmosphere?", cat: "Science", opts: ["Oxygen", "Carbon", "Nitrogen", "Argon"], ans: 2 }
   ],
   war: [
     { q: "What is Newton's First Law of Motion about?", cat: "Physics", opts: ["Gravity", "Inertia", "Energy", "Force"], ans: 1 },
     { q: "The Mahabharata was written by whom?", cat: "Culture", opts: ["Valmiki", "Tulsidas", "Vyasa", "Kalidasa"], ans: 2 },
     { q: "Which country has the most natural lakes?", cat: "Geography", opts: ["USA", "Russia", "Canada", "Brazil"], ans: 2 },
-    { q: "What is the speed of light?", cat: "Physics", opts: ["310 m/s", "310 m/s", "310 m/s", "310 m/s"], ans: 0 },
+    { q: "What is the speed of light?", cat: "Physics", opts: ["3x10^8 m/s", "3x10^6 m/s", "3x10^5 m/s", "3x10^9 m/s"], ans: 0 },
     { q: "Which element has atomic number 1?", cat: "Chemistry", opts: ["Helium", "Hydrogen", "Lithium", "Carbon"], ans: 1 },
     { q: "Who was the first person in space?", cat: "Science", opts: ["Neil Armstrong", "Buzz Aldrin", "Yuri Gagarin", "John Glenn"], ans: 2 },
     { q: "How many sides does a hexagon have?", cat: "Mathematics", opts: ["5", "6", "7", "8"], ans: 1 },
+    { q: "What does CPU stand for in computers?", cat: "Technology", opts: ["Central Process Unit", "Computer Personal Unit", "Central Processing Unit", "Central Processor Unit"], ans: 2 },
+    { q: "Which planet is closest to the Sun?", cat: "Astronomy", opts: ["Venus", "Earth", "Mars", "Mercury"], ans: 3 },
+    { q: "What is the boiling point of water in Celsius?", cat: "Physics", opts: ["90", "100", "110", "120"], ans: 1 }
   ],
+  stash: [
+    { q: "Which is the tallest mountain in the world?", cat: "Geography", opts: ["K2", "Mount Everest", "Kangchenjunga", "Lhotse"], ans: 1 },
+    { q: "What is the largest mammal?", cat: "Biology", opts: ["Elephant", "Blue Whale", "Giraffe", "Shark"], ans: 1 },
+    { q: "Who discovered Penicillin?", cat: "Science", opts: ["Marie Curie", "Alexander Fleming", "Isaac Newton", "Albert Einstein"], ans: 1 },
+    { q: "Which is the smallest continent?", cat: "Geography", opts: ["Europe", "Australia", "Antarctica", "South America"], ans: 1 },
+    { q: "What is 25% of 200?", cat: "Mathematics", opts: ["25", "50", "75", "100"], ans: 1 },
+    { q: "In which year did the Titanic sink?", cat: "History", opts: ["1905", "1912", "1918", "1923"], ans: 1 }
+  ]
 };
 
 // ===== SCREEN NAVIGATION =====
@@ -113,7 +129,7 @@ function navigateTo(screenId) {
 
 function updateNavActive(screenId) {
   document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active-nav'));
-  const navMap = { home: 'nav-home', play: 'nav-play', watch: 'nav-watch', store: 'nav-store', profile: 'nav-profile' };
+  const navMap = { home: 'nav-home', play: 'nav-play', watch: 'nav-watch', community: 'nav-community', profile: 'nav-profile' };
   if (navMap[screenId]) {
     document.getElementById(navMap[screenId])?.classList.add('active-nav');
   }
@@ -313,7 +329,7 @@ function handleLogout() {
 // ===== QUIZ =====
 // ===== PLAY TABS =====
 function switchPlayTab(tab) {
-  const tabs = ['drill', 'clash', 'war'];
+  const tabs = ['drill', 'arcade', 'clash', 'war'];
   tabs.forEach(t => {
     const btn = document.getElementById(`ptab-${t}`);
     const content = document.getElementById(`ptab-content-${t}`);
@@ -371,7 +387,7 @@ function checkSubscription(feature) {
   return true;
 }
 
-function startQuiz(mode) {
+function startQuiz(mode, isVs = false, oppName = 'Opponent') {
   const questions = [...questionBank[mode] || questionBank.daily];
   // Shuffle
   for (let i = questions.length - 1; i > 0; i--) {
@@ -386,10 +402,28 @@ function startQuiz(mode) {
   state.quiz.correct = 0;
   state.quiz.streak = 0;
   state.quiz.startTime = Date.now();
+  state.quiz.isVs = isVs;
+  state.quiz.oppName = oppName;
+  state.quiz.oppScore = 0;
+  clearTimeout(state.quiz.oppTimeout);
+
+  const vsOverlay = document.getElementById('vs-mode-overlay');
+  if (vsOverlay) {
+    if (isVs) {
+      vsOverlay.classList.remove('hidden');
+      document.getElementById('vs-opp-name').textContent = oppName;
+      document.getElementById('vs-my-score').textContent = 0;
+      document.getElementById('vs-opp-score').textContent = 0;
+      document.getElementById('vs-prog-me').style.width = '0%';
+      document.getElementById('vs-prog-opp').style.width = '0%';
+    } else {
+      vsOverlay.classList.add('hidden');
+    }
+  }
 
   navigateTo('quiz');
 
-  const modeNames = { daily: ' Daily Drill', war: ' Crazy War', stash: '" Weekly Stash' };
+  const modeNames = { daily: ' Daily Drill', war: ' Crazy War', stash: ' Weekly Stash' };
   document.getElementById('quiz-mode-name').textContent = modeNames[mode] || 'Daily Drill';
 
   loadQuestion();
@@ -437,6 +471,7 @@ function loadQuestion() {
 
   // Timer
   startTimer();
+  if(state.quiz.isVs) simulateOpponent();
 }
 
 function startTimer() {
@@ -491,6 +526,13 @@ function selectAnswer(chosen, correct, btn, container) {
     state.quiz.streak = 0;
   }
 
+  
+  if(state.quiz.isVs) {
+    document.getElementById('vs-my-score').textContent = state.quiz.score;
+    const qCount = state.quiz.questions.length;
+    document.getElementById('vs-prog-me').style.width = ((state.quiz.current + 1)/qCount)*100 + '%';
+  }
+  
   state.quiz.current++;
   setTimeout(loadQuestion, 1200);
 }
@@ -1250,10 +1292,10 @@ const _origNavigateTo = navigateTo;
 
 // FAB visibility based on screen
 const origOnScreenEnter = onScreenEnter;
-function onScreenEnter(screenId) {
+onScreenEnter = function(screenId) {
   origOnScreenEnter(screenId);
   const fab = document.getElementById('games-fab');
-  const showFabOn = ['home','play','store','profile','csi'];
+  const showFabOn = ['home','play','store','profile','csi','community'];
   if (fab) {
     if (showFabOn.includes(screenId)) fab.classList.add('show');
     else fab.classList.remove('show');
@@ -1261,28 +1303,28 @@ function onScreenEnter(screenId) {
   if (screenId === 'home') {
     updateHomeStreakStrip();
   }
-}
+};
 
 // Hook watch videos to mission 1 (watch 2 videos)
 let videosWatchedCount = 0;
 const _origToggleReelPlay = toggleReelPlay;
-function toggleReelPlay(id) {
+toggleReelPlay = function(id) {
   _origToggleReelPlay(id);
   if (reelState[id] && reelState[id].playing) {
     // count watch start towards mission
   }
-}
+};
 
 // Override reelState earned to also track mission
 const _origUpdateZinos = updateAllZinos;
-function updateAllZinos() {
+updateAllZinos = function() {
   _origUpdateZinos();
   // track watch mission
   if (state.currentScreen === 'watch') {
     videosWatchedCount++;
     if (videosWatchedCount <= 2) completeMission(1);
   }
-}
+};
 
 
 /* ========================================
@@ -1920,8 +1962,103 @@ function shareZinoCard(){
 
 // ── Hook initZinoLoop ──
 const _zlOrigOnScreenEnter=onScreenEnter;
-function onScreenEnter(screenId){
+onScreenEnter = function(screenId){
   _zlOrigOnScreenEnter(screenId);
   if(screenId==='home') initZinoLoop();
+};
+
+// ===== FRIEND CHALLENGE =====
+let friendChallengesLeft = 3;
+
+function openFriendChallengeModal() {
+  document.getElementById('fc-modal').classList.remove('hidden');
+  document.getElementById('fc-modal-count').textContent = friendChallengesLeft;
+  const drillLeftCount = document.getElementById('fc-left-count');
+  if (drillLeftCount) drillLeftCount.textContent = friendChallengesLeft;
+}
+
+function closeFriendChallengeModal() {
+  document.getElementById('fc-modal').classList.add('hidden');
+}
+
+function sendFriendChallenge(btn, friendName) {
+  if (friendChallengesLeft <= 0) {
+    showToast('❌ No challenges left for today!');
+    return;
+  }
+  
+  if (btn.classList.contains('invited')) return;
+
+  friendChallengesLeft--;
+  state.user.csiScore += 20; // Increase social point
+  
+  btn.classList.add('invited');
+  btn.textContent = 'Invited!';
+  
+  document.getElementById('fc-modal-count').textContent = friendChallengesLeft;
+  const drillLeftCount = document.getElementById('fc-left-count');
+  if (drillLeftCount) drillLeftCount.textContent = friendChallengesLeft;
+  
+  showToast(`🔥 Challenged ${friendName}! +20 CSI Points!`);
+  
+  // Optionally update CSI visually if on CSI screen
+  const csiEl = document.getElementById('csi-score-number');
+  if (csiEl) csiEl.setAttribute('data-target', state.user.csiScore);
+
+  closeFriendChallengeModal();
+  startQuiz('daily', true, friendName);
+}
+// VS Mode opponent simulation
+function simulateOpponent() {
+  clearTimeout(state.quiz.oppTimeout);
+  if(state.quiz.current >= state.quiz.questions.length) return;
+  
+  const delay = 1000 + Math.random() * 4000; // Opponent takes 1-5 seconds to answer
+  state.quiz.oppTimeout = setTimeout(() => {
+    // 70% chance to get it right
+    if(Math.random() > 0.3) {
+      state.quiz.oppScore += 10 + Math.floor(Math.random()*5);
+      const oppScoreEl = document.getElementById('vs-opp-score');
+      if (oppScoreEl) oppScoreEl.textContent = state.quiz.oppScore;
+    }
+    const qCount = state.quiz.questions.length;
+    // Just loosely tie opponent progress to time passed so it feels alive
+    const oppProgEl = document.getElementById('vs-prog-opp');
+    if (oppProgEl) {
+        let oppProg = parseFloat(oppProgEl.style.width) || 0;
+        oppProg += (100 / qCount);
+        oppProgEl.style.width = Math.min(100, oppProg) + '%';
+    }
+    
+    // Sometimes opponent sends an emoji
+    if(Math.random() > 0.7) {
+      const emojis = ['🔥', '🥶', '💣'];
+      const e = emojis[Math.floor(Math.random() * emojis.length)];
+      showIncomingVsAttack(e);
+    }
+  }, delay);
+}
+
+function sendVsAttack(emoji) {
+  showToast(`Sent ${emoji} to ${state.quiz.oppName}!`);
+  // Small bonus
+  state.quiz.score += 5; 
+  if(state.quiz.isVs) {
+      const myScoreEl = document.getElementById('vs-my-score');
+      if(myScoreEl) myScoreEl.textContent = state.quiz.score;
+  }
+}
+
+function showIncomingVsAttack(emoji) {
+  const el = document.getElementById('vs-incoming-atk');
+  if(!el) return;
+  el.textContent = emoji;
+  el.classList.remove('hidden');
+  el.style.opacity = '1';
+  el.style.transform = 'translate(-50%,-50%) scale(2)';
+  setTimeout(() => {
+    el.style.opacity = '0';
+    el.style.transform = 'translate(-50%,-50%) scale(0)';
+  }, 1500);
 }
 

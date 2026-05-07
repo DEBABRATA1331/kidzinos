@@ -8,9 +8,10 @@
   <title>Kidzinos  S Ab Kuch Crazy Karte Hai!</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&family=Fredoka+One&family=Baloo+2:wght@400;600;700;800&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
   <link rel="stylesheet" href="style.css?v=2" />
+  <link rel="stylesheet" href="social-features.css?v=1" />
 </head>
 <body>
 
@@ -546,6 +547,9 @@
             <button class="chn-action-btn drill-action">
               <i class="fa-solid fa-bolt"></i> Start Now
             </button>
+            <button class="chn-action-btn" onclick="openFriendChallengeModal()" style="background: linear-gradient(135deg, #7c3aed, #4f46e5); margin-top: 8px;">
+              <i class="fa-solid fa-user-ninja"></i> Battle a Friend (<span id="fc-left-count">3</span> left)
+            </button>
           </div>
         </div>
 
@@ -686,6 +690,8 @@
 
       </div><!-- end war tab -->
 
+
+
       <div style="height:80px"></div>
     </div>
   </div>
@@ -813,6 +819,45 @@
     </div>
 
     <div class="quiz-body">
+      <!-- VS MODE OVERLAY (Hidden by default) -->
+      <div id="vs-mode-overlay" class="vs-mode-overlay hidden" style="background: rgba(0,0,0,0.4); padding: 10px; border-radius: 12px; margin-bottom: 15px; border: 1px solid rgba(255,255,255,0.1);">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom: 8px;">
+          <div style="display:flex; align-items:center; gap:8px;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#8b5cf6;display:flex;align-items:center;justify-content:center;font-weight:bold;">ME</div>
+            <div>
+              <div style="font-size:0.75rem; color:rgba(255,255,255,0.7);">Score</div>
+              <div style="font-size:1.1rem; font-weight:bold; color:#fff;" id="vs-my-score">0</div>
+            </div>
+          </div>
+          <div style="font-size: 1.2rem; font-weight:900; color:#f59e0b; font-style:italic;">VS</div>
+          <div style="display:flex; align-items:center; gap:8px; flex-direction:row-reverse; text-align:right;">
+            <div style="width:36px;height:36px;border-radius:50%;background:#ef4444;display:flex;align-items:center;justify-content:center;font-weight:bold;">OPP</div>
+            <div>
+              <div style="font-size:0.75rem; color:rgba(255,255,255,0.7);" id="vs-opp-name">Opponent</div>
+              <div style="font-size:1.1rem; font-weight:bold; color:#fff;" id="vs-opp-score">0</div>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Progress bars -->
+        <div style="width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:3px; margin-bottom:4px; overflow:hidden;">
+          <div id="vs-prog-me" style="width:0%; height:100%; background:#8b5cf6; transition:width 0.3s;"></div>
+        </div>
+        <div style="width:100%; height:6px; background:rgba(255,255,255,0.1); border-radius:3px; margin-bottom:10px; overflow:hidden;">
+          <div id="vs-prog-opp" style="width:0%; height:100%; background:#ef4444; transition:width 0.3s;"></div>
+        </div>
+        
+        <!-- Emoji Attack -->
+        <div style="display:flex; justify-content:center; gap:12px;">
+          <button onclick="sendVsAttack('🔥')" style="background:rgba(255,255,255,0.1); border:none; border-radius:20px; padding:4px 12px; font-size:1.2rem; cursor:pointer;">🔥</button>
+          <button onclick="sendVsAttack('🥶')" style="background:rgba(255,255,255,0.1); border:none; border-radius:20px; padding:4px 12px; font-size:1.2rem; cursor:pointer;">🥶</button>
+          <button onclick="sendVsAttack('💣')" style="background:rgba(255,255,255,0.1); border:none; border-radius:20px; padding:4px 12px; font-size:1.2rem; cursor:pointer;">💣</button>
+        </div>
+        
+        <!-- Incoming Attack Anim -->
+        <div id="vs-incoming-atk" style="position:absolute; top:40%; left:50%; transform:translate(-50%,-50%) scale(0); font-size:100px; opacity:0; pointer-events:none; transition:all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); z-index:1000;"></div>
+      </div>
+
       <div class="quiz-streak-banner" id="quiz-streak-banner" style="display:none">
          Streak x<span id="streak-num">2</span>! Keep going!
       </div>
@@ -1628,6 +1673,71 @@
         <div class="game-card-name">Street Rush</div>
         <div class="game-card-reward">+15 🎈 per round</div>
       </div>
+      <div class="game-card gc-flappy" onclick="launchGame('flappy')" style="background:linear-gradient(135deg,#3b0764,#6b21a8);border-color:rgba(216,184,255,0.5);">
+        <span class="game-card-emoji">🎈</span>
+        <div class="game-card-name">Flappy Balloon</div>
+        <div class="game-card-reward">+10 🎈 per round</div>
+      </div>
+      <div class="game-card gc-shooter" onclick="launchGame('shooter')" style="background:linear-gradient(135deg,#000000,#1e1b4b);border-color:rgba(99,102,241,0.5);">
+        <span class="game-card-emoji">🚀</span>
+        <div class="game-card-name">Space Shooter</div>
+        <div class="game-card-reward">+15 🎈 per round</div>
+      </div>
+      <div class="game-card gc-whack" onclick="launchGame('whack')" style="background:linear-gradient(135deg,#450a0a,#7f1d1d);border-color:rgba(239,68,68,0.5);">
+        <span class="game-card-emoji">👾</span>
+        <div class="game-card-name">Whack-a-Monster</div>
+        <div class="game-card-reward">+10 🎈 per round</div>
+      </div>
+      <div class="game-card gc-brick" onclick="launchGame('brick')" style="background:linear-gradient(135deg,#172554,#1e3a8a);border-color:rgba(59,130,246,0.5);">
+        <span class="game-card-emoji">🧱</span>
+        <div class="game-card-name">Brick Breaker</div>
+        <div class="game-card-reward">+15 🎈 per round</div>
+      </div>
+      <div class="game-card gc-doodle" onclick="launchGame('doodle')" style="background:linear-gradient(135deg,#064e3b,#047857);border-color:rgba(16,185,129,0.5);">
+        <span class="game-card-emoji">🦘</span>
+        <div class="game-card-name">Doodle Jumper</div>
+        <div class="game-card-reward">+15 🎈 per round</div>
+      </div>
+      <div class="game-card gc-car" onclick="launchGame('car')" style="background:linear-gradient(135deg,#422006,#713f12);border-color:rgba(234,179,8,0.5);">
+        <span class="game-card-emoji">🏎️</span>
+        <div class="game-card-name">Car Dodger</div>
+        <div class="game-card-reward">+10 🎈 per round</div>
+      </div>
+      <div class="game-card gc-mathslice" onclick="launchGame('mathslice')" style="background:linear-gradient(135deg,#0f172a,#334155);border-color:rgba(148,163,184,0.5);">
+        <span class="game-card-emoji">🔪</span>
+        <div class="game-card-name">Math Slicer</div>
+        <div class="game-card-reward">+15 🎈 per round</div>
+      </div>
+      <div class="game-card gc-catch" onclick="launchGame('catch')" style="background:linear-gradient(135deg,#312e81,#4338ca);border-color:rgba(99,102,241,0.5);">
+        <span class="game-card-emoji">🧺</span>
+        <div class="game-card-name">Catch 'Em All</div>
+        <div class="game-card-reward">+10 🎈 per round</div>
+      </div>
+      <div class="game-card gc-simon" onclick="launchGame('simon')" style="background:linear-gradient(135deg,#831843,#be185d);border-color:rgba(244,114,182,0.5);">
+        <span class="game-card-emoji">🧠</span>
+        <div class="game-card-name">Simon Pattern</div>
+        <div class="game-card-reward">+20 🎈 per round</div>
+      </div>
+      <div class="game-card gc-ttt" onclick="launchGame('ttt')" style="background:linear-gradient(135deg,#022c22,#065f46);border-color:rgba(52,211,153,0.5);">
+        <span class="game-card-emoji">❌</span>
+        <div class="game-card-name">Tic Tac Toe</div>
+        <div class="game-card-reward">+10 🎈 per round</div>
+      </div>
+      <div class="game-card gc-word" onclick="launchGame('word')" style="background:linear-gradient(135deg,#2e1065,#4c1d95);border-color:rgba(167,139,250,0.5);">
+        <span class="game-card-emoji">📝</span>
+        <div class="game-card-name">Word Guess</div>
+        <div class="game-card-reward">+15 🎈 per round</div>
+      </div>
+      <div class="game-card gc-colormatch" onclick="launchGame('colormatch')" style="background:linear-gradient(135deg,#4a044e,#701a75);border-color:rgba(232,121,249,0.5);">
+        <span class="game-card-emoji">🎨</span>
+        <div class="game-card-name">Color Match</div>
+        <div class="game-card-reward">+10 🎈 per round</div>
+      </div>
+      <div class="game-card gc-gravity" onclick="launchGame('gravity')" style="background:linear-gradient(135deg,#1c1917,#44403c);border-color:rgba(168,162,158,0.5);">
+        <span class="game-card-emoji">🔄</span>
+        <div class="game-card-name">Gravity Flip</div>
+        <div class="game-card-reward">+15 🎈 per round</div>
+      </div>
     </div>
     <!-- Prizes info -->
     <div style="margin:0 16px;">
@@ -1696,13 +1806,13 @@
     <div class="nav-icon"><i class="fa-solid fa-circle-play"></i></div>
     <div class="nav-label">Watch</div>
   </button>
-  <button class="nav-item" id="nav-store" onclick="navigateTo('store')">
-    <div class="nav-icon"><i class="fa-solid fa-bag-shopping"></i></div>
-    <div class="nav-label">Store</div>
+  <button class="nav-item" id="nav-community" onclick="navigateTo('community')">
+    <div class="nav-icon"><i class="fa-solid fa-fire"></i></div>
+    <div class="nav-label">Community</div>
   </button>
-  <button class="nav-item" id="nav-profile" onclick="navigateTo('profile')">
-    <div class="nav-icon"><i class="fa-solid fa-circle-user"></i></div>
-    <div class="nav-label">Profile</div>
+  <button class="nav-item" id="nav-arcade" onclick="navigateTo('games')">
+    <div class="nav-icon"><i class="fa-solid fa-gamepad"></i></div>
+    <div class="nav-label">Arcade</div>
   </button>
 </nav>
 
@@ -1804,8 +1914,248 @@
   </div>
 </div>
 
+<!-- ====== COMMUNITY SCREEN ====== -->
+<div id="screen-community" class="screen app-screen">
+  <div class="app-wrap">
+    <div class="comm-header">
+      <div class="comm-header-left">
+        <div class="comm-title">Community</div>
+        <div class="comm-sub">Think. Share. Rise.</div>
+      </div>
+      <div class="comm-header-right">
+        <div class="comm-xp-pill"><i class="fa-solid fa-bolt"></i> <span id="comm-xp">7,840</span> XP</div>
+      </div>
+    </div>
+
+    <!-- Community Sub-tabs -->
+    <div class="comm-tab-row">
+      <button class="comm-tab active-ctab" id="ctab-dilemma" onclick="switchCommTab('dilemma')">
+        <i class="fa-solid fa-scale-balanced"></i> Dilemma
+      </button>
+      <button class="comm-tab" id="ctab-sparks" onclick="switchCommTab('sparks')">
+        <i class="fa-solid fa-bolt"></i> Sparks
+      </button>
+      <button class="comm-tab" id="ctab-firevotes" onclick="switchCommTab('firevotes')">
+        <i class="fa-solid fa-fire"></i> Fire Votes
+      </button>
+    </div>
+
+    <div class="home-scroll" id="comm-scroll">
+
+      <!-- ===== DAILY DILEMMA TAB ===== -->
+      <div id="ctab-content-dilemma" class="ctab-content">
+        <div class="dilemma-card" id="dilemma-card">
+          <div class="dilemma-date" id="dilemma-date">Daily Dilemma &middot; May 6</div>
+          <div class="dilemma-question" id="dilemma-question">Should robots be allowed to make decisions for humans?</div>
+          <div class="dilemma-voters" id="dilemma-voters">4,218 students voted today</div>
+
+          <!-- Vote Buttons (pre-vote state) -->
+          <div class="dilemma-vote-area" id="dilemma-vote-area">
+            <button class="dilemma-vote-btn dv-yes" id="dv-yes" onclick="voteDilemma('yes')">
+              <i class="fa-solid fa-check"></i> Yes
+            </button>
+            <button class="dilemma-vote-btn dv-no" id="dv-no" onclick="voteDilemma('no')">
+              <i class="fa-solid fa-xmark"></i> No
+            </button>
+          </div>
+
+          <!-- Post-vote state (hidden initially) -->
+          <div class="dilemma-result-area hidden" id="dilemma-result-area">
+            <div class="dilemma-your-vote">You voted: <span id="dilemma-your-vote-text" class="dv-highlight">Yes</span></div>
+            <div class="dilemma-lock-msg" id="dilemma-lock-msg">
+              <div class="lock-timer-ring">
+                <svg viewBox="0 0 36 36" class="lock-svg">
+                  <circle cx="18" cy="18" r="16" fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="3"/>
+                  <circle cx="18" cy="18" r="16" fill="none" stroke="#A855F7" stroke-width="3" stroke-dasharray="100" stroke-dashoffset="0" stroke-linecap="round" id="lock-timer-circle" transform="rotate(-90 18 18)"/>
+                </svg>
+                <span class="lock-timer-num" id="lock-timer-num">30</span>
+              </div>
+              <span>Results reveal in <strong id="lock-seconds">30</strong>s</span>
+            </div>
+            <div class="dilemma-bars hidden" id="dilemma-bars">
+              <div class="dilemma-bar-row">
+                <span class="db-label">Yes &middot; <span id="db-yes-pct">62</span>%</span>
+                <span class="db-label">No &middot; <span id="db-no-pct">38</span>%</span>
+              </div>
+              <div class="dilemma-bar-track">
+                <div class="dilemma-bar-fill" id="dilemma-bar-fill" style="width:0%"></div>
+              </div>
+              <div class="dilemma-majority" id="dilemma-majority">You're with the majority today!</div>
+            </div>
+          </div>
+
+          <!-- Reasoning -->
+          <div class="dilemma-reasoning-area hidden" id="dilemma-reasoning-area">
+            <div class="dilemma-reason-label">Your reasoning (optional)</div>
+            <div class="dilemma-reason-wrap">
+              <textarea class="dilemma-reason-input" id="dilemma-reason-input" maxlength="100" placeholder="Add your take... (100 chars)"></textarea>
+              <span class="dilemma-char-count" id="dilemma-char-count">0/100</span>
+            </div>
+            <button class="dilemma-reason-btn" onclick="postDilemmaReasoning()"><i class="fa-solid fa-paper-plane"></i> Post under alias (+5 XP)</button>
+          </div>
+
+          <!-- Share -->
+          <div class="dilemma-share-row hidden" id="dilemma-share-row">
+            <button class="dilemma-share-btn" onclick="shareDilemma()">
+              <i class="fa-brands fa-whatsapp"></i> Share on WhatsApp
+            </button>
+          </div>
+        </div>
+
+        <!-- Top Reasonings -->
+        <div class="comm-section-hdr" style="margin-top:16px">
+          <span><i class="fa-solid fa-fire"></i> Top Reasonings Today</span>
+        </div>
+        <div id="dilemma-reasonings-feed" class="reasonings-feed">
+          <!-- JS populated -->
+        </div>
+      </div>
+
+      <!-- ===== SPARKS TAB ===== -->
+      <div id="ctab-content-sparks" class="ctab-content hidden">
+        <!-- Create Spark Form -->
+        <div class="create-post-card" style="background: rgba(168,85,247,0.1); border: 1.5px solid rgba(168,85,247,0.3); border-radius: 14px; padding: 14px; margin-bottom: 16px;">
+          <div style="font-size: 0.85rem; font-weight: 700; color: #A855F7; margin-bottom: 8px;"><i class="fa-solid fa-pen-to-square"></i> Create a Spark</div>
+          <textarea id="new-spark-input" style="width:100%; height:60px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color:#fff; padding:8px; font-family:var(--font-main); font-size:0.85rem; resize:none; margin-bottom:8px;" placeholder="What's on your mind?"></textarea>
+          <div style="display:flex; gap:8px;">
+            <select id="new-spark-topic" style="flex:1; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color:#fff; padding:6px; font-size:0.8rem; outline:none;">
+              <option value="Science">Science</option>
+              <option value="History">History</option>
+              <option value="Mathematics">Maths</option>
+              <option value="Geography">Geography</option>
+              <option value="Biology">Biology</option>
+            </select>
+            <button onclick="postUserSpark()" style="background: linear-gradient(135deg, #A855F7, #7C3AED); border:none; border-radius:8px; padding: 6px 16px; color:#fff; font-weight:bold; cursor:pointer;">Post</button>
+          </div>
+        </div>
+
+        <!-- Topic filter pills -->
+        <div class="spark-filter-row" id="spark-filter-row">
+          <button class="spark-filter active-sf" data-topic="all" onclick="filterSparks('all')">All</button>
+          <button class="spark-filter" data-topic="Science" onclick="filterSparks('Science')"><i class="fa-solid fa-flask"></i> Science</button>
+          <button class="spark-filter" data-topic="History" onclick="filterSparks('History')"><i class="fa-solid fa-landmark"></i> History</button>
+          <button class="spark-filter" data-topic="Mathematics" onclick="filterSparks('Mathematics')"><i class="fa-solid fa-calculator"></i> Maths</button>
+          <button class="spark-filter" data-topic="Geography" onclick="filterSparks('Geography')"><i class="fa-solid fa-globe"></i> Geography</button>
+          <button class="spark-filter" data-topic="Biology" onclick="filterSparks('Biology')"><i class="fa-solid fa-dna"></i> Biology</button>
+        </div>
+
+        <!-- Sparks Feed -->
+        <div id="sparks-feed" class="sparks-feed">
+          <!-- JS populated -->
+        </div>
+      </div>
+
+      <!-- ===== FIRE VOTES TAB ===== -->
+      <div id="ctab-content-firevotes" class="ctab-content hidden">
+        <!-- Create Fire Vote Form -->
+        <div class="create-post-card" style="background: rgba(249,115,22,0.1); border: 1.5px solid rgba(249,115,22,0.3); border-radius: 14px; padding: 14px; margin-bottom: 16px;">
+          <div style="font-size: 0.85rem; font-weight: 700; color: #F97316; margin-bottom: 8px;"><i class="fa-solid fa-fire"></i> Create a Fire Vote</div>
+          <textarea id="new-fv-input" style="width:100%; height:60px; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color:#fff; padding:8px; font-family:var(--font-main); font-size:0.85rem; resize:none; margin-bottom:8px;" placeholder="Share an opinion for people to vote on..."></textarea>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="new-fv-topic" placeholder="Topic (e.g. Technology)" style="flex:1; background: rgba(0,0,0,0.2); border: 1px solid rgba(255,255,255,0.1); border-radius: 8px; color:#fff; padding:6px; font-size:0.8rem; outline:none;">
+            <button onclick="postUserFireVote()" style="background: linear-gradient(135deg, #F97316, #EA580C); border:none; border-radius:8px; padding: 6px 16px; color:#fff; font-weight:bold; cursor:pointer;">Post</button>
+          </div>
+        </div>
+
+        <div class="fv-header-card">
+          <div class="fv-title-row">
+            <div class="fv-title">Fire Votes &middot; This Week</div>
+            <div class="fv-fire-remaining" id="fv-fire-remaining">
+              <i class="fa-solid fa-fire"></i> <span id="fv-fires-left">10</span> fires left
+            </div>
+          </div>
+          <div class="fv-age-band-row">
+            <button class="fv-band active-band" data-band="all" onclick="filterFireBand('all')">All</button>
+            <button class="fv-band" data-band="10-12" onclick="filterFireBand('10-12')">10&ndash;12</button>
+            <button class="fv-band" data-band="13-15" onclick="filterFireBand('13-15')">13&ndash;15</button>
+            <button class="fv-band" data-band="16-17" onclick="filterFireBand('16-17')">16&ndash;17</button>
+          </div>
+        </div>
+
+        <!-- Fire Votes Feed -->
+        <div id="firevotes-feed" class="firevotes-feed">
+          <!-- JS populated -->
+        </div>
+
+        <!-- Weekly Winners -->
+        <div class="fv-winners-section hidden" id="fv-winners-section">
+          <div class="comm-section-hdr"><span><i class="fa-solid fa-trophy"></i> Fire Thinkers of the Week</span></div>
+          <div id="fv-winners-list" class="fv-winners-list"></div>
+        </div>
+      </div>
+
+      <div style="height:80px"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ====== SPARK PROMPT MODAL (post-quiz) ====== -->
+<div id="spark-prompt-modal" class="spark-prompt-overlay hidden">
+  <div class="spark-prompt-card">
+    <div class="spark-prompt-header">
+      <div class="spark-prompt-badge">Quiz Complete!</div>
+      <div class="spark-prompt-score" id="spark-score">8/10</div>
+      <div class="spark-prompt-topic" id="spark-topic">Photosynthesis &middot; +80 XP</div>
+    </div>
+    <div class="spark-prompt-body">
+      <div class="spark-prompt-alias" id="spark-alias">
+        <i class="fa-solid fa-user-secret"></i> Cosmic Falcon's spark &#10022;
+      </div>
+      <div class="spark-prompt-question" id="spark-prompt-q">
+        If plants can make food from sunlight, why can't humans just sit in the sun?
+      </div>
+      <div class="spark-input-wrap">
+        <textarea class="spark-input" id="spark-input" maxlength="150" placeholder="Share your thought... (150 chars)"></textarea>
+        <span class="spark-char-count" id="spark-char-count">0/150</span>
+      </div>
+    </div>
+    <div class="spark-prompt-actions">
+      <button class="spark-post-btn" onclick="postSpark()">
+        <i class="fa-solid fa-paper-plane"></i> Post anonymously (+10 XP)
+      </button>
+      <button class="spark-skip-btn" onclick="closeSparkPrompt()">
+        Skip for now
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ====== FRIEND CHALLENGE MODAL ====== -->
+<div id="fc-modal" class="modal-overlay hidden">
+  <div class="modal-card">
+    <div class="modal-icon">⚔️</div>
+    <div class="modal-title">Battle a Friend</div>
+    <div class="modal-sub">Challenge friends real-time! Earn CSI Points for playing together.</div>
+    
+    <div style="margin: 16px 0; background: rgba(0,0,0,0.2); border-radius: 12px; padding: 12px; max-height: 200px; overflow-y: auto;">
+      <div class="fc-friend-row">
+        <div class="fc-avatar">R</div>
+        <div class="fc-name">Rahul Verma</div>
+        <button class="fc-invite-btn" onclick="sendFriendChallenge(this, 'Rahul Verma')">Invite</button>
+      </div>
+      <div class="fc-friend-row">
+        <div class="fc-avatar">P</div>
+        <div class="fc-name">Priya Sharma</div>
+        <button class="fc-invite-btn" onclick="sendFriendChallenge(this, 'Priya Sharma')">Invite</button>
+      </div>
+      <div class="fc-friend-row">
+        <div class="fc-avatar">A</div>
+        <div class="fc-name">Aarav Singh</div>
+        <button class="fc-invite-btn" onclick="sendFriendChallenge(this, 'Aarav Singh')">Invite</button>
+      </div>
+    </div>
+
+    <div class="modal-current" style="margin-bottom:12px;">Challenges left today: <strong id="fc-modal-count">3</strong></div>
+    
+    <div class="modal-actions">
+      <button class="modal-cancel" onclick="closeFriendChallengeModal()">Close</button>
+    </div>
+  </div>
+</div>
+
 <script src="app.js?v=2"></script>
 <script src="arcade-games.js?v=2"></script>
+<script src="social-features.js?v=1"></script>
 </body>
 </html>
 
