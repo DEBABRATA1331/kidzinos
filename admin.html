@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="description" content="Kidzinos Admin Dashboard - Real-time Feature Integration">
+  <title>Kidzinos Admin Dashboard</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body>
+
+  <!-- Background Gradients -->
+  <div class="bg-glow bg-glow-1"></div>
+  <div class="bg-glow bg-glow-2"></div>
+
+  <div class="admin-container">
+    <!-- Header -->
+    <header class="admin-header">
+      <div class="logo-area">
+        <span class="logo-brand">Kidz<span>inos</span></span>
+        <span class="logo-badge">ADMIN</span>
+      </div>
+      <div class="header-actions">
+        <a href="index.html" class="view-app-btn"><i class="fa-solid fa-arrow-left"></i> Back to App</a>
+      </div>
+    </header>
+
+    <!-- Main Layout -->
+    <div class="admin-content-layout">
+      
+      <!-- Sidebar / Navigation -->
+      <aside class="admin-sidebar">
+        <div class="nav-group">
+          <div class="nav-label">Management</div>
+          <button class="side-nav-btn active" onclick="switchTab('contests')">
+            <i class="fa-solid fa-trophy"></i> Contests
+          </button>
+          <button class="side-nav-btn" onclick="switchTab('questions')">
+            <i class="fa-solid fa-circle-question"></i> Questions
+          </button>
+        </div>
+        
+        <div class="stats-panel">
+          <div class="stat-card">
+            <div class="stat-value" id="stat-contests-count">0</div>
+            <div class="stat-title">Active Contests</div>
+          </div>
+          <div class="stat-card">
+            <div class="stat-value" id="stat-questions-count">0</div>
+            <div class="stat-title">Uploaded Qs</div>
+          </div>
+        </div>
+      </aside>
+
+      <!-- Main Panels -->
+      <main class="admin-main">
+        
+        <!-- ==================== CONTESTS TAB ==================== -->
+        <section id="tab-contests" class="tab-panel active">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Contest Creator</h2>
+              <p class="panel-sub">Deploy real-time interactive challenges to the kidzinos app.</p>
+            </div>
+          </div>
+
+          <div class="panel-grid">
+            <!-- Form Card -->
+            <div class="form-container-card">
+              <h3 class="form-header-title"><i class="fa-solid fa-plus"></i> Create New Contest</h3>
+              <form id="contest-form" onsubmit="saveContest(event)">
+                <div class="form-grid-2">
+                  <div class="input-field">
+                    <label for="contest-title">Contest Title</label>
+                    <input type="text" id="contest-title" placeholder="e.g. WAH WAH CHALLENGE" required>
+                  </div>
+                  <div class="input-field">
+                    <label for="contest-image">Banner Image URL</label>
+                    <input type="text" id="contest-image" placeholder="e.g. char1.jpg or external url">
+                  </div>
+                </div>
+
+                <div class="form-grid-3">
+                  <div class="input-field">
+                    <label for="contest-type">Challenge Type</label>
+                    <select id="contest-type" required>
+                      <option value="Practice">Practice</option>
+                      <option value="Contest">Contest</option>
+                      <option value="Clash">Clash</option>
+                      <option value="War" selected>War</option>
+                    </select>
+                  </div>
+                  <div class="input-field">
+                    <label for="contest-pricing">Mode / Pricing</label>
+                    <select id="contest-pricing" onchange="toggleEntryFee()">
+                      <option value="Free" selected>Free</option>
+                      <option value="Paid">Paid</option>
+                    </select>
+                  </div>
+                  <div class="input-field" id="entry-fee-group" style="opacity: 0.5; pointer-events: none;">
+                    <label for="contest-fee">Entry Fee (INR)</label>
+                    <input type="number" id="contest-fee" value="0" min="0">
+                  </div>
+                </div>
+
+                <div class="form-grid-2">
+                  <div class="input-field">
+                    <label for="contest-league">Target League</label>
+                    <select id="contest-league">
+                      <option value="No League" selected>No League</option>
+                      <option value="Junior">Junior (Ages 8-12)</option>
+                      <option value="Senior">Senior (Ages 13-17)</option>
+                    </select>
+                  </div>
+                  <div class="input-field">
+                    <label for="contest-end">End Date & Time</label>
+                    <input type="datetime-local" id="contest-end" required>
+                  </div>
+                </div>
+
+                <!-- Enrollment Window -->
+                <div class="form-grid-2">
+                  <div class="input-field">
+                    <label for="enroll-opens">Enrollment Opens</label>
+                    <input type="datetime-local" id="enroll-opens">
+                  </div>
+                  <div class="input-field">
+                    <label for="enroll-closes">Enrollment Closes</label>
+                    <input type="datetime-local" id="enroll-closes">
+                  </div>
+                </div>
+
+                <div class="input-field">
+                  <label for="contest-rules">Contest Rules (One per line)</label>
+                  <textarea id="contest-rules" rows="4" placeholder="One Shot Only - Once you submit, that attempt is locked.&#10;Beat the Clock - Finish before time runs out.&#10;Play Fair, Think Smart."></textarea>
+                </div>
+
+                <!-- Prizes -->
+                <div class="prizes-section">
+                  <div class="prizes-header">
+                    <label>Prizes</label>
+                    <button type="button" class="add-prize-btn" onclick="addPrizeInput()"><i class="fa-solid fa-plus"></i> Add Prize</button>
+                  </div>
+                  <div id="prizes-list-container" class="prizes-input-list">
+                    <div class="prize-input-row">
+                      <span class="prize-rank">1st</span>
+                      <input type="text" placeholder="e.g. ₹50,000 cash or 500 coins" required>
+                      <button type="button" class="del-prize-btn" onclick="removePrizeRow(this)"><i class="fa-solid fa-trash"></i></button>
+                    </div>
+                  </div>
+                </div>
+
+                <button type="submit" class="submit-action-btn"><i class="fa-solid fa-rocket"></i> Launch Contest</button>
+              </form>
+            </div>
+
+            <!-- List Card -->
+            <div class="list-container-card">
+              <h3 class="form-header-title"><i class="fa-solid fa-list"></i> Custom Contests</h3>
+              <div id="contests-list" class="items-list scrollable-list">
+                <!-- Dynamically populated -->
+                <div class="empty-state">No custom contests launched yet.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ==================== QUESTIONS TAB ==================== -->
+        <section id="tab-questions" class="tab-panel">
+          <div class="panel-header">
+            <div>
+              <h2 class="panel-title">Question Uploader</h2>
+              <p class="panel-sub">Append questions directly to the quiz modes.</p>
+            </div>
+          </div>
+
+          <div class="panel-grid">
+            <!-- Form Card -->
+            <div class="form-container-card">
+              <h3 class="form-header-title"><i class="fa-solid fa-plus"></i> Upload Question</h3>
+              <form id="question-form" onsubmit="saveQuestion(event)">
+                <div class="form-grid-2">
+                  <div class="input-field">
+                    <label for="q-category">Quiz Mode / Category</label>
+                    <select id="q-category" required>
+                      <option value="daily">Daily Drill</option>
+                      <option value="war" selected>Crazy War</option>
+                      <option value="stash">Weekly Stash</option>
+                    </select>
+                  </div>
+                  <div class="input-field">
+                    <label for="q-tag">Subject Tag</label>
+                    <input type="text" id="q-tag" placeholder="e.g. Science, Tech, Mathematics" required>
+                  </div>
+                </div>
+
+                <div class="input-field">
+                  <label for="q-text">Question Text</label>
+                  <input type="text" id="q-text" placeholder="Enter your crazy question..." required>
+                </div>
+
+                <!-- Options -->
+                <div class="options-group">
+                  <label>Answer Options</label>
+                  <div class="option-row">
+                    <span class="opt-label">A</span>
+                    <input type="text" class="q-opt-val" placeholder="Option A" required>
+                  </div>
+                  <div class="option-row">
+                    <span class="opt-label">B</span>
+                    <input type="text" class="q-opt-val" placeholder="Option B" required>
+                  </div>
+                  <div class="option-row">
+                    <span class="opt-label">C</span>
+                    <input type="text" class="q-opt-val" placeholder="Option C" required>
+                  </div>
+                  <div class="option-row">
+                    <span class="opt-label">D</span>
+                    <input type="text" class="q-opt-val" placeholder="Option D" required>
+                  </div>
+                </div>
+
+                <div class="input-field">
+                  <label for="q-correct">Correct Option</label>
+                  <select id="q-correct" required>
+                    <option value="0">Option A</option>
+                    <option value="1">Option B</option>
+                    <option value="2">Option C</option>
+                    <option value="3">Option D</option>
+                  </select>
+                </div>
+
+                <button type="submit" class="submit-action-btn"><i class="fa-solid fa-cloud-arrow-up"></i> Upload Question</button>
+              </form>
+            </div>
+
+            <!-- List Card -->
+            <div class="list-container-card">
+              <h3 class="form-header-title"><i class="fa-solid fa-database"></i> Question Database</h3>
+              <div id="questions-list" class="items-list scrollable-list">
+                <!-- Dynamically populated -->
+                <div class="empty-state">No custom questions uploaded yet.</div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- Toast system -->
+  <div id="toast" class="toast hidden"></div>
+
+  <!-- Hidden iframe for cross-origin sync with the main app -->
+  <iframe id="sync-iframe" src="http://localhost:5001/sync.html" style="display:none;"></iframe>
+
+  <script src="admin.js"></script>
+</body>
+</html>

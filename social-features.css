@@ -435,3 +435,154 @@
 .fc-invite-btn.invited {
   background: #22c55e; border-color: transparent; color: #fff; pointer-events: none;
 }
+
+/* ========================================================
+   UNLIMITED ZONE FEED STYLES
+   ======================================================== */
+.uz-feed-container {
+  scrollbar-width: none;
+}
+.uz-feed-container::-webkit-scrollbar {
+  display: none;
+}
+
+.uz-post {
+  scroll-snap-align: start;
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  padding: 80px 20px 20px 20px;
+  box-sizing: border-box;
+}
+
+.uz-post-inner {
+  width: 100%;
+  max-width: 400px;
+  background: var(--st-card);
+  border-radius: 24px;
+  padding: 24px;
+  position: relative;
+  border: 1px solid rgba(255,255,255,0.05);
+  box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+/* Specific post types */
+.uz-post-city {
+  padding: 0;
+  overflow: hidden;
+  background: transparent;
+  border: none;
+}
+.uz-post-city img {
+  width: 100%;
+  height: 350px;
+  object-fit: cover;
+  border-radius: 24px;
+  border: 2px solid rgba(255,255,255,0.1);
+}
+.uz-post-city-info {
+  background: rgba(0,0,0,0.8);
+  backdrop-filter: blur(10px);
+  padding: 16px;
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  border-bottom-left-radius: 24px;
+  border-bottom-right-radius: 24px;
+}
+
+.uz-post-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  margin-bottom: 16px;
+}
+.uz-post-avatar {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #a855f7, #ec4899);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 1.2rem;
+  color: #fff;
+}
+.uz-post-user {
+  text-align: left;
+}
+.uz-post-user-name {
+  font-weight: 700;
+  font-size: 1rem;
+  color: #fff;
+}
+.uz-post-user-time {
+  font-size: 0.75rem;
+  color: rgba(255,255,255,0.5);
+}
+
+/* Reactions */
+.uz-reactions {
+  display: flex;
+  gap: 16px;
+  margin-top: 20px;
+  width: 100%;
+  justify-content: center;
+}
+.uz-reaction-btn {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  cursor: pointer;
+  transition: transform 0.2s;
+}
+.uz-reaction-btn:hover {
+  transform: scale(1.1);
+}
+.uz-reaction-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  transition: all 0.3s;
+}
+.uz-reaction-count {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.7);
+}
+
+.uz-reaction-btn.reacted-hype .uz-reaction-icon {
+  background: #eab308;
+  color: #fff;
+  box-shadow: 0 0 15px rgba(234,175,8,0.5);
+}
+.uz-reaction-btn.reacted-buzz .uz-reaction-icon {
+  background: #3b82f6;
+  color: #fff;
+  box-shadow: 0 0 15px rgba(59,130,246,0.5);
+}
+.uz-reaction-btn.reacted-love .uz-reaction-icon {
+  background: #ef4444;
+  color: #fff;
+  box-shadow: 0 0 15px rgba(239,68,68,0.5);
+}

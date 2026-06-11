@@ -78,8 +78,8 @@ const questionBank = {
 
 // ===== SCREEN NAVIGATION =====
 function navigateTo(screenId) {
-  const noNav = ['splash','login','register','quiz','result'];
-  const noStrip = ['splash','login','register','quiz','result'];
+  const noNav = ['splash','login','register','quiz','result','battle','unlimited-zone'];
+  const noStrip = ['splash','login','register','quiz','result','battle'];
 
   const currentEl = document.getElementById(`screen-${state.currentScreen}`);
   const nextEl = document.getElementById(`screen-${screenId}`);
@@ -121,6 +121,7 @@ function navigateTo(screenId) {
   } else {
     nav.classList.add('visible');
     updateNavActive(screenId);
+
   }
 
   // Screen-specific init
@@ -129,18 +130,21 @@ function navigateTo(screenId) {
 
 function updateNavActive(screenId) {
   document.querySelectorAll('.nav-item').forEach(btn => btn.classList.remove('active-nav'));
-  const navMap = { home: 'nav-home', play: 'nav-play', watch: 'nav-watch', community: 'nav-community', profile: 'nav-profile' };
+  const navMap = { home: 'nav-home', play: 'nav-play', watch: 'nav-watch', store: 'nav-store', games: 'nav-games' };
   if (navMap[screenId]) {
     document.getElementById(navMap[screenId])?.classList.add('active-nav');
   }
 }
 
 function onScreenEnter(screenId) {
+  if (screenId === 'unlimited-zone' && typeof initUnlimitedZone === 'function') initUnlimitedZone();
+
   switch (screenId) {
     case 'home':
       updateHomeZinos();
       startBannerSlider();
       updateHomeUserName();
+      if (typeof initCustomContests === 'function') initCustomContests();
       break;
     case 'store':
       document.getElementById('store-zino').textContent = state.user.zinoCoins;
@@ -150,6 +154,7 @@ function onScreenEnter(screenId) {
       break;
     case 'play':
       document.getElementById('play-zino').textContent = state.user.zinoCoins;
+      if (typeof initCustomContests === 'function') initCustomContests();
       break;
     case 'watch':
       const wz = document.getElementById('watch-zino-count');
@@ -167,7 +172,7 @@ function updateHomeZinos() {
 }
 function updateHomeUserName() {
   const nameEl = document.getElementById('home-username');
-  if (nameEl) nameEl.textContent = state.user.name + '!';
+  if (nameEl) nameEl.textContent = "Welcome back, " + state.user.name;
 }
 
 // ===== BANNER SLIDER =====
@@ -222,7 +227,10 @@ function handleLogin() {
     }
 
     setTimeout(() => {
+      // Restore saved profile/game state for returning user
+      if (typeof loadGameState === 'function') loadGameState();
       state.loggedIn = true;
+      localStorage.setItem('kidzinos_logged_in', 'true');
       showToast('✅ OTP Verified! Welcome back!');
       setTimeout(() => {
         navigateTo('home');
@@ -231,6 +239,7 @@ function handleLogin() {
     }, 0);
     return;
   }
+
 
   // ---- STEP 1: Validate mobile number ----
   const mobile = mobileInput.value.trim();
@@ -308,6 +317,9 @@ function handleRegister() {
   state.user.dob = dob;
   state.user.city = city;
   state.loggedIn = true;
+  localStorage.setItem('kidzinos_logged_in', 'true');
+  // Persist profile so it survives refresh
+  if (typeof saveGameState === 'function') saveGameState();
 
   showToast(' Profile created! Welcome to Kidzinos!');
   setTimeout(() => navigateTo('home'), 800);
@@ -316,6 +328,7 @@ function handleRegister() {
 function handleLogout() {
   if (confirm('Are you sure you want to logout?')) {
     state.loggedIn = false;
+    localStorage.removeItem('kidzinos_logged_in');
     state.user.name = 'Jay';
     navigateTo('login');
     document.getElementById('mobile-group').classList.remove('hidden');
@@ -352,19 +365,71 @@ const challengeData = {
 };
 
 function showChallengeDetail(id) {
-  const d = challengeData[id] || challengeData['war1'];
+  let d;
+  if (id && id.toString().startsWith('custom_')) {
+    const customContests = JSON.parse(localStorage.getItem('kidzinos_contests') || '[]');
+    const contest = customContests.find(c => c.id === id);
+    if (contest) {
+      d = {
+        name: contest.title,
+        prize1: contest.prizes && contest.prizes[0] ? contest.prizes[0] : 'N/A',
+        prize2: contest.prizes && contest.prizes[1] ? contest.prizes[1] : 'N/A',
+        prize3: contest.prizes && contest.prizes[2] ? contest.prizes[2] : 'N/A',
+        day: 1,
+        total: 1,
+        ends: contest.endDate ? new Date(contest.endDate).toLocaleDateString('en-US', {month:'short', day:'numeric'}) : 'TBD',
+        rules: contest.rules || '',
+        type: contest.type || 'war'
+      };
+    }
+  }
+
+  if (!d) {
+    d = challengeData[id] || challengeData['war1'];
+  }
+
   // Update content
   document.getElementById('chd-name').textContent = d.name;
+
   // Update rewards
   const rw = document.querySelectorAll('.chd-reward-row strong');
-  if (rw[0]) rw[0].textContent = d.prize1 + ' cash';
-  if (rw[1]) rw[1].textContent = d.prize2 + ' cash';
-  if (rw[2]) rw[2].textContent = d.prize3 + ' cash';
+  if (rw[0]) rw[0].textContent = d.prize1 + (d.prize1.includes('₹') || (d.prize1.includes('🎈') || d.prize1.includes('🪙')) || d.prize1.includes('cash') ? '' : ' cash');
+  if (rw[1]) rw[1].textContent = d.prize2 + (d.prize2.includes('₹') || (d.prize2.includes('🎈') || d.prize2.includes('🪙')) || d.prize2.includes('cash') ? '' : ' cash');
+  if (rw[2]) rw[2].textContent = d.prize3 + (d.prize3.includes('₹') || (d.prize3.includes('🎈') || d.prize3.includes('🪙')) || d.prize3.includes('cash') ? '' : ' cash');
+
   // Update stat
   const stvals = document.querySelectorAll('.chd-stat-val');
-  if (stvals[0]) stvals[0].innerHTML = `<i class="fa-solid fa-fire"></i> Day ${d.day}`;
-  if (stvals[1]) stvals[1].innerHTML = `<i class="fa-solid fa-layer-group"></i> ${d.total}`;
+  if (stvals[0]) stvals[0].innerHTML = `<i class="fa-solid fa-fire"></i> ${d.type ? d.type.toUpperCase() : 'CONTEST'}`;
+  if (stvals[1]) stvals[1].innerHTML = `<i class="fa-solid fa-layer-group"></i> ${d.total || 1} Day(s)`;
   if (stvals[2]) stvals[2].innerHTML = `<i class="fa-regular fa-calendar-check"></i> ${d.ends}`;
+
+  // Update rules for custom contest if custom rules present
+  const rulesList = document.querySelector('.chd-rules-list');
+  if (rulesList && d.rules) {
+    rulesList.innerHTML = d.rules.split('\n').filter(r => r.trim()).map((rule, idx) => `
+      <div class="chd-rule">
+        <span class="chd-rule-num">${idx + 1}</span>
+        <span>${rule}</span>
+      </div>
+    `).join('');
+  } else if (rulesList) {
+    rulesList.innerHTML = `
+      <div class="chd-rule"><span class="chd-rule-num">1</span> <span>One Shot Only &ndash; Once you submit, that attempt is locked. No take-backs.</span></div>
+      <div class="chd-rule"><span class="chd-rule-num">2</span> <span>Beat the Clock &ndash; Finish before time runs out, or the test ends automatically.</span></div>
+      <div class="chd-rule"><span class="chd-rule-num">3</span> <span>Play Fair, Think Smart &ndash; No cheating, no outside help, no shortcuts.</span></div>
+      <div class="chd-rule"><span class="chd-rule-num">4</span> <span>Stable Net, Stable Mind &ndash; Poor connection is your risk. Keep internet ready.</span></div>
+      <div class="chd-rule"><span class="chd-rule-num">5</span> <span>Fast + Right Wins &ndash; Accuracy matters most, speed breaks ties.</span></div>
+    `;
+  }
+
+  // Update the sticky CTA button to start the quiz
+  const ctaBtn = document.querySelector('.chd-sticky-cta button');
+  if (ctaBtn) {
+    const modeMap = { Practice: 'daily', Contest: 'daily', Clash: 'stash', War: 'war' };
+    const quizMode = modeMap[d.type] || 'daily';
+    ctaBtn.setAttribute('onclick', `startQuiz('${quizMode}')`);
+    ctaBtn.innerHTML = `<i class="fa-solid fa-lock-open"></i> Start Challenge Now`;
+  }
 
   navigateTo('challenge');
 }
@@ -388,6 +453,7 @@ function checkSubscription(feature) {
 }
 
 function startQuiz(mode, isVs = false, oppName = 'Opponent') {
+  if (typeof syncCustomQuestions === 'function') syncCustomQuestions();
   const questions = [...questionBank[mode] || questionBank.daily];
   // Shuffle
   for (let i = questions.length - 1; i > 0; i--) {
@@ -590,7 +656,7 @@ function endQuiz() {
   if (hinglishEl) hinglishEl.textContent = banner;
   document.getElementById('result-coins-won').textContent = `+${earned}`;
   const totalEl = document.getElementById('result-total-zinos');
-  if (totalEl) totalEl.textContent = `Total: ${state.user.zinoCoins} 🎈`;
+  if (totalEl) totalEl.textContent = `Total: ${state.user.zinoCoins} 🪙`;
   const pctEl = document.getElementById('result-percentile');
   if (pctEl) pctEl.textContent = `Top ${rankPct}%`;
   const rankEl = document.getElementById('result-rank');
@@ -624,99 +690,9 @@ function endQuiz() {
 }
 
 function goBackFromQuiz() {
+  // WATCH & EARN logic has been moved to watch-features.js
   clearInterval(state.quiz.timerInterval);
   navigateTo('play');
-}
-
-// ===== WATCH & EARN S REELS =====
-const reelState = {}; // { [id]: { playing, progress, interval } }
-
-function toggleReelPlay(id) {
-  if (!reelState[id]) reelState[id] = { playing: false, progress: 0 };
-  const s = reelState[id];
-  s.playing = !s.playing;
-
-  const pi = document.getElementById(`reel-pi-${id}`);
-  if (pi) {
-    pi.classList.remove('hidden');
-    pi.innerHTML = s.playing
-      ? '<i class="fa-solid fa-pause"></i>'
-      : '<i class="fa-solid fa-play"></i>';
-    // Remove and re-add to restart animation
-    pi.style.animation = 'none';
-    requestAnimationFrame(() => { pi.style.animation = ''; });
-  }
-
-  if (s.playing) {
-    const earned = document.getElementById(`reel-${id}`)?.dataset.earned === 'true';
-    s.interval = setInterval(() => {
-      s.progress = Math.min(100, s.progress + 1.5);
-      const fill = document.getElementById(`reel-fill-${id}`);
-      const hint = document.getElementById(`reel-hint-${id}`);
-      if (fill) fill.style.width = s.progress + '%';
-
-      // Earn at 80%
-      if (s.progress >= 80 && !s.earned && !earned) {
-        s.earned = true;
-        state.user.zinoCoins += 1;
-        updateAllZinos();
-        const earnedBadge = document.getElementById(`reel-earned-${id}`);
-        if (earnedBadge) {
-          earnedBadge.classList.remove('hidden');
-          setTimeout(() => earnedBadge.classList.add('hidden'), 2500);
-        }
-        if (hint) {
-          hint.innerHTML = '<i class="fa-solid fa-check" style="color:var(--crazy-green)"></i> Zino Earned!';
-          hint.style.color = 'var(--crazy-green)';
-        }
-        showToast(' +1 Zino Balloon Earned!');
-        document.getElementById(`watch-zino-count`).textContent = state.user.zinoCoins;
-      }
-      if (s.progress >= 100) {
-        clearInterval(s.interval);
-        s.playing = false;
-      }
-    }, 150);
-  } else {
-    clearInterval(s.interval);
-  }
-}
-
-function reelEarn(id, btn) {
-  const reel = document.getElementById(`reel-${id}`);
-  if (reel?.dataset.earned === 'true' || reelState[id]?.earned) {
-    showToast(' Already earned from this video!');
-    return;
-  }
-  // Prompt to watch
-  showToast(' Play the video to earn your Zino!');
-  toggleReelPlay(id);
-}
-
-function reelLike(btn) {
-  const icon = btn.querySelector('.ra-icon');
-  const label = btn.querySelector('.ra-label');
-  if (btn.classList.contains('liked')) {
-    btn.classList.remove('liked');
-    const n = parseInt(label.textContent) - 1;
-    label.textContent = n >= 1000 ? (n/1000).toFixed(1) + 'K' : n;
-  } else {
-    btn.classList.add('liked');
-    const current = label.textContent;
-    const n = parseFloat(current) * (current.includes('K') ? 1000 : 1) + 1;
-    label.textContent = n >= 1000 ? (n/1000).toFixed(1) + 'K' : n;
-    showToast(' Liked!');
-  }
-}
-
-function reelShare() {
-  const text = 'Check out this crazy video from Crazy XYZ!  #CrazyXYZ #Kidzinos';
-  if (navigator.share) {
-    navigator.share({ title: 'Crazy XYZ', text, url: 'https://youtube.com/@crazyxyz' }).catch(() => {});
-  } else {
-    showToast(' Link copied!');
-    navigator.clipboard?.writeText('https://youtube.com/@crazyxyz');
-  }
 }
 
 // Legacy video player (kept for compatibility)
@@ -729,7 +705,7 @@ function playVideo(videoId, title, alreadyEarned) {
   document.getElementById('yt-link').href = `https://www.youtube.com/@crazyxyz`;
   document.getElementById('player-prog-fill').style.width = '0%';
   document.getElementById('prog-pct').textContent = '0%';
-  document.getElementById('player-status').textContent = 'Watch 80% to earn Zino Balloon';
+  document.getElementById('player-status').textContent = 'Watch 80% to earn Zino Coin';
 
   let progress = 0;
   let earned = false;
@@ -745,9 +721,9 @@ function playVideo(videoId, title, alreadyEarned) {
         earned = true;
         state.user.zinoCoins += 1;
         updateAllZinos();
-        document.getElementById('player-status').textContent = ' Zino Balloon Earned! Keep watching!';
+        document.getElementById('player-status').textContent = ' Zino Coin Earned! Keep watching!';
         document.getElementById('player-prog-fill').style.background = 'var(--crazy-green)';
-        showToast(' +1 Zino Balloon Earned!');
+        showToast(' +1 Zino Coin Earned!');
       }
 
       if (progress >= 100) {
@@ -778,7 +754,7 @@ function requestProduct(name, coins) {
   const confirmBtn = document.getElementById('modal-confirm-btn');
   if (state.user.zinoCoins < coins) {
     confirmBtn.style.opacity = '0.5';
-    confirmBtn.onclick = () => showToast(' Not enough Zino Balloons!');
+    confirmBtn.onclick = () => showToast(' Not enough Zino Coins!');
   } else {
     confirmBtn.style.opacity = '1';
     confirmBtn.onclick = () => confirmRequest(name, coins);
@@ -791,7 +767,7 @@ function requestProduct(name, coins) {
 function confirmRequest(name, coins) {
   if (!pendingProductData) return;
   if (state.user.zinoCoins < pendingProductData.coins) {
-    showToast(' Not enough Zino Balloons!');
+    showToast(' Not enough Zino Coins!');
     closeModal();
     return;
   }
@@ -897,11 +873,6 @@ function challengeFriend() {
 function updateAllZinos() {
   const zinoEls = document.querySelectorAll('#zino-count, #play-zino, #store-zino, .profile-zino-count');
   zinoEls.forEach(el => el && (el.textContent = state.user.zinoCoins));
-  // Also sync Zino Loop widget
-  const zlBall = document.getElementById('zl-balloon-count');
-  if (zlBall) zlBall.textContent = state.user.zinoCoins;
-  const zlStreak = document.getElementById('zl-streak-count');
-  if (zlStreak) zlStreak.textContent = state.user.streak || 0;
 }
 
 function showToast(msg) {
@@ -952,13 +923,23 @@ document.addEventListener('DOMContentLoaded', () => {
   splash.style.display = 'flex';
   splash.classList.add('active');
 
-  // After loader animation, go to login
+  // After loader animation, check persistent login
+  const isLoggedIn = localStorage.getItem('kidzinos_logged_in') === 'true';
+  const splashDelay = isLoggedIn ? 900 : 2800; // Faster splash if already logged in
+
   setTimeout(() => {
-    navigateTo('login');
     setupBannerSwipe();
     initMissionsTimer();
-    setTimeout(() => showStreakPopup(), 1000);
-  }, 2800);
+    if (isLoggedIn) {
+      // Restore all state before going home
+      if (typeof loadGameState === 'function') loadGameState();
+      state.loggedIn = true;
+      navigateTo('home');
+      setTimeout(() => showStreakPopup(), 1200);
+    } else {
+      navigateTo('login');
+    }
+  }, splashDelay);
 
   // Demo: auto-login after splash for testing
   // Uncomment below to skip login:
@@ -981,41 +962,39 @@ document.addEventListener('DOMContentLoaded', () => {
 
 // Prevent default scroll bounce on iOS
 document.addEventListener('touchmove', function (e) {
-  const target = e.target.closest('.home-scroll, .quiz-body, .reg-bg, .onboard-bg');
+  const target = e.target.closest('.home-scroll, .stories-row, .quiz-body, .reg-bg, .onboard-bg');
   if (!target) e.preventDefault();
 }, { passive: false });
 
 // ===== STREAK SYSTEM =====
-function showStreakPopup() {
+function claimDailyStreakRewardSilently() {
   if (!state.loggedIn) return;
   const s = state.user.streak || 5;
-  const el = document.getElementById('streak-popup');
-  if (!el) return;
-  document.getElementById('streak-popup-day').textContent = `Day ${s} Streak`;
-  const titles = ['Pehla Kadam!','Aur Aage Badh!','Teen Din Ka Toofan!','Char Din Ka Cheetah!','5 Din Ka King!','6 Din Ka Legend!','7 Din Ka God!'];
-  document.getElementById('streak-popup-title').textContent = titles[Math.min(s-1, titles.length-1)];
   const bonus = s >= 7 ? 25 : s >= 5 ? 15 : s >= 3 ? 10 : 5;
-  document.getElementById('streak-bonus-text').textContent = `+${bonus} Bonus Zino Balloons!`;
-  const cal = document.getElementById('streak-calendar');
-  if (cal) {
-    cal.innerHTML = '';
-    for (let i = 1; i <= 7; i++) {
-      const d = document.createElement('div');
-      d.className = 'sc-day' + (i < s ? ' done' : i === s ? ' today' : '');
-      d.textContent = i <= s ? '🔥' : i;
-      cal.appendChild(d);
-    }
+  
+  const todayStr = new Date().toDateString();
+  const lastClaim = localStorage.getItem('kidzinos_last_streak_claim');
+  if (lastClaim === todayStr) {
+    updateAllZinos();
+    if (typeof updateHomeStats === 'function') updateHomeStats();
+    updateHomeStreakStrip();
+    return;
   }
-  el.classList.remove('hidden');
+  
+  state.user.zinoCoins += bonus;
+  localStorage.setItem('kidzinos_last_streak_claim', todayStr);
+  if (typeof saveGameState === 'function') saveGameState();
+  
+  updateAllZinos();
+  if (typeof updateHomeStats === 'function') updateHomeStats();
+  updateHomeStreakStrip();
+  showToast(`⚡ Daily Streak Maintained! +${bonus} Zino Coins added!`);
+}
+function showStreakPopup() {
+  claimDailyStreakRewardSilently();
 }
 function closeStreakPopup() {
-  const el = document.getElementById('streak-popup');
-  if (el) el.classList.add('hidden');
-  const bonus = state.user.streak >= 7 ? 25 : state.user.streak >= 5 ? 15 : state.user.streak >= 3 ? 10 : 5;
-  state.user.zinoCoins += bonus;
-  updateAllZinos();
-  showToast(`🔥 +${bonus} Streak Bonus Balloons!`);
-  updateHomeStreakStrip();
+  // Legacy fallback
 }
 function updateHomeStreakStrip() {
   const s = state.user.streak || 5;
@@ -1058,7 +1037,7 @@ function completeMission(idx) {
     const rewards = [15, 10, 10];
     state.user.zinoCoins += rewards[idx];
     updateAllZinos();
-    showToast(`✅ Mission done! +${rewards[idx]} Zino Balloons!`);
+    showToast(`✅ Mission done! +${rewards[idx]} Zino Coins!`);
     if (metaEl) metaEl.textContent = '✅ Completed!';
     checkAllMissions();
   } else {
@@ -1073,7 +1052,7 @@ function checkAllMissions() {
     if (combo) combo.classList.remove('hidden');
     state.user.zinoCoins += 25;
     updateAllZinos();
-    showToast('⚡ DAILY CRAZY COMBO! +25 Bonus Balloons!');
+    showToast('⚡ DAILY CRAZY COMBO! +25 Bonus Coins!');
   }
 }
 function initMissionsTimer() {
@@ -1146,7 +1125,7 @@ function endMiniGame() {
       <div class="grp-emoji">🎉</div>
       <div class="grp-title">Game Over!</div>
       <div class="grp-score">Score: ${mgState.score} points</div>
-      <div class="grp-reward"><img src="zino-balloon.png" style="width:24px;" /> +${earned} Zino Balloons Earned!</div>
+      <div class="grp-reward"><img src="zino-coin.png" style="width:24px;" /> +${earned} Zino Coins Earned!</div>
       <button class="grp-btn" onclick="closeMiniGame()">Back to Games 🎮</button>
     </div>`;
 }
@@ -1305,668 +1284,6 @@ onScreenEnter = function(screenId) {
   }
 };
 
-// Hook watch videos to mission 1 (watch 2 videos)
-let videosWatchedCount = 0;
-const _origToggleReelPlay = toggleReelPlay;
-toggleReelPlay = function(id) {
-  _origToggleReelPlay(id);
-  if (reelState[id] && reelState[id].playing) {
-    // count watch start towards mission
-  }
-};
-
-// Override reelState earned to also track mission
-const _origUpdateZinos = updateAllZinos;
-updateAllZinos = function() {
-  _origUpdateZinos();
-  // track watch mission
-  if (state.currentScreen === 'watch') {
-    videosWatchedCount++;
-    if (videosWatchedCount <= 2) completeMission(1);
-  }
-};
-
-
-/* ========================================
-   ZINO LOOP v2.0 - PART 1
-   Activity Master + State + Init + Widget
-======================================== */
-
-const activityMaster = [
-  { id:'school', icon:'🎒', name:'School', color:'#FF6B35', gradient:'linear-gradient(135deg,#FF6B35,#FF4500)', desc:'Aaj school mein kya karoge?',
-    subOptions:[
-      {id:'attend', icon:'📋', name:'Attend Class', balloons:5},
-      {id:'notes',  icon:'✍️', name:'Make Notes',   balloons:5},
-      {id:'submit', icon:'📝', name:'Submit HW',    balloons:8},
-      {id:'sports', icon:'⚽', name:'Sports Period', balloons:5},
-      {id:'exam',   icon:'📊', name:'Exam Prep',    balloons:10}
-    ]
-  },
-  { id:'homework', icon:'📚', name:'Homework', color:'#7C3AED', gradient:'linear-gradient(135deg,#7C3AED,#5B21B6)', desc:'Kaunsa homework karoge aaj?',
-    subOptions:[
-      {id:'math',    icon:'🔢', name:'Maths',         balloons:8},
-      {id:'science', icon:'🔬', name:'Science',       balloons:8},
-      {id:'english', icon:'📖', name:'English',       balloons:6},
-      {id:'hindi',   icon:'📜', name:'Hindi',         balloons:6},
-      {id:'social',  icon:'🌍', name:'Social Studies',balloons:6}
-    ]
-  },
-  { id:'gaming', icon:'🎮', name:'Gaming', color:'#10B981', gradient:'linear-gradient(135deg,#10B981,#059669)', desc:'Kaunsa game kheloge?',
-    subOptions:[
-      {id:'pubg',      icon:'🔫', name:'PUBG / BGMI',   balloons:5},
-      {id:'freefire',  icon:'🔥', name:'Free Fire',     balloons:5},
-      {id:'chess',     icon:'♟️', name:'Chess',         balloons:10},
-      {id:'minecraft', icon:'⛏️', name:'Minecraft',    balloons:8},
-      {id:'fifa',      icon:'⚽', name:'FIFA / Football',balloons:5}
-    ]
-  },
-  { id:'exercise', icon:'🏃', name:'Exercise', color:'#F59E0B', gradient:'linear-gradient(135deg,#F59E0B,#D97706)', desc:'Aaj body fit karoge?',
-    subOptions:[
-      {id:'run',    icon:'🏃', name:'Running',     balloons:10},
-      {id:'pushup', icon:'💪', name:'Push-ups',    balloons:8},
-      {id:'yoga',   icon:'🧘', name:'Yoga',        balloons:8},
-      {id:'cycle',  icon:'🚴', name:'Cycling',     balloons:8},
-      {id:'sport',  icon:'🏏', name:'Outdoor Sport',balloons:10}
-    ]
-  },
-  { id:'reading', icon:'📕', name:'Reading', color:'#60C8FF', gradient:'linear-gradient(135deg,#60C8FF,#0070CC)', desc:'Kya padhoge aaj?',
-    subOptions:[
-      {id:'novel',   icon:'📗', name:'Story / Novel',  balloons:8},
-      {id:'news',    icon:'📰', name:'News',            balloons:5},
-      {id:'comic',   icon:'🦸', name:'Comics',          balloons:5},
-      {id:'textbook',icon:'📘', name:'Textbook',        balloons:10},
-      {id:'gk',      icon:'❓', name:'GK / Quiz Prep', balloons:8}
-    ]
-  },
-  { id:'music', icon:'🎵', name:'Music', color:'#EC4899', gradient:'linear-gradient(135deg,#EC4899,#BE185D)', desc:'Aaj music time!',
-    subOptions:[
-      {id:'practice', icon:'🎸', name:'Instrument Practice', balloons:10},
-      {id:'listen',   icon:'🎧', name:'Listen Music',        balloons:5},
-      {id:'sing',     icon:'🎤', name:'Singing',             balloons:8},
-      {id:'compose',  icon:'🎼', name:'Compose / Write',     balloons:12}
-    ]
-  },
-  { id:'cricket', icon:'🏏', name:'Cricket', color:'#F59E0B', gradient:'linear-gradient(135deg,#F59E0B,#92400E)', desc:'Cricket ka scene kya hai?',
-    subOptions:[
-      {id:'bat',   icon:'🏏', name:'Batting Practice', balloons:10},
-      {id:'bowl',  icon:'🎳', name:'Bowling Practice', balloons:10},
-      {id:'watch', icon:'📺', name:'Watch Match',      balloons:5},
-      {id:'team',  icon:'👥', name:'Team Game',        balloons:12}
-    ]
-  },
-  { id:'art', icon:'🎨', name:'Art', color:'#8B5CF6', gradient:'linear-gradient(135deg,#8B5CF6,#6D28D9)', desc:'Creativity time!',
-    subOptions:[
-      {id:'draw',  icon:'✏️', name:'Drawing', balloons:8},
-      {id:'paint', icon:'🎨', name:'Painting',balloons:10},
-      {id:'craft', icon:'✂️', name:'Craft',   balloons:10},
-      {id:'doodle',icon:'🖊️', name:'Doodle',  balloons:5}
-    ]
-  },
-  { id:'youtube', icon:'📺', name:'YouTube', color:'#EF4444', gradient:'linear-gradient(135deg,#EF4444,#B91C1C)', desc:'Kya dekhoge aaj?',
-    subOptions:[
-      {id:'crazyx',   icon:'⭐', name:'Crazy XYZ Videos',balloons:8},
-      {id:'learn_yt', icon:'📚', name:'Learn Something', balloons:10},
-      {id:'gaming_yt',icon:'🎮', name:'Gaming Videos',   balloons:5},
-      {id:'comedy',   icon:'😂', name:'Comedy / Meme',   balloons:5},
-      {id:'shorts',   icon:'⚡', name:'Shorts Binge',    balloons:3}
-    ]
-  },
-  { id:'cooking', icon:'🍳', name:'Cooking', color:'#F97316', gradient:'linear-gradient(135deg,#F97316,#EA580C)', desc:'Aaj kya banayenge?',
-    subOptions:[
-      {id:'help',      icon:'🤝', name:'Help in Kitchen',balloons:5},
-      {id:'snack',     icon:'🍕', name:'Make a Snack',   balloons:8},
-      {id:'learn_cook',icon:'👨‍🍳', name:'Learn a Recipe', balloons:10},
-      {id:'chai',      icon:'☕', name:'Chai Banao',      balloons:5}
-    ]
-  },
-  { id:'friends', icon:'👫', name:'Hangout', color:'#06B6D4', gradient:'linear-gradient(135deg,#06B6D4,#0891B2)', desc:'Dosto ke saath kya?',
-    subOptions:[
-      {id:'meet',   icon:'🤝', name:'Meet Friends',     balloons:8},
-      {id:'call',   icon:'📞', name:'Call / Video Call',balloons:5},
-      {id:'game_f', icon:'🎲', name:'Play Together',    balloons:10},
-      {id:'outing', icon:'🚶', name:'Go Out',           balloons:10}
-    ]
-  },
-  { id:'sleep', icon:'😴', name:'Sleep', color:'#6366F1', gradient:'linear-gradient(135deg,#6366F1,#4F46E5)', desc:'Rest mode on!',
-    subOptions:[
-      {id:'nap',   icon:'💤', name:'Power Nap (20min)',balloons:5},
-      {id:'night', icon:'🌙', name:'Night Sleep',      balloons:8},
-      {id:'rest',  icon:'🛋️', name:'Relax / Chill',   balloons:5}
-    ]
-  },
-  { id:'prayer', icon:'🙏', name:'Prayer', color:'#F59E0B', gradient:'linear-gradient(135deg,#F59E0B,#B45309)', desc:'Spiritual time 🙏',
-    subOptions:[
-      {id:'morning_p', icon:'🌅', name:'Morning Prayer',   balloons:8},
-      {id:'evening_p', icon:'🌆', name:'Evening Prayer',   balloons:8},
-      {id:'meditate',  icon:'🧘', name:'Meditation',       balloons:10},
-      {id:'gratitude', icon:'💝', name:'Gratitude Journal',balloons:8}
-    ]
-  },
-  { id:'study', icon:'📖', name:'Self Study', color:'#34D399', gradient:'linear-gradient(135deg,#34D399,#059669)', desc:'Apne aap padho!',
-    subOptions:[
-      {id:'revision',icon:'🔄', name:'Revision',    balloons:10},
-      {id:'new_ch',  icon:'📑', name:'New Chapter', balloons:12},
-      {id:'notes_s', icon:'📓', name:'Make Notes',  balloons:8},
-      {id:'mock',    icon:'📊', name:'Mock Test',   balloons:15}
-    ]
-  }
-];
-
-// ── State ──
-state.zinoLoop = { dailyPlan:{ date:'', activities:[] } };
-
-// ── LocalStorage ──
-const ZL_KEY = 'kidzinos_zl_v2';
-function zlSave(){
-  try{
-    localStorage.setItem(ZL_KEY, JSON.stringify({
-      streak: state.user.streak,
-      zinoCoins: state.user.zinoCoins,
-      lastActiveDate: state.user.lastActiveDate||'',
-      dailyPlan: state.zinoLoop.dailyPlan
-    }));
-  }catch(e){}
-}
-function zlLoad(){
-  try{
-    const d = JSON.parse(localStorage.getItem(ZL_KEY)||'null');
-    if(!d) return;
-    if(d.streak!==undefined) state.user.streak=d.streak;
-    if(d.zinoCoins!==undefined) state.user.zinoCoins=d.zinoCoins;
-    if(d.lastActiveDate) state.user.lastActiveDate=d.lastActiveDate;
-    if(d.dailyPlan) state.zinoLoop.dailyPlan=d.dailyPlan;
-  }catch(e){}
-}
-function zlTodayStr(){
-  const n=new Date();
-  return `${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`;
-}
-
-// ── INIT ──
-function initZinoLoop(){
-  zlLoad();
-  const today=zlTodayStr();
-  const plan=state.zinoLoop.dailyPlan;
-  if(plan.date!==today){
-    const d=new Date(); d.setDate(d.getDate()-1);
-    const yesterday=`${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
-    const last=state.user.lastActiveDate||'';
-    if(last===yesterday){
-      if(plan.activities.filter(a=>a.completed).length>=1){
-        state.user.streak=(state.user.streak||0)+1;
-        checkStreakMilestone();
-      }
-    } else if(last&&last!==yesterday&&last!==today){
-      showToast('🔥 Streak paused! Aaj complete kar — wapas aa jao!');
-    }
-    state.zinoLoop.dailyPlan={date:today,activities:[]};
-    state.user.lastActiveDate=today;
-    zlSave();
-  }
-  zlRenderWidget();
-  updateAllZinos();
-}
-
-function checkStreakMilestone(){
-  const s=state.user.streak;
-  if([3,7,14,30].includes(s)){
-    state.user.zinoCoins+=20;
-    updateAllZinos(); zlSave();
-    showToast(`🔥 ${s} Day Streak! +20 Bonus Balloons! OP consistency 😎`);
-    setTimeout(()=>showShareCard('milestone'),1000);
-  }
-}
-
-// ── Widget Render ──
-function zlRenderWidget(){
-  const el=document.getElementById('zl-streak-count');
-  if(el) el.textContent=state.user.streak||0;
-  const bl=document.getElementById('zl-balloon-count');
-  if(bl) bl.textContent=state.user.zinoCoins||0;
-
-  const acts=state.zinoLoop.dailyPlan.activities;
-  const scroll=document.getElementById('zl-activity-scroll');
-  const hint=document.getElementById('zl-empty-hint');
-
-  if(!acts.length){ scroll&&scroll.classList.add('hidden'); hint&&hint.classList.remove('hidden'); return; }
-  hint&&hint.classList.add('hidden');
-  scroll&&scroll.classList.remove('hidden');
-  scroll.innerHTML='';
-  acts.forEach(act=>{
-    const master=activityMaster.find(a=>a.id===act.id)||{color:'#7C3AED',gradient:'linear-gradient(135deg,#7C3AED,#5B21B6)'};
-    const done=act.completedSubs?act.completedSubs.length:0;
-    const total=act.selectedSubs?act.selectedSubs.length:0;
-    const isAllDone=act.completed;
-    const card=document.createElement('div');
-    card.className='zl-home-card'+(isAllDone?' done':'');
-    card.style.setProperty('--card-color', master.color);
-    card.innerHTML=`
-      <div class="zl-hc-icon">${act.icon}</div>
-      <div class="zl-hc-name">${act.name}</div>
-      ${total>0?`<div class="zl-hc-sub">${done}/${total}</div>`:''}
-    `;
-    card.onclick=()=>openActivityDetail(act.id);
-    scroll.appendChild(card);
-  });
-  zlRenderProgressBar();
-}
-
-function zlRenderProgressBar(){
-  const acts=state.zinoLoop.dailyPlan.activities;
-  if(!acts.length) return;
-  let row=document.getElementById('zl-progress-row');
-  if(!row){
-    row=document.createElement('div');
-    row.id='zl-progress-row'; row.className='zl-progress-row';
-    row.innerHTML=`<div class="zl-progress-bar"><div class="zl-progress-fill" id="zl-progress-fill" style="width:0%"></div></div><div class="zl-progress-label" id="zl-progress-label">0/${acts.length}</div>`;
-    document.getElementById('zino-loop-widget').appendChild(row);
-  }
-  const done=acts.filter(a=>a.completed).length;
-  const pct=Math.round((done/acts.length)*100);
-  const f=document.getElementById('zl-progress-fill');
-  const l=document.getElementById('zl-progress-label');
-  if(f) f.style.width=pct+'%';
-  if(l) l.textContent=`${done}/${acts.length}`;
-}
-
-/* ========================================
-   ZINO LOOP v2.0 - PART 2
-   Bottom Sheet Builder & Sub-Option Picker
-======================================== */
-
-// ── BOTTOM SHEET ──
-function openLoopBuilder(){
-  const backdrop=document.getElementById('zl-backdrop');
-  const sheet=document.getElementById('zl-sheet');
-  backdrop.classList.remove('hidden');
-  sheet.classList.remove('hidden');
-  zlRenderSheet();
-  document.body.style.overflow='hidden';
-}
-function closeLoopBuilder(){
-  const backdrop=document.getElementById('zl-backdrop');
-  const sheet=document.getElementById('zl-sheet');
-  backdrop.classList.add('hidden');
-  sheet.classList.add('hidden');
-  document.body.style.overflow='';
-}
-
-function zlRenderSheet(){
-  zlRenderSheetList();
-  zlRenderPredefinedGrid();
-  zlUpdateCountLabel();
-}
-
-function zlUpdateCountLabel(){
-  const c=state.zinoLoop.dailyPlan.activities.length;
-  const el=document.getElementById('zl-activity-count-label');
-  if(el){
-    if(c===0) el.textContent='Abhi kuch select nahi kiya';
-    else el.textContent=`${c}/6 Quests Selected`;
-  }
-}
-
-// ── Selected Activities List in Sheet ──
-function zlRenderSheetList(){
-  const list=document.getElementById('zl-activity-list');
-  if(!list) return;
-  const acts=state.zinoLoop.dailyPlan.activities;
-  list.innerHTML='';
-  if(acts.length===0){
-    list.innerHTML=`<div style="text-align:center;color:rgba(255,255,255,0.3);font-size:0.85rem;font-weight:700;padding:12px 0;">Niche se option select karo 👇</div>`;
-    return;
-  }
-  acts.forEach((act,idx)=>{
-    const master=activityMaster.find(a=>a.id===act.id)||{color:'#7C3AED'};
-    const total=act.selectedSubs?act.selectedSubs.length:0;
-    const item=document.createElement('div');
-    item.className='zl-list-item';
-    item.dataset.id=act.id;
-    item.draggable=true;
-    item.style.borderColor=master.color;
-    item.innerHTML=`
-      <span class="zl-item-icon">${act.icon}</span>
-      <div class="zl-item-details">
-        <div class="zl-item-name">${act.name}</div>
-        ${total>0?`<div class="zl-item-subcount">${total} Tasks</div>`:''}
-      </div>
-      <span class="zl-item-drag"><i class="fa-solid fa-grip-lines"></i></span>
-      <button class="zl-item-remove" onclick="zlRemoveActivity('${act.id}')"><i class="fa-solid fa-xmark"></i></button>
-    `;
-    item.addEventListener('dragstart',zlDragStart);
-    item.addEventListener('dragover',zlDragOver);
-    item.addEventListener('drop',zlDrop);
-    item.addEventListener('dragend',zlDragEnd);
-    item.addEventListener('touchstart',zlTouchStart,{passive:true});
-    item.addEventListener('touchmove',zlTouchMove,{passive:false});
-    item.addEventListener('touchend',zlTouchEnd,{passive:true});
-    list.appendChild(item);
-  });
-}
-
-// Drag & Drop
-let zlDragIdx=null, zlDragEl=null, zlTouchY=0, zlTouchDragEl=null;
-function zlDragStart(e){
-  const list=document.getElementById('zl-activity-list');
-  zlDragEl=e.currentTarget; zlDragIdx=Array.from(list.children).indexOf(zlDragEl);
-  setTimeout(()=>zlDragEl.classList.add('dragging'),0);
-}
-function zlDragOver(e){
-  e.preventDefault();
-  const list=document.getElementById('zl-activity-list');
-  const overEl=e.currentTarget; const overIdx=Array.from(list.children).indexOf(overEl);
-  if(overIdx!==zlDragIdx){
-    const acts=state.zinoLoop.dailyPlan.activities;
-    const [moved]=acts.splice(zlDragIdx,1);
-    acts.splice(overIdx,0,moved);
-    zlDragIdx=overIdx; zlRenderSheetList();
-  }
-}
-function zlDrop(e){e.preventDefault();}
-function zlDragEnd(){ if(zlDragEl) zlDragEl.classList.remove('dragging'); zlDragEl=null; zlDragIdx=null; }
-function zlTouchStart(e){ zlTouchY=e.touches[0].clientY; zlTouchDragEl=e.currentTarget; }
-function zlTouchMove(e){
-  if(!zlTouchDragEl) return; e.preventDefault();
-  const dy=e.touches[0].clientY-zlTouchY;
-  zlTouchDragEl.style.transform=`translateY(${dy}px)`;
-  zlTouchDragEl.style.zIndex='999'; zlTouchDragEl.style.opacity='0.8';
-}
-function zlTouchEnd(e){
-  if(!zlTouchDragEl) return;
-  zlTouchDragEl.style.transform=''; zlTouchDragEl.style.zIndex=''; zlTouchDragEl.style.opacity='';
-  const list=document.getElementById('zl-activity-list');
-  const items=Array.from(list.querySelectorAll('.zl-list-item'));
-  const fromIdx=items.indexOf(zlTouchDragEl);
-  const endY=e.changedTouches[0].clientY;
-  let toIdx=fromIdx;
-  items.forEach((item,i)=>{ const r=item.getBoundingClientRect(); if(endY>r.top&&endY<r.bottom) toIdx=i; });
-  if(toIdx!==fromIdx){
-    const acts=state.zinoLoop.dailyPlan.activities;
-    const [moved]=acts.splice(fromIdx,1); acts.splice(toIdx,0,moved);
-    zlRenderSheetList();
-  }
-  zlTouchDragEl=null;
-}
-
-// ── Predefined Grid & Sub-Option Selector ──
-let expandedActId=null;
-
-function zlRenderPredefinedGrid(){
-  const grid=document.getElementById('zl-predefined-grid');
-  if(!grid) return;
-  const addedIds=state.zinoLoop.dailyPlan.activities.map(a=>a.id);
-  grid.innerHTML='';
-  activityMaster.forEach(act=>{
-    const isAdded=addedIds.includes(act.id);
-    const wrap=document.createElement('div');
-    wrap.className='zl-pill-wrap';
-    
-    const pill=document.createElement('button');
-    pill.className='zl-pill'+(isAdded?' added':'')+(expandedActId===act.id?' expanded':'');
-    pill.innerHTML=`<span class="zl-pill-icon">${act.icon}</span>${act.name}`;
-    pill.onclick=()=>{
-      if(isAdded) return showToast('Pehle se added hai!');
-      expandedActId=(expandedActId===act.id)?null:act.id;
-      zlRenderPredefinedGrid();
-    };
-    wrap.appendChild(pill);
-
-    if(expandedActId===act.id && !isAdded){
-      const subBox=document.createElement('div');
-      subBox.className='zl-suboptions-box';
-      subBox.style.borderColor=act.color;
-      subBox.innerHTML=`<div class="zl-sub-title">${act.desc} (Select mulitple)</div>`;
-      
-      const chips=document.createElement('div');
-      chips.className='zl-sub-chips';
-      const selectedSubs=new Set();
-      
-      act.subOptions.forEach(sub=>{
-        const c=document.createElement('div');
-        c.className='zl-sub-chip';
-        c.innerHTML=`${sub.icon} ${sub.name} <span class="zl-sub-bal">+${sub.balloons}</span>`;
-        c.onclick=()=>{
-          c.classList.toggle('selected');
-          if(c.classList.contains('selected')) selectedSubs.add(sub);
-          else selectedSubs.delete(sub);
-        };
-        chips.appendChild(c);
-      });
-      subBox.appendChild(chips);
-
-      const addBtn=document.createElement('button');
-      addBtn.className='zl-sub-add-btn';
-      addBtn.style.background=act.gradient;
-      addBtn.textContent='Add to Plan';
-      addBtn.onclick=()=>{
-        if(selectedSubs.size===0) return showToast('At least 1 task select karo!');
-        zlConfirmAddActivity(act, Array.from(selectedSubs));
-      };
-      subBox.appendChild(addBtn);
-      wrap.appendChild(subBox);
-    }
-    grid.appendChild(wrap);
-  });
-}
-
-function zlConfirmAddActivity(act, selectedSubs){
-  const acts=state.zinoLoop.dailyPlan.activities;
-  if(acts.length>=6){ showToast('😎 Max 6 Quests allowed!'); return; }
-  acts.push({
-    id: act.id,
-    icon: act.icon,
-    name: act.name,
-    completed: false,
-    order: acts.length,
-    isCustom: false,
-    selectedSubs: selectedSubs.map(s=>({id:s.id, name:s.name, icon:s.icon, balloons:s.balloons})),
-    completedSubs: []
-  });
-  expandedActId=null;
-  zlRenderSheet();
-}
-
-function addCustomActivity(){
-  const input=document.getElementById('zl-custom-input');
-  if(!input) return;
-  const name=input.value.trim();
-  if(!name){ showToast('🖊️ Kuch naam toh likho!'); return; }
-  const acts=state.zinoLoop.dailyPlan.activities;
-  if(acts.length>=6){ showToast('😎 Max 6 Quests!'); return; }
-  const id='custom_'+Date.now();
-  const icons=['⭐','🔆','🎯','💫','🌟','🚀','🎪','🎭'];
-  const icon=icons[Math.floor(Math.random()*icons.length)];
-  acts.push({
-    id, icon, name, completed:false, order:acts.length, isCustom:true,
-    selectedSubs: [{id:'c1', icon:'⭐', name:'Complete Task', balloons:10}],
-    completedSubs: []
-  });
-  input.value='';
-  zlRenderSheet();
-  showToast(`${icon} "${name}" added!`);
-}
-
-function zlRemoveActivity(actId){
-  const acts=state.zinoLoop.dailyPlan.activities;
-  const idx=acts.findIndex(a=>a.id===actId);
-  if(idx!==-1) acts.splice(idx,1);
-  zlRenderSheet();
-}
-
-function saveLoopPlan(){
-  const acts=state.zinoLoop.dailyPlan.activities;
-  state.user.lastActiveDate=zlTodayStr();
-  zlSave(); closeLoopBuilder(); zlRenderWidget();
-  if(acts.length===0) showToast('📝 Plan khali hai!');
-  else showToast(`✅ ${acts.length} Quests locked in! Level bana le 🔥`);
-}
-
-/* ========================================
-   ZINO LOOP v2.0 - PART 3
-   Activity Quests Modal & Share Card v2
-======================================== */
-
-// ── Activity Detail Modal (Quest Screen) ──
-let currentDetailActId=null;
-
-function openActivityDetail(actId){
-  const act=state.zinoLoop.dailyPlan.activities.find(a=>a.id===actId);
-  if(!act) return;
-  currentDetailActId=actId;
-  const master=activityMaster.find(a=>a.id===act.id)||{color:'#7C3AED',gradient:'linear-gradient(135deg,#7C3AED,#5B21B6)'};
-  
-  let modal=document.getElementById('zl-quest-modal');
-  if(!modal){
-    modal=document.createElement('div');
-    modal.id='zl-quest-modal'; modal.className='zl-quest-modal hidden';
-    document.body.appendChild(modal);
-  }
-  
-  const isAllDone=act.completed;
-  
-  modal.innerHTML=`
-    <div class="zl-qm-backdrop" onclick="closeActivityDetail()"></div>
-    <div class="zl-qm-card">
-      <button class="zl-qm-close" onclick="closeActivityDetail()">✕</button>
-      <div class="zl-qm-header" style="background:${master.gradient}">
-        <div class="zl-qm-icon">${act.icon}</div>
-        <div class="zl-qm-title">${act.name}</div>
-        <div class="zl-qm-sub">Complete tasks to earn balloons!</div>
-      </div>
-      <div class="zl-qm-body" id="zl-qm-body"></div>
-      ${isAllDone?`<div class="zl-qm-footer"><button class="zl-qm-btn-done" onclick="closeActivityDetail()">Awesome! 🔥</button></div>`:''}
-    </div>
-  `;
-  modal.classList.remove('hidden');
-  document.body.style.overflow='hidden';
-  zlRenderQuestList();
-}
-
-function closeActivityDetail(){
-  const modal=document.getElementById('zl-quest-modal');
-  if(modal) modal.classList.add('hidden');
-  document.body.style.overflow='';
-  currentDetailActId=null;
-}
-
-function zlRenderQuestList(){
-  const act=state.zinoLoop.dailyPlan.activities.find(a=>a.id===currentDetailActId);
-  if(!act) return;
-  const body=document.getElementById('zl-qm-body');
-  if(!body) return;
-  
-  body.innerHTML='';
-  act.selectedSubs.forEach(sub=>{
-    const isDone=act.completedSubs.includes(sub.id);
-    const row=document.createElement('div');
-    row.className='zl-q-row'+(isDone?' done':'');
-    row.innerHTML=`
-      <div class="zl-q-icon">${sub.icon}</div>
-      <div class="zl-q-name">${sub.name}</div>
-      <div class="zl-q-reward">
-        <img src="zino-balloon.png" class="zl-q-bal"><span>+${sub.balloons}</span>
-      </div>
-      <div class="zl-q-check">${isDone?'<i class="fa-solid fa-check"></i>':''}</div>
-    `;
-    if(!isDone) row.onclick=(e)=>zlCompleteSubTask(sub, e.currentTarget);
-    body.appendChild(row);
-  });
-}
-
-function zlCompleteSubTask(sub, el){
-  const act=state.zinoLoop.dailyPlan.activities.find(a=>a.id===currentDetailActId);
-  if(!act||act.completedSubs.includes(sub.id)) return;
-  
-  act.completedSubs.push(sub.id);
-  el.classList.add('done');
-  el.querySelector('.zl-q-check').innerHTML='<i class="fa-solid fa-check"></i>';
-  
-  // Reward
-  state.user.zinoCoins+=sub.balloons;
-  updateAllZinos(); zlSave();
-  
-  // Coin burst
-  const burst=document.createElement('div');
-  burst.className='zl-coin-burst'; burst.textContent=`+${sub.balloons} 🎈`;
-  el.appendChild(burst);
-  setTimeout(()=>burst.remove(),750);
-  
-  // Check if all subtasks in this activity are done
-  if(act.completedSubs.length===act.selectedSubs.length){
-    act.completed=true;
-    setTimeout(()=>{
-      showToast(`✅ ${act.icon} ${act.name} Completed!`);
-      closeActivityDetail();
-      zlRenderWidget();
-      checkAllActivitiesDone();
-    },800);
-  } else {
-    zlRenderWidget(); // Update progress bar
-  }
-}
-
-function checkAllActivitiesDone(){
-  const acts=state.zinoLoop.dailyPlan.activities;
-  const allDone=acts.every(a=>a.completed);
-  if(allDone && acts.length>0){
-    setTimeout(()=>{
-      state.user.zinoCoins+=15; // All done bonus
-      updateAllZinos(); zlSave();
-      state.user.lastActiveDate=zlTodayStr();
-      showToast('⚡ SABHI QUESTS DONE! +15 Bonus Balloons! OP! 😎');
-      setTimeout(()=>showShareCard('alldone'),1400);
-    },600);
-  }
-}
-
-// ── SHARE CARD v2 ──
-function showShareCard(triggerType='manual'){
-  const s=state.user.streak||0;
-  const b=state.user.zinoCoins||0;
-  const levels=[
-    {min:0, label:'Beginner', emoji:'🌱'}, {min:3, label:'Challenger', emoji:'⚡'},
-    {min:7, label:'Consistent Player', emoji:'🔥'}, {min:14, label:'Beast Mode', emoji:'💥'},
-    {min:30, label:'Crazy Legend', emoji:'👑'}
-  ];
-  let lvl=levels[0]; levels.forEach(l=>{if(s>=l.min) lvl=l;});
-
-  let title="ZINO LOOP";
-  if(triggerType==='milestone') title="🔥 STREAK MILESTONE!";
-  if(triggerType==='alldone') title="🎯 DAILY QUESTS DONE!";
-
-  document.getElementById('zl-sc-title').textContent=title;
-  document.getElementById('zl-sc-streak').textContent=s;
-  document.getElementById('zl-sc-balloons').textContent=b;
-  document.getElementById('zl-sc-level').textContent=lvl.label;
-  document.getElementById('zl-sc-level-emoji').textContent=lvl.emoji;
-  document.getElementById('zl-sc-label').textContent=lvl.label;
-  document.getElementById('zl-share-modal').classList.remove('hidden');
-}
-
-function closeShareCard(){ document.getElementById('zl-share-modal').classList.add('hidden'); }
-
-function shareZinoWhatsApp(){
-  const s=state.user.streak||0; const b=state.user.zinoCoins||0;
-  const text=`🔥 I'm on a ${s} Day Streak on Kidzinos!\n🎈 Collected ${b} Zino Balloons!\n\nJoin me and complete daily quests 🚀 #Kidzinos #CrazyXYZ`;
-  window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`,'_blank');
-  closeShareCard();
-}
-
-function shareZinoCard(){
-  const s=state.user.streak||0; const b=state.user.zinoCoins||0;
-  const text=`🔥 I'm on a ${s} Day Streak on Kidzinos!\n🎈 Collected ${b} Zino Balloons!\n\nJoin me and complete daily quests 🚀 #Kidzinos #CrazyXYZ`;
-  if(navigator.share) navigator.share({title:'Mera Zino Loop Card! 🔥',text,url:'https://kidzinos.com'}).catch(()=>{});
-  else { navigator.clipboard?.writeText(text); showToast('📋 Card details copied!'); }
-  closeShareCard();
-}
-
-// ── Hook initZinoLoop ──
-const _zlOrigOnScreenEnter=onScreenEnter;
-onScreenEnter = function(screenId){
-  _zlOrigOnScreenEnter(screenId);
-  if(screenId==='home') initZinoLoop();
-};
-
 // ===== FRIEND CHALLENGE =====
 let friendChallengesLeft = 3;
 
@@ -2060,5 +1377,450 @@ function showIncomingVsAttack(emoji) {
     el.style.opacity = '0';
     el.style.transform = 'translate(-50%,-50%) scale(0)';
   }, 1500);
+}
+
+// ===== LOCALSTORAGE CUSTOM SYNC =====
+const defaultQuestionBank = JSON.parse(JSON.stringify(questionBank));
+
+function syncCustomQuestions() {
+  for (const key in defaultQuestionBank) {
+    questionBank[key] = [...defaultQuestionBank[key]];
+  }
+
+  const customQuestions = JSON.parse(localStorage.getItem('kidzinos_questions') || '[]');
+  customQuestions.forEach(q => {
+    const mode = q.mode || 'daily';
+    if (questionBank[mode]) {
+      questionBank[mode].push({
+        q: q.q,
+        opts: q.opts,
+        ans: parseInt(q.ans),
+        cat: q.cat || 'General'
+      });
+    }
+  });
+}
+
+function initCustomContests() {
+  const customContests = JSON.parse(localStorage.getItem('kidzinos_contests') || '[]');
+
+  // 1. Render in Home Screen Hero Banner Slider
+  const slider = document.querySelector('.banner-slider');
+  const dotsContainer = document.querySelector('.banner-dots');
+
+  if (slider && dotsContainer) {
+    document.querySelectorAll('.custom-slide, .custom-dot').forEach(el => el.remove());
+
+    customContests.forEach(contest => {
+      const slide = document.createElement('div');
+      slide.className = 'banner-slide custom-slide';
+
+      let gradient = 'linear-gradient(135deg, #1e003a, #7c3aed)';
+      if (contest.type === 'Clash') gradient = 'linear-gradient(135deg, #091830, #0050cc)';
+      if (contest.type === 'War') gradient = 'linear-gradient(135deg, #1a0500, #ff4500)';
+
+      slide.style.background = gradient;
+
+      const topPrize = contest.prizes && contest.prizes[0] ? contest.prizes[0] : 'Rewards';
+      const typeLabel = contest.type ? contest.type.toUpperCase() : 'CONTEST';
+      const leagueLabel = contest.league && contest.league !== 'No League' ? ` • ${contest.league.toUpperCase()}` : '';
+
+      slide.innerHTML = `
+        <div class="banner-text">
+          <div class="banner-label"><i class="fa-solid fa-trophy"></i> ${typeLabel}${leagueLabel}</div>
+          <div class="banner-title">${contest.title}</div>
+          <div class="banner-sub">Top Prize: ${topPrize} • Play to Win!</div>
+          <button class="banner-cta" onclick="showChallengeDetail('${contest.id}')">Join Now</button>
+        </div>
+        <img src="${contest.imageUrl || 'char1.jpg'}" class="banner-char" alt="Crazy XYZ" onerror="this.src='char1.jpg'" />
+      `;
+
+      slider.insertBefore(slide, dotsContainer);
+
+      const dot = document.createElement('span');
+      dot.className = 'b-dot custom-dot';
+      dotsContainer.appendChild(dot);
+    });
+  }
+
+  // 2. Render in Play Zone Tabs
+  const drillContainer = document.getElementById('custom-drill-container');
+  const clashContainer = document.getElementById('custom-clash-container');
+  const warContainer = document.getElementById('custom-war-container');
+
+  if (drillContainer) drillContainer.innerHTML = '';
+  if (clashContainer) clashContainer.innerHTML = '';
+  if (warContainer) warContainer.innerHTML = '';
+
+  customContests.forEach(contest => {
+    let targetContainer = null;
+    let cardClass = 'challenge-card-new';
+    let actionBtnClass = 'drill-action';
+    let actionIcon = 'fa-bolt';
+    let actionText = 'Start Now';
+    let rewardText = contest.prizes && contest.prizes[0] ? contest.prizes[0] : '+10 Zino Coins';
+
+    if (contest.type === 'Practice' || contest.type === 'Contest') {
+      targetContainer = drillContainer;
+      cardClass = 'challenge-card-new';
+      actionBtnClass = 'drill-action';
+      actionIcon = 'fa-bolt';
+      actionText = 'Start Now';
+    } else if (contest.type === 'Clash') {
+      targetContainer = clashContainer;
+      cardClass = 'challenge-card-new';
+      actionBtnClass = 'clash-action';
+      actionIcon = 'fa-calendar-week';
+      actionText = 'Enter Clash';
+    } else if (contest.type === 'War') {
+      targetContainer = warContainer;
+      cardClass = 'challenge-card-new';
+      actionBtnClass = 'war-action';
+      actionIcon = 'fa-khanda';
+      actionText = 'Enter War';
+    }
+
+    if (targetContainer) {
+      const card = document.createElement('div');
+      card.className = `${cardClass} custom-card`;
+      card.setAttribute('onclick', `showChallengeDetail('${contest.id}')`);
+      card.style.marginTop = '16px'; // Space out nicely from preceding items
+
+      const endsText = contest.endDate ? new Date(contest.endDate).toLocaleDateString('en-US', {month:'short', day:'numeric'}) : 'TBD';
+
+      card.innerHTML = `
+        <div class="chn-thumb" style="background: linear-gradient(135deg, #10062a, #3b0764)">
+          <img src="${contest.imageUrl || 'char3.jpg'}" class="chn-bg-img" alt="" onerror="this.src='char3.jpg'" />
+          <div class="chn-thumb-overlay"></div>
+          <div class="chn-live-badge"><span class="live-dot"></span> LIVE</div>
+        </div>
+        <div class="chn-body">
+          <div class="chn-title">${contest.title}</div>
+          <div class="chn-meta-row">
+            <span class="chn-meta-item gold-text"><i class="fa-solid fa-trophy"></i> ${rewardText}</span>
+            <span class="chn-meta-item"><i class="fa-solid fa-list-ol"></i> ${contest.league || 'All Leagues'}</span>
+          </div>
+          <div class="chn-meta-row">
+            <span class="chn-meta-item"><i class="fa-regular fa-clock"></i> Fee: ${contest.entryFee ? '₹' + contest.entryFee : 'Free'}</span>
+            <span class="chn-meta-item red-text"><i class="fa-solid fa-circle-dot"></i> Ends ${endsText}</span>
+          </div>
+          <button class="chn-action-btn ${actionBtnClass}">
+            <i class="fa-solid ${actionIcon}"></i> ${actionText}
+          </button>
+        </div>
+      `;
+      targetContainer.appendChild(card);
+    }
+  });
+}
+
+
+/* =========================================================================
+   DAILY DOZE & CRAZY RANK LEADERBOARD
+   ========================================================================= */
+
+// 1. Leaderboard Modal Logic
+function openLeaderboard() {
+  document.getElementById('leaderboard-modal').classList.remove('hidden');
+  renderLeaderboard();
+}
+
+function renderLeaderboard() {
+  const list = document.getElementById('leaderboard-list');
+  if (!list) return;
+  
+  const tags = [
+    { name: 'Legend', icon: 'fa-crown', color: '#FFD700', rank: '#1 - #10' },
+    { name: 'Grand Master', icon: 'fa-gem', color: '#8B5CF6', rank: '#11 - #50' },
+    { name: 'Master', icon: 'fa-star', color: '#EF4444', rank: '#51 - #200' },
+    { name: 'Hero', icon: 'fa-bolt', color: '#F97316', rank: '#201 - #1000' },
+    { name: 'Super Human', icon: 'fa-fire', color: '#EC4899', rank: '#1001 - #5000' },
+    { name: 'Pro', icon: 'fa-shield-halved', color: '#3B82F6', rank: '#5001 - #20000' },
+    { name: 'Learner', icon: 'fa-book', color: '#10B981', rank: '#20001+' }
+  ];
+  
+  list.innerHTML = tags.map((tag, i) => `
+    <div style="display:flex; align-items:center; justify-content:space-between; background:rgba(255,255,255,0.05); border:1px solid rgba(255,255,255,0.1); border-radius:12px; padding:16px;">
+      <div style="display:flex; align-items:center; gap:16px;">
+        <div style="width:40px; height:40px; border-radius:50%; background:rgba(255,255,255,0.1); display:flex; align-items:center; justify-content:center; color:${tag.color}; font-size:1.2rem; box-shadow:0 0 15px ${tag.color}40;">
+          <i class="fa-solid ${tag.icon}"></i>
+        </div>
+        <div>
+          <div style="font-size:1.1rem; font-weight:800; color:#fff; font-family:'Space Grotesk', sans-serif;">${tag.name}</div>
+          <div style="font-size:0.75rem; color:var(--st-muted); margin-top:2px;">Aspirational Rank</div>
+        </div>
+      </div>
+      <div style="font-weight:700; color:rgba(255,255,255,0.8); background:rgba(0,0,0,0.3); padding:4px 10px; border-radius:20px; font-size:0.8rem;">
+        ${tag.rank}
+      </div>
+    </div>
+  `).join('');
+}
+
+function closeLeaderboard() {
+  document.getElementById('leaderboard-modal').classList.add('hidden');
+}
+
+// 2. Daily Doze Swipe Logic
+let dozeFacts = [
+  { id: 1, category: "SPACE", text: "A day on Venus is longer than a year on Venus." },
+  { id: 2, category: "ANIMALS", text: "Octopuses have three hearts and blue blood." },
+  { id: 3, category: "TECH", text: "The first computer mouse was made of wood." },
+  { id: 4, category: "HISTORY", text: "Cleopatra lived closer in time to the Moon landing than to the construction of the Great Pyramid." }
+];
+
+let currentDozeIndex = 0;
+let isDozeOpen = false;
+
+function toggleDailyDoze() {
+  const container = document.getElementById('daily-doze-container');
+  const arrow = document.getElementById('daily-doze-arrow');
+  isDozeOpen = !isDozeOpen;
+  
+  if (isDozeOpen) {
+    container.style.display = 'block';
+    arrow.style.transform = 'rotate(180deg)';
+    renderDailyDozeStack();
+  } else {
+    container.style.display = 'none';
+    arrow.style.transform = 'rotate(0deg)';
+  }
+}
+
+function renderDailyDozeStack() {
+  const stack = document.getElementById('dd-swipe-stack');
+  const grid = document.getElementById('dd-grid-view');
+  const actions = document.getElementById('dd-actions');
+  
+  if (currentDozeIndex >= dozeFacts.length) {
+    stack.style.display = 'none';
+    actions.style.display = 'none';
+    grid.style.display = 'flex';
+    renderDozeGrid();
+    return;
+  }
+  
+  stack.style.display = 'block';
+  actions.style.display = 'flex';
+  grid.style.display = 'none';
+  
+  stack.innerHTML = '';
+  // Render remaining cards
+  for (let i = dozeFacts.length - 1; i >= currentDozeIndex; i--) {
+    const fact = dozeFacts[i];
+    const card = document.createElement('div');
+    card.className = 'swipe-card';
+    card.id = `doze-card-${i}`;
+    card.style.zIndex = dozeFacts.length - i;
+    
+    // Scale down cards behind
+    const diff = i - currentDozeIndex;
+    if (diff > 0) {
+      card.style.transform = `scale(${1 - diff * 0.05}) translateY(${diff * -10}px)`;
+      card.style.opacity = `${1 - diff * 0.2}`;
+    }
+    
+    card.innerHTML = `
+      <div class="swipe-card-category">${fact.category}</div>
+      <div class="swipe-card-content">${fact.text}</div>
+    `;
+    stack.appendChild(card);
+  }
+}
+
+function swipeDailyDoze(direction) {
+  if (currentDozeIndex >= dozeFacts.length) return;
+  
+  const currentCard = document.getElementById(`doze-card-${currentDozeIndex}`);
+  if (currentCard) {
+    if (direction === 'right') {
+      currentCard.style.animation = 'swipeOutRight 0.4s forwards';
+    } else {
+      currentCard.style.animation = 'swipeOutLeft 0.4s forwards';
+    }
+    
+    setTimeout(() => {
+      currentDozeIndex++;
+      renderDailyDozeStack();
+    }, 400);
+  }
+}
+
+function renderDozeGrid() {
+  const gridItems = document.getElementById('dd-grid-items');
+  gridItems.innerHTML = '';
+  dozeFacts.forEach(fact => {
+    const item = document.createElement('div');
+    item.style.background = 'rgba(255,255,255,0.05)';
+    item.style.border = '1px solid rgba(255,255,255,0.1)';
+    item.style.borderRadius = '12px';
+    item.style.padding = '12px';
+    item.style.display = 'flex';
+    item.style.flexDirection = 'column';
+    item.style.gap = '8px';
+    
+    item.innerHTML = `
+      <div style="font-size:0.7rem; color:#00F2FE; font-weight:800; letter-spacing:1px;">${fact.category}</div>
+      <div style="font-size:0.8rem; color:#fff;">${fact.text}</div>
+    `;
+    gridItems.appendChild(item);
+  });
+}
+
+// Add swipeOutLeft animation to CSS dynamically since we forgot it in social-ui.css
+if (!document.getElementById('doze-animations')) {
+  const style = document.createElement('style');
+  style.id = 'doze-animations';
+  style.innerHTML = `
+    @keyframes swipeOutLeft {
+      0% { transform: translateX(0) rotate(0); opacity: 1; }
+      100% { transform: translateX(-150%) rotate(-30deg); opacity: 0; }
+    }
+    }
+  `;
+  document.head.appendChild(style);
+}
+// ===== SECRET MISSIONS =====
+const smCityCards = [
+  { name: 'Hyderabad', fact: 'The City of Pearls — home to the world\'s largest film studio complex, Ramoji Film City!' },
+  { name: 'Delhi', fact: 'India\'s capital has ruins from 7 different cities built on the same ground across 1,000 years!' },
+  { name: 'Jaipur', fact: 'The Pink City was painted pink in 1876 to welcome the Prince of Wales — and it stayed that way!' },
+  { name: 'Kolkata', fact: 'Kolkata is home to Asia\'s oldest operating tram network, running since 1880!' },
+  { name: 'Chennai', fact: 'Marina Beach in Chennai is the world\'s second longest natural urban beach!' },
+];
+
+let smCompleted = JSON.parse(localStorage.getItem('sm_completed') || '[false,false,false,false,false]');
+let smCardIndex = parseInt(localStorage.getItem('sm_card_index') || '0');
+
+function initSecretMissions() {
+  smCompleted.forEach((done, i) => {
+    if (done) markMissionDone(i);
+  });
+  updateSmProgress();
+}
+
+function toggleSecretMissions() {
+  const body = document.getElementById('sm-body');
+  const chevron = document.getElementById('sm-chevron');
+  if (!body) return;
+  const isOpen = body.style.display === 'block';
+  body.style.display = isOpen ? 'none' : 'block';
+  if (chevron) chevron.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+
+function toggleLandmarks() {
+  const lb = document.getElementById('sm-landmark-body');
+  const chev = document.getElementById('lm-chevron');
+  if (!lb) return;
+  const isOpen = lb.style.display === 'block';
+  lb.style.display = isOpen ? 'none' : 'block';
+  if (chev) chev.style.transform = isOpen ? '' : 'rotate(180deg)';
+}
+
+function markMissionDone(index) {
+  const row = document.getElementById(`sm-mission-${index}`);
+  const check = document.getElementById(`sm-check-${index}`);
+  if (row) row.classList.add('completed');
+  if (check) {
+    check.classList.add('done');
+    check.innerHTML = '<i class="fa-solid fa-circle-check"></i>';
+  }
+  const dot = document.getElementById(`sm-pdot-${index}`);
+  if (dot) dot.classList.add('active');
+}
+
+function completeMission(index) {
+  if (smCompleted[index]) return;
+  smCompleted[index] = true;
+  localStorage.setItem('sm_completed', JSON.stringify(smCompleted));
+  markMissionDone(index);
+  updateSmProgress();
+}
+
+function updateSmProgress() {
+  const count = smCompleted.filter(Boolean).length;
+  const pct = (count / 5) * 100;
+  const bar = document.getElementById('sm-progress-bar');
+  const badge = document.getElementById('missions-status-badge');
+
+  if (bar) bar.style.width = pct + '%';
+  if (badge) {
+    badge.textContent = `${count}/5`;
+    if (count === 5) badge.classList.add('complete');
+    else badge.classList.remove('complete');
+  }
+
+  // Sync dots
+  smCompleted.forEach((done, i) => {
+    const dot = document.getElementById(`sm-pdot-${i}`);
+    if (dot) dot.classList.toggle('active', done);
+  });
+
+  if (count === 5) revealCityCard();
+}
+
+function revealCityCard() {
+  const preview = document.getElementById('sm-city-reward-preview');
+  if (!preview) return;
+  preview.style.display = 'block';
+
+  const city = smCityCards[smCardIndex % smCityCards.length];
+  const nameEl = document.getElementById('sm-city-name');
+  const factEl = document.getElementById('sm-city-fact');
+  if (nameEl) nameEl.textContent = city.name;
+  if (factEl) factEl.textContent = city.fact;
+}
+
+function shareCityCard() {
+  const city = smCityCards[smCardIndex % smCityCards.length];
+  const text = `🎴 I just unlocked the ${city.name} City Card on Kidzinos!\n\n"${city.fact}"\n\nJoin me → kidzinos.com #Kidzinos #CrazyXYZ`;
+  if (navigator.share) {
+    navigator.share({ title: 'Kidzinos City Card', text });
+  } else {
+    navigator.clipboard.writeText(text).then(() => alert('City card text copied! Share it anywhere!'));
+  }
+}
+
+// Init on page load
+document.addEventListener('DOMContentLoaded', () => { initSecretMissions(); });
+
+// ===== STORY VIEWER =====
+function openStory(name, avatarSrc, text) {
+  const modal = document.getElementById('view-story-modal');
+  if (!modal) return;
+
+  // Set avatar
+  const avatarEl = document.getElementById('story-view-avatar');
+  if (avatarEl) {
+    if (avatarSrc) {
+      avatarEl.innerHTML = `<img src="${avatarSrc}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;" onerror="this.parentElement.textContent='${name.charAt(0)}'" />`;
+    } else {
+      avatarEl.textContent = name.charAt(0);
+    }
+  }
+
+  // Set name
+  const nameEl = document.getElementById('story-view-name');
+  if (nameEl) nameEl.textContent = name;
+
+  // Set content
+  const contentEl = document.getElementById('story-view-content');
+  if (contentEl) contentEl.textContent = text || '';
+
+  modal.classList.remove('hidden');
+
+  // Inject circle button (circle.js)
+  if (typeof injectCircleIntoStory === 'function') {
+    injectCircleIntoStory(name, avatarSrc);
+  }
+}
+
+function closeViewStoryModal() {
+  const modal = document.getElementById('view-story-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function openAddStoryModal() {
+  showToast('📸 Story creation coming soon! Stay tuned.');
 }
 

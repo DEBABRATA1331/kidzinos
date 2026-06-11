@@ -1,0 +1,23 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Kidzinos Sync Partner</title>
+  <script>
+    window.addEventListener('message', (event) => {
+      // Security check: Only allow localhost/127.0.0.1 origins
+      const origin = event.origin;
+      if (!origin.includes('localhost') && !origin.includes('127.0.0.1')) return;
+      
+      const payload = event.data;
+      if (payload && payload.action === 'sync_localstorage') {
+        localStorage.setItem(payload.key, JSON.stringify(payload.data));
+        // Acknowledge back
+        event.source.postMessage({ action: 'sync_ack', key: payload.key }, origin);
+      }
+    });
+  </script>
+</head>
+<body>
+</body>
+</html>

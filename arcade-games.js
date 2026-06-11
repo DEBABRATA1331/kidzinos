@@ -57,7 +57,7 @@ function launchArcade(type) {
       <div class="arcade-gameover-title">Game Over!</div>
       <div class="arcade-gameover-score">Score: <span id="arc-final">0</span></div>
       <div class="arcade-gameover-best">Best: <span id="arc-best2">0</span></div>
-      <div class="arcade-gameover-reward">🎈 +<span id="arc-earned">${cfg.reward}</span> Zino Balloons!</div>
+      <div class="arcade-gameover-reward">🪙 +<span id="arc-earned">${cfg.reward}</span> Zino Coins!</div>
       <div class="arcade-btn-row">
         <button class="arcade-replay-btn" onclick="startArcade()">▶ Replay</button>
         <button class="arcade-quit-btn" onclick="closeArcade()">✕ Quit</button>
@@ -117,7 +117,7 @@ function arcadeGameOver() {
   state.user.zinoCoins += arcadeState.reward;
   updateAllZinos();
   completeMission(2);
-  showToast(`🎮 +${arcadeState.reward} Zino Balloons!`);
+  showToast(`🎮 +${arcadeState.reward} Zino Coins!`);
 }
 
 function updateArcScore(n) {
@@ -401,7 +401,7 @@ function initStreet(canvas) {
   let touchStartX = null, shifting = false;
 
   const OBS = ['🚌','🚗','🛢️','⚡','🪨','🚧'];
-  const COIN_CHAR = '🎈';
+  const COIN_CHAR = '🪙';
   const CHAR = '🏃';
 
   function shiftLane(dir) {

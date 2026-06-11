@@ -1,0 +1,593 @@
+/* =================================================================
+   WATCH & EARN — Two-Tab CSS (XYZ Video + Featured Video)
+   ================================================================= */
+
+/* ── Screen container ─────────────────────────────────────── */
+#screen-watch {
+  padding: 0 !important;
+  overflow: hidden !important;
+}
+.watch-wrap {
+  position: relative;
+  width: 100%;
+  height: 100vh;
+  background: #0F0F1A;
+}
+
+/* ── Floating header ──────────────────────────────────────── */
+.watch-floating-header {
+  position: absolute;
+  top: 0; left: 0; right: 0;
+  z-index: 50;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 44px 16px 8px;
+  background: linear-gradient(to bottom, rgba(15,15,26,0.95), transparent);
+  pointer-events: none;
+}
+.watch-floating-header > * { pointer-events: auto; }
+.wfh-brand {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: -0.3px;
+}
+.wfh-brand i { color: #a855f7; }
+
+/* ── Tab row ──────────────────────────────────────────────── */
+.watch-tab-row {
+  position: absolute;
+  top: 86px; left: 0; right: 0;
+  z-index: 51;
+  display: flex;
+  gap: 0;
+  padding: 0 16px;
+  pointer-events: auto;
+}
+.watch-tab {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  padding: 9px 0 11px;
+  border: none;
+  background: none;
+  color: rgba(255,255,255,0.4);
+  font-size: 0.85rem;
+  font-weight: 800;
+  font-family: 'Space Grotesk', sans-serif;
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+}
+.watch-tab i { font-size: 0.78rem; }
+.active-wtab {
+  color: #fff;
+  border-bottom-color: #a855f7;
+}
+
+/* ── Panels ───────────────────────────────────────────────── */
+.watch-panel {
+  position: absolute;
+  inset: 0;
+}
+.watch-panel.hidden { display: none !important; }
+
+/* ── XYZ Reels (existing reel classes extended) ───────────── */
+.xyz-reel .reel-actions {
+  right: 10px;
+  bottom: 140px;
+  gap: 20px;
+}
+.earn-action-btn {
+  background: linear-gradient(135deg, rgba(255,215,0,0.15), rgba(255,165,0,0.1)) !important;
+  border: 1px solid rgba(255,215,0,0.3) !important;
+}
+.earn-action-btn .ra-icon {
+  color: #FFD700 !important;
+}
+.earn-action-btn.earned-state {
+  background: rgba(34,197,94,0.1) !important;
+  border-color: rgba(34,197,94,0.3) !important;
+}
+.earn-action-btn.earned-state .ra-icon { color: #22c55e !important; }
+
+/* ── Comments Sheet ───────────────────────────────────────── */
+.reel-comments-sheet {
+  width: 100%;
+  max-width: 480px;
+  height: 72vh;
+  background: #111118;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-bottom: none;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUpSheet 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+}
+.reel-comments-handle {
+  width: 36px;
+  height: 4px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 2px;
+  margin: 12px auto 0;
+  flex-shrink: 0;
+}
+.reel-comments-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  flex-shrink: 0;
+}
+.reel-comment-item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+}
+.rci-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.85rem;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.rci-body {
+  flex: 1;
+}
+.rci-name {
+  font-size: 0.78rem;
+  font-weight: 800;
+  color: rgba(255,255,255,0.7);
+  margin-bottom: 3px;
+}
+.rci-text {
+  font-size: 0.9rem;
+  color: #fff;
+  line-height: 1.4;
+}
+.rci-actions {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  margin-top: 6px;
+}
+.rci-like-btn {
+  background: none;
+  border: none;
+  color: rgba(255,255,255,0.4);
+  font-size: 0.75rem;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font-family: 'Space Grotesk', sans-serif;
+  font-weight: 700;
+  transition: color 0.2s;
+}
+.rci-like-btn.liked { color: #ef4444; }
+.rci-time {
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.3);
+}
+
+.reel-comment-input-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 12px 16px max(16px, env(safe-area-inset-bottom));
+  border-top: 1px solid rgba(255,255,255,0.07);
+  background: #111118;
+  flex-shrink: 0;
+}
+.reel-comment-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #FF1A35, #B3001B);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.9rem;
+  font-weight: 800;
+  color: #fff;
+  flex-shrink: 0;
+}
+.reel-comment-input {
+  flex: 1;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 9px 14px;
+  color: #fff;
+  font-size: 0.9rem;
+  font-family: 'Space Grotesk', sans-serif;
+  outline: none;
+}
+.reel-comment-input:focus {
+  border-color: rgba(168,85,247,0.5);
+}
+.reel-comment-input::placeholder { color: rgba(255,255,255,0.3); }
+.reel-comment-send {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  border: none;
+  color: #fff;
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: transform 0.2s;
+  flex-shrink: 0;
+}
+.reel-comment-send:active { transform: scale(0.9); }
+
+/* ── Featured Video Cards ──────────────────────────────────── */
+.fv-card {
+  display: flex;
+  flex-direction: column;
+  background: rgba(255,255,255,0.02);
+  border-radius: 16px;
+  overflow: hidden;
+  margin-bottom: 16px;
+  cursor: pointer;
+  transition: transform 0.18s;
+  border: 1px solid rgba(255,255,255,0.06);
+}
+.fv-card:active { transform: scale(0.98); }
+.fv-card-earned {
+  border-color: rgba(34,197,94,0.2);
+  background: rgba(34,197,94,0.03);
+}
+
+.fv-thumb-wrap {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  background: #1a1a2e;
+  overflow: hidden;
+}
+.fv-thumb {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.3s;
+}
+.fv-card:active .fv-thumb { transform: scale(1.03); }
+
+.fv-play-overlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(0,0,0,0.35);
+  transition: background 0.2s;
+}
+.fv-play-overlay i {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  background: rgba(255,255,255,0.92);
+  color: #111;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.3rem;
+  padding-left: 4px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+}
+.fv-card:active .fv-play-overlay { background: rgba(0,0,0,0.5); }
+
+.fv-duration {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  background: rgba(0,0,0,0.75);
+  color: #fff;
+  font-size: 0.72rem;
+  font-weight: 800;
+  padding: 2px 6px;
+  border-radius: 4px;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.fv-live-badge {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  background: #FF0000;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 900;
+  padding: 3px 8px;
+  border-radius: 4px;
+  letter-spacing: 0.5px;
+}
+.fv-earned-overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(34,197,94,0.25);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1rem;
+  font-weight: 900;
+  color: #22c55e;
+  gap: 6px;
+  font-family: 'Space Grotesk', sans-serif;
+  backdrop-filter: blur(2px);
+}
+
+.fv-info {
+  padding: 12px 14px;
+}
+.fv-title {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #fff;
+  line-height: 1.35;
+  margin-bottom: 8px;
+  font-family: 'Space Grotesk', sans-serif;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.fv-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-wrap: wrap;
+  margin-bottom: 8px;
+}
+.fv-channel {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 0.75rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.6);
+}
+.fv-ch-avatar {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+.fv-dot {
+  font-size: 0.65rem;
+  color: rgba(255,255,255,0.3);
+}
+.fv-views, .fv-time {
+  font-size: 0.72rem;
+  color: rgba(255,255,255,0.45);
+  font-weight: 600;
+}
+.fv-earn-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(255,215,0,0.08);
+  border: 1px solid rgba(255,215,0,0.2);
+  border-radius: 20px;
+  padding: 4px 10px;
+  font-size: 0.72rem;
+  font-weight: 800;
+  color: #FFD700;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* ── Featured Video Player Modal ──────────────────────────── */
+.featured-player-sheet {
+  width: 100%;
+  max-width: 480px;
+  max-height: 92vh;
+  background: #111118;
+  border-top-left-radius: 24px;
+  border-top-right-radius: 24px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-bottom: none;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUpSheet 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+}
+.fp-handle {
+  width: 36px;
+  height: 4px;
+  background: rgba(255,255,255,0.18);
+  border-radius: 2px;
+  margin: 12px auto 0;
+  flex-shrink: 0;
+}
+.fp-video-area {
+  background: #000;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 16/9;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.fp-video-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.fp-progress-wrap {
+  position: absolute;
+  bottom: 0; left: 0; right: 0;
+  padding: 0 12px 8px;
+}
+.fp-progress-bar {
+  height: 3px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 2px;
+  overflow: hidden;
+  margin-bottom: 4px;
+}
+.fp-progress-fill {
+  height: 100%;
+  width: 0%;
+  background: #FF0000;
+  transition: width 0.3s ease;
+}
+.fp-progress-meta {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.68rem;
+  color: rgba(255,255,255,0.5);
+}
+
+.fp-info-area {
+  overflow-y: auto;
+  flex: 1;
+  padding: 14px 16px 24px;
+}
+.fp-title {
+  font-size: 0.95rem;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.3;
+  margin-bottom: 12px;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.fp-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 14px;
+}
+.fp-ch-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
+}
+.fp-subscribe-btn {
+  margin-left: auto;
+  background: #FF0000;
+  border: none;
+  border-radius: 20px;
+  padding: 7px 14px;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 900;
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex-shrink: 0;
+}
+.fp-actions-row {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  scrollbar-width: none;
+  margin-bottom: 14px;
+  padding-bottom: 2px;
+}
+.fp-actions-row::-webkit-scrollbar { display: none; }
+.fp-action {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 20px;
+  padding: 8px 14px;
+  color: #fff;
+  font-size: 0.8rem;
+  font-weight: 700;
+  cursor: pointer;
+  white-space: nowrap;
+  font-family: 'Space Grotesk', sans-serif;
+  transition: all 0.2s;
+  flex-shrink: 0;
+}
+.fp-action:active { background: rgba(255,255,255,0.12); }
+
+.fp-yt-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: #FF0000;
+  color: #fff;
+  border-radius: 8px;
+  padding: 10px 20px;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-decoration: none;
+  font-family: 'Space Grotesk', sans-serif;
+}
+
+/* Earn bar inside player */
+.fp-earn-bar {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,215,0,0.06);
+  border: 1px solid rgba(255,215,0,0.18);
+  border-radius: 14px;
+  padding: 12px 14px;
+}
+.fp-earn-track {
+  height: 6px;
+  background: rgba(255,255,255,0.1);
+  border-radius: 3px;
+  overflow: hidden;
+}
+.fp-earn-fill {
+  height: 100%;
+  width: 0%;
+  background: linear-gradient(90deg, #FFD700, #FF8C00);
+  border-radius: 3px;
+  transition: width 0.4s ease;
+}
+.fp-collect-btn {
+  background: linear-gradient(135deg, #FFD700, #FF8C00);
+  border: none;
+  border-radius: 12px;
+  padding: 8px 14px;
+  color: #111;
+  font-size: 0.82rem;
+  font-weight: 900;
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  flex-shrink: 0;
+  animation: popIn 0.4s cubic-bezier(0.175,0.885,0.32,1.275);
+}
+.fp-collect-btn.hidden { display: none; }
+@keyframes popIn {
+  from { transform: scale(0.5); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}

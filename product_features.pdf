@@ -1,0 +1,178 @@
+# Kidzinos App - Detailed Product Features Document (PFD)
+
+## 1. Executive Summary
+**Kidzinos** is a mobile-first, web-based gamified application designed to build positive habits and test knowledge for users aged 10–14. Heavily inspired by the "Crazy XYZ" YouTube brand, the application merges micro-learning (trivia), hyper-casual arcade gaming, daily routine building, and a simulated social environment. The core hook lies in earning "Zino Balloons" and increasing one's "Crazy Social Index" (CSI) to unlock higher tiers and virtual rewards.
+
+---
+
+## 2. Core Currencies & Progression Systems
+
+### 2.1 Zino Balloons (Primary Virtual Currency)
+* **Definition:** The standard economy token used for purchasing real/virtual items in the Store.
+* **Earning Mechanics:**
+  * **Daily Routines (Zino Loop):** Completing all daily checklist tasks grants a bulk reward.
+  * **Trivia Mode:** Earned based on the number of correct answers + time bonus + streak multipliers.
+  * **Arcade Mode:** Earned per mini-game session (ranges from +5 to +15 depending on game difficulty).
+* **Usage:** Redeemed in the "Store" tab for virtual avatars, power-ups, or sweepstakes entries.
+
+### 2.2 Crazy Social Index (CSI) - Experience System
+* **Definition:** A cumulative XP system that tracks a user's social interaction and long-term performance.
+* **Earning Mechanics:**
+  * **Quizzes:** 50% of earned Zino Balloons from any quiz are duplicated as CSI points.
+  * **Friend Challenges:** +20 CSI points awarded per friend challenged (up to 3x daily).
+* **Ranking Tiers:**
+  * Lv.1 Rookie (0 XP)
+  * Lv.2 Newcomer (500 XP)
+  * Lv.3 Challenger (1,200 XP)
+  * Lv.4 Fighter (2,200 XP)
+  * Lv.5 Warrior (3,500 XP)
+  * Lv.6 Beast (5,200 XP)
+  * Lv.7 Legend (7,200 XP)
+  * Lv.8 Crazy Star (9,500 XP)
+  * Lv.9 Unstoppable (12,500 XP)
+  * Lv.10 GOD MODE (16,000+ XP)
+
+### 2.3 Streak Mechanics
+* **Trivia Streak:** 3 consecutive correct answers trigger a "Streak Banner" in the quiz UI and apply a `2x` multiplier to all subsequent base scores until an incorrect answer resets it.
+* **App Login/Loop Streak:** Tracks consecutive days the user completes their Zino Loop.
+
+---
+
+## 3. User Journey & Navigation Architecture
+
+### 3.1 Authentication & Onboarding
+* **Splash Screen:** Displays the Kidzinos logo and "Ab Kuch Crazy Karte Hai!" slogan for 2 seconds.
+* **Login Flow:** 
+  * Asks for a 10-digit mobile number.
+  * Transitions to a 4-digit OTP screen.
+  * *Current logic:* Hardcoded to accept "1234". Invalid entries trigger a red error flash and a CSS UI shake animation.
+
+### 3.2 Navigation Hierarchy
+The app utilizes a static bottom tab bar (`id="bottom-nav"`) mapped to 5 core screens:
+1. **Home (`/home`):** The Dashboard. Contains the Zino Loop, Banner Slider, and quick-stats.
+2. **Play (`/play`):** The central hub for Quizzes and the Arcade.
+3. **Watch (`/watch`):** A TikTok/Reel-style vertical scrolling video feed.
+4. **Community (`/community`):** The "Spark" social feed and friend challenge interface.
+5. **Profile (`/profile`):** User settings, CSI rank progress bar, and historical stats.
+
+*Note: Navigation utilizes a custom JavaScript `navigateTo` function handling 350ms CSS slide-out and fade-in transitions for Single Page App (SPA) seamlessness.*
+
+---
+
+## 4. The Zino Loop (Routine Builder)
+* **Objective:** Gamify the user's real-life daily routine.
+* **Mechanics:**
+  * Contains predefined activity blocks: School, Study, Playtime, Sleep.
+  * Each block contains a visual gradient card and an icon.
+  * Tapping a card opens a modal overlay with 3-4 sub-tasks (e.g., "Homework Done", "Read 10 Pages").
+  * Ticking off sub-tasks fills a radial progress bar.
+* **Social Hook:** Users can export their "Zino Loop Card". The system generates a formatted string (`"🔥 I'm on a {X} Day Streak on Kidzinos!..."`) and utilizes the native `navigator.share()` API to send it directly to WhatsApp.
+
+---
+
+## 5. The Challenge Arena (Quiz Engine)
+
+### 5.1 Game Modes
+1. **Daily Drill:** 15-question pool. Free to play. Covers Science, Chemistry, Geography, Biology, and Math.
+2. **Crazy War:** 10-question pool. Requires "Crazy Pass". Covers Physics, Culture, Astronomy.
+3. **Weekly Stash:** 6-question pool. High-stakes competition format.
+
+### 5.2 Quiz Core Logic
+* **Timer:** 30 seconds per question. At <= 10 seconds, the timer text turns red and pulses. At 0 seconds, it auto-advances, marking the question incorrect and resetting the streak.
+* **Scoring Algorithm:**
+  * Base points: +10 for correct.
+  * Time Bonus: +5 points if >20s remaining. +2 points if >10s remaining.
+  * Multiplier: Total is multiplied by `2` if streak >= 3.
+* **Visual Feedback:** Correct answers flash green (`.option-correct`), incorrect answers flash red while highlighting the actual correct answer. A floating text animation (`+15 pts!`) spawns at the tapped coordinates.
+
+### 5.3 Live VS Mode (Asynchronous/Simulated Multiplayer)
+* **Trigger:** Initiated via the "Battle a Friend" button.
+* **UI Implementation:** A fixed overlay at the top of the quiz screen (`#vs-mode-overlay`) displaying User Score vs. Opponent Score, accompanied by dual horizontal progress bars.
+* **Opponent AI Logic:** 
+  * The `simulateOpponent()` function runs a recursive timeout loop with a random delay between 1,000ms and 5,000ms.
+  * The AI has a 70% probability (`Math.random() > 0.3`) of answering correctly.
+  * Upon a correct answer, the AI's score increases by `10 + Math.floor(Math.random() * 5)` points.
+
+---
+
+## 6. The Arcade (Mini-Games)
+Housed within the Play tab (`#screen-games`), the Arcade is a vertically scrollable grid of hyper-casual, fast-paced games.
+* **Balloon Pop:** +5 🎈 per round. Tag: FREE.
+* **Crazy Maths:** +8 🎈 per round. Tag: FREE.
+* **Memory Match:** +6 🎈 per round. Tag: FREE.
+* **Reflex Rush:** +10 🎈 per round. Features an interactive DOM-based target that changes colors randomly across a predefined palette and registers taps via the `reflexTap()` logic.
+* **Crazy Dino Rush:** +12 🎈 per round. Endless side-scroller. Tag: NEW (Green).
+* **IPL Smash:** +15 🎈 per round. Timing-based batting. Tag: HOT (Orange).
+* **Street Rush:** +15 🎈 per round. Obstacle avoidance. Tag: NEW (Cyan).
+* **Flappy Balloon:** +10 🎈 per round. Physics-based tapping.
+
+---
+
+## 7. Social & Community Ecosystem ("Spark")
+The "Spark" community feature is the core social retention engine of Kidzinos, designed to create a sense of presence, competition, and peer recognition.
+
+### 7.1 The "Spark" Feed Architecture
+* **Infinite Scroll Interface:** A continuously loading vertical feed mimicking modern social media (like Instagram or TikTok feeds) to maintain high user engagement.
+* **Event-Driven Content Generation:** The feed algorithm dynamically populates cards based on simulated or real community achievements, such as:
+  * *"Rahul Verma just scored 450 in Daily Drill"* (Performance flexing)
+  * *"Priya reached Level 4: Fighter!"* (Progression milestones)
+  * *"Amit is on a 7-Day Quiz Streak!"* (Consistency recognition)
+* **Visual Hierarchy:** Each "Spark Card" is rendered with a dark, frosted-glass aesthetic (`var(--crazy-dark)` with slight opacity), allowing neon text highlights and emojis to draw the eye immediately to the achievement metric.
+
+### 7.2 Dynamic Identity & Avatars
+* **Algorithmic Avatar Generation:** To ensure the feed always looks populated and vibrant even without user-uploaded images, the system uses a fallback avatar generator built into `social-features.js`.
+  * It extracts the first letter of the user's alias (e.g., "R" for Rahul).
+  * Forces `toUpperCase()` formatting.
+  * Injects the letter into a circular DOM node with a randomized or pre-set bright background color from the app's palette (e.g., `#8b5cf6`, `#ef4444`).
+* **Profile Integration:** Users can click on an avatar to view a minimized version of that player's public stats (their CSI rank and total Zino count).
+
+### 7.3 Peer-to-Peer Interaction & Reactions
+* **Spark Reactions (Fire, Bulb, Rocket):** Instead of a generic "Like" button, users can react to Spark posts with three distinct emojis representing different types of appreciation:
+  * 🔥 **Fire:** For "hot" takes, high scores, or intense achievements.
+  * 💡 **Bulb:** For clever thoughts, facts, or strategy sharing.
+  * 🚀 **Rocket:** For rapid progress, streaks, or leveling up.
+  * *Logic:* Users can only select one reaction per post. Tapping a new reaction toggles the previous one off and increments the new counter.
+* **Direct "Battle" Triggers:** Users can challenge the author of a post to a VS Mode battle.
+* **Anti-Spam & Scarcity Control:**
+  * To preserve the perceived value of a "Challenge," users are strictly limited to **3 outgoing friend challenges per day** (tracked via the `friendChallengesLeft` variable).
+  * Attempting to bypass this limit triggers an error toast: `"❌ No challenges left for today!"`.
+  * Successful challenges award the challenger an immediate **+20 CSI Points**.
+
+### 7.4 The "Daily Dilemma" Feature
+A core engagement driver asking users a thought-provoking, age-appropriate ethical or philosophical question (e.g., *"Should robots make decisions for humans?"*).
+* **Voting Mechanism:** Users must cast a blind "Yes" or "No" vote before seeing the community consensus.
+* **The "Lock" Timer:** After voting, the UI locks for exactly 30 seconds (`dl.lockTimer`) accompanied by an SVG circular countdown. This enforces a "cooling-off" period where the user must reflect on their choice before seeing results.
+* **Result Reveal & Reward:** Once the timer expires, the global consensus bars (Yes% vs No%) animate in, and the user is awarded **+2 XP**. They also receive immediate feedback on whether they sided with the "majority" or are a "rebel thinker."
+* **Reasoning Feed:** Post-vote, users can submit a 100-character explanation for their choice, earning **+5 XP and +3 Zino Balloons**. These reasonings populate a sub-feed where peers can react with 🔥 Fire.
+
+### 7.5 Fire Votes Feed
+A secondary social feed dedicated to peer opinions and debates (often stemming from Daily Dilemmas or Quiz Sparks).
+* **Age Band Filtering:** Users can filter opinions by age cohorts (`10-12`, `13-15`, `16-17`, or `all`).
+* **The "Fire" Scarcity Economy:** 
+  * Users can vote 👍 Agree or 👎 Disagree infinitely.
+  * However, users are only given **10 🔥 "Fire" Votes per week**.
+  * Casting a Fire vote requires careful consideration. Exhausting the weekly pool triggers a toast: `"🔥 No fires left this week — choose wisely next week!"`.
+  * Receiving a Fire vote grants the author a massive +3 to their post score and boosts their CSI by +1.
+
+### 7.6 Global & Local Leaderboards
+* **Tiered Rankings:** The Community tab houses competitive leaderboards split into distinct time horizons:
+  * *Daily Top Brains:* Resets every 24 hours.
+  * *Weekly Clash Leaders:* Aggregates scores over a 7-day period.
+  * *All-Time Legends:* Based heavily on cumulative CSI scores rather than just Zino Balloons.
+
+### 7.7 Viral Export & "Flex" Sharing
+* **WhatsApp Native Integration:** Using the browser's `navigator.share()` API, users can instantly broadcast their achievements or the Daily Dilemma question.
+* **The "Zino Loop Card":** A specialized string export that structures the user's data into an attractive text payload (e.g., `"🔥 I'm on a 5 Day Streak on Kidzinos!\n🎈 Collected 250 Zino Balloons!\n\nJoin me and complete daily quests 🚀 #Kidzinos #CrazyXYZ"`).
+* **The "Crazy Pass":** Premium tier gating access to Crazy War and Weekly Stash. Currently implemented as a UX block pushing users to a mock payment gateway (`"Pay ₹2 & Unlock All"`).
+* **Rules & Fair Play Ruleset:** Explicit terms listed in the app:
+  * "One Shot Only - No take-backs."
+  * "Beat the Clock."
+  * "Accuracy matters most, speed breaks ties."
+  * Disclaimer banner: *"No gambling. Skills-based evaluation."*
+
+---
+
+## 9. Technical Architecture Guidelines
+* **State Management:** A centralized constant `state` object controls user data, quiz progression, timeouts, and UI routing.
+* **CSS Methodology:** Heavy usage of CSS Variables (`var(--crazy-navy)`) for instant theme application. Absolute/Fixed positioning for screen routing (`.screen` class swapping `display: none` to `display: flex`).
+* **Hoisting Safeties:** Function overrides for gamification hooks (e.g., `onScreenEnter`) strictly utilize variable reassignment (`funcName = function() { ... }`) to prevent JavaScript maximum call stack recursion errors.

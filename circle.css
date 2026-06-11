@@ -1,0 +1,368 @@
+/* =========================================================================
+   CIRCLE FEATURE CSS — Kidzinos
+   ========================================================================= */
+
+/* ── Circle nav button & badge ────────────────────────── */
+.circle-nav-btn {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  background: linear-gradient(135deg, rgba(99,102,241,0.15), rgba(168,85,247,0.15));
+  border: 1px solid rgba(99,102,241,0.35);
+  border-radius: 20px;
+  padding: 6px 14px;
+  color: #a78bfa;
+  font-size: 0.82rem;
+  font-weight: 800;
+  font-family: 'Space Grotesk', sans-serif;
+  cursor: pointer;
+  letter-spacing: 0.3px;
+  transition: all 0.2s ease;
+}
+.circle-nav-btn:hover {
+  background: linear-gradient(135deg, rgba(99,102,241,0.25), rgba(168,85,247,0.25));
+  transform: scale(1.03);
+}
+.circle-badge {
+  position: absolute;
+  top: -6px;
+  right: -6px;
+  width: 18px;
+  height: 18px;
+  background: #ef4444;
+  border-radius: 50%;
+  font-size: 0.65rem;
+  font-weight: 900;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 2px solid #0F0F1A;
+  animation: pulse-badge 2s infinite;
+}
+@keyframes pulse-badge {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.2); }
+}
+
+/* ── Circle send button (in story & UZ) ─────────────────── */
+.circle-send-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  border: none;
+  border-radius: 22px;
+  padding: 10px 22px;
+  color: #fff;
+  font-size: 0.88rem;
+  font-weight: 800;
+  font-family: 'Space Grotesk', sans-serif;
+  cursor: pointer;
+  box-shadow: 0 4px 16px rgba(99,102,241,0.4);
+  transition: all 0.25s cubic-bezier(0.175,0.885,0.32,1.275);
+  letter-spacing: 0.3px;
+}
+.circle-send-btn:hover:not(:disabled) {
+  transform: scale(1.05) translateY(-1px);
+  box-shadow: 0 6px 20px rgba(99,102,241,0.55);
+}
+.circle-send-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+.circle-send-btn.pending {
+  background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+  border: 1px solid rgba(255,255,255,0.12);
+  color: rgba(255,255,255,0.5);
+  box-shadow: none;
+  cursor: default;
+}
+.circle-send-btn.in-circle {
+  background: linear-gradient(135deg, rgba(34,197,94,0.15), rgba(16,185,129,0.15));
+  border: 1px solid rgba(34,197,94,0.3);
+  color: #22c55e;
+  box-shadow: 0 4px 12px rgba(34,197,94,0.2);
+  cursor: default;
+}
+
+/* ── UZ Circle CTA (compact row under each post) ───────── */
+.uz-circle-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 16px 14px;
+  border-top: 1px solid rgba(255,255,255,0.05);
+}
+.uz-circle-row .uz-circle-meta {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 0.78rem;
+  color: rgba(255,255,255,0.5);
+}
+.uz-circle-row .uz-circle-mini-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: rgba(99,102,241,0.12);
+  border: 1px solid rgba(99,102,241,0.3);
+  border-radius: 18px;
+  padding: 6px 14px;
+  color: #a78bfa;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-family: 'Space Grotesk', sans-serif;
+}
+.uz-circle-mini-btn:hover:not(:disabled) {
+  background: rgba(99,102,241,0.22);
+  transform: scale(1.04);
+}
+.uz-circle-mini-btn.sent-state {
+  color: rgba(255,255,255,0.35);
+  background: rgba(255,255,255,0.04);
+  border-color: rgba(255,255,255,0.08);
+  cursor: default;
+}
+.uz-circle-mini-btn.circled-state {
+  color: #22c55e;
+  background: rgba(34,197,94,0.1);
+  border-color: rgba(34,197,94,0.25);
+  cursor: default;
+}
+
+/* ── Circle Modal ─────────────────────────────────────── */
+.circle-modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.75);
+  backdrop-filter: blur(8px);
+  z-index: 9998;
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  animation: fadeInOverlay 0.2s ease;
+}
+@keyframes fadeInOverlay {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+.circle-modal-sheet {
+  width: 100%;
+  max-width: 480px;
+  max-height: 88vh;
+  background: #111118;
+  border-top-left-radius: 28px;
+  border-top-right-radius: 28px;
+  border: 1px solid rgba(255,255,255,0.08);
+  border-bottom: none;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: slideUpSheet 0.35s cubic-bezier(0.175,0.885,0.32,1.1);
+}
+@keyframes slideUpSheet {
+  from { transform: translateY(100%); opacity: 0; }
+  to   { transform: translateY(0);    opacity: 1; }
+}
+.circle-modal-handle {
+  width: 40px;
+  height: 4px;
+  background: rgba(255,255,255,0.2);
+  border-radius: 2px;
+  margin: 12px auto 0;
+  flex-shrink: 0;
+}
+.circle-modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px 12px;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  flex-shrink: 0;
+}
+.circle-modal-title {
+  font-family: 'Space Grotesk', sans-serif;
+  font-size: 1.15rem;
+  font-weight: 800;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.circle-modal-title i {
+  color: #a78bfa;
+}
+.circle-modal-close {
+  background: rgba(255,255,255,0.06);
+  border: 1px solid rgba(255,255,255,0.1);
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  color: rgba(255,255,255,0.6);
+  font-size: 0.9rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+.circle-modal-close:hover {
+  background: rgba(255,255,255,0.12);
+  color: #fff;
+}
+
+/* Tabs */
+.circle-tabs {
+  display: flex;
+  gap: 0;
+  padding: 12px 20px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.07);
+  flex-shrink: 0;
+}
+.circle-tab {
+  flex: 1;
+  text-align: center;
+  padding: 8px 0 12px;
+  font-size: 0.82rem;
+  font-weight: 700;
+  color: rgba(255,255,255,0.4);
+  cursor: pointer;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s;
+  font-family: 'Space Grotesk', sans-serif;
+  background: none;
+  border-top: none;
+  border-left: none;
+  border-right: none;
+  margin-bottom: -1px;
+}
+.circle-tab.active-circle-tab {
+  color: #a78bfa;
+  border-bottom-color: #a78bfa;
+}
+
+/* Tab panels */
+.circle-tab-panel {
+  overflow-y: auto;
+  flex: 1;
+  padding: 16px 16px 24px;
+}
+
+/* Request items */
+.circle-req-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  background: rgba(255,255,255,0.04);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 14px;
+  padding: 12px 14px;
+  margin-bottom: 10px;
+  transition: background 0.2s;
+  animation: fadeSlideIn 0.3s ease forwards;
+}
+@keyframes fadeSlideIn {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+.circle-req-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #ef4444, #dc2626);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.1rem;
+  font-weight: 800;
+  color: #fff;
+  font-family: 'Space Grotesk', sans-serif;
+  flex-shrink: 0;
+}
+.circle-req-info {
+  flex: 1;
+  min-width: 0;
+}
+.circle-req-name {
+  font-size: 0.92rem;
+  font-weight: 800;
+  color: #fff;
+  font-family: 'Space Grotesk', sans-serif;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.circle-req-meta {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 3px;
+}
+.circle-req-tag {
+  font-size: 0.68rem;
+  font-weight: 800;
+  padding: 2px 8px;
+  border-radius: 10px;
+  background: rgba(255,215,0,0.1);
+  color: #FFD700;
+  border: 1px solid rgba(255,215,0,0.25);
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Circle Back / Decline buttons */
+.circle-back-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: linear-gradient(135deg, #6366f1, #a855f7);
+  border: none;
+  border-radius: 12px;
+  padding: 7px 13px;
+  color: #fff;
+  font-size: 0.78rem;
+  font-weight: 800;
+  cursor: pointer;
+  font-family: 'Space Grotesk', sans-serif;
+  box-shadow: 0 3px 10px rgba(99,102,241,0.35);
+  transition: transform 0.2s;
+  white-space: nowrap;
+}
+.circle-back-btn:hover {
+  transform: scale(1.04);
+}
+.circle-decline-btn {
+  background: rgba(239,68,68,0.1);
+  border: 1px solid rgba(239,68,68,0.25);
+  border-radius: 10px;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #ef4444;
+  cursor: pointer;
+  font-size: 0.9rem;
+  transition: all 0.2s;
+}
+.circle-decline-btn:hover {
+  background: rgba(239,68,68,0.2);
+}
+
+/* Story circle footer */
+#story-circle-footer {
+  margin-top: 16px;
+  padding-top: 14px;
+  border-top: 1px solid rgba(255,255,255,0.07);
+}
+
+/* Story circle header row */
+.story-circle-header-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
