@@ -139,7 +139,7 @@ onScreenEnter = function(screenId){
     updateHomeStats();
     updateCitiesUI();
     initUnlimitedZone();
-    renderStories();
+    if (typeof renderStories === 'function') renderStories();
   }
 };
 

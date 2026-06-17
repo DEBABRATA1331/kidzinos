@@ -373,3 +373,79 @@ window.fpLike = fpLike;
 window.fpDislike = fpDislike;
 window.fpShare = fpShare;
 window.fpSave = fpSave;
+
+// ── Featured Video Search & Filter ──────────────────────────────
+let fvCurrentCategory = 'all';
+
+// Map video index → categories (matches data in featuredVideos array)
+const fvVideoCategories = {
+  0: ['trending', 'challenge'],
+  1: ['science', 'trending'],
+  2: ['behind'],
+  3: ['challenge', 'trending'],
+  4: ['quiz', 'trending']
+};
+
+function filterFeaturedVideos() {
+  const input = document.getElementById('fv-search-input');
+  const clearBtn = document.getElementById('fv-search-clear');
+  const query = input ? input.value.trim().toLowerCase() : '';
+  if (clearBtn) clearBtn.style.display = query ? 'flex' : 'none';
+
+  const cards = document.querySelectorAll('#featured-video-list .fv-card');
+  let visibleCount = 0;
+
+  cards.forEach((card, idx) => {
+    const titleEl = card.querySelector('.fv-title');
+    const title = titleEl ? titleEl.textContent.toLowerCase() : '';
+    const cats = fvVideoCategories[idx] || [];
+
+    const matchesSearch = !query || title.includes(query);
+    const matchesCat = fvCurrentCategory === 'all' || cats.includes(fvCurrentCategory);
+
+    if (matchesSearch && matchesCat) {
+      card.style.display = '';
+      visibleCount++;
+    } else {
+      card.style.display = 'none';
+    }
+  });
+
+  // Update result count
+  const countEl = document.getElementById('fv-result-count');
+  if (countEl) countEl.textContent = visibleCount + ' video' + (visibleCount !== 1 ? 's' : '');
+
+  // Show/hide no results
+  let noRes = document.getElementById('fv-no-results-msg');
+  const list = document.getElementById('featured-video-list');
+  if (visibleCount === 0) {
+    if (!noRes && list) {
+      noRes = document.createElement('div');
+      noRes.id = 'fv-no-results-msg';
+      noRes.className = 'fv-no-results';
+      noRes.innerHTML = '<i class="fa-solid fa-video-slash"></i><p>No videos found</p>';
+      list.appendChild(noRes);
+    }
+  } else {
+    if (noRes) noRes.remove();
+  }
+}
+
+function clearFVSearch() {
+  const input = document.getElementById('fv-search-input');
+  if (input) input.value = '';
+  const clearBtn = document.getElementById('fv-search-clear');
+  if (clearBtn) clearBtn.style.display = 'none';
+  filterFeaturedVideos();
+}
+
+function setFVCategory(cat, btn) {
+  fvCurrentCategory = cat;
+  document.querySelectorAll('.fv-chip').forEach(c => c.classList.remove('active-fv-chip'));
+  if (btn) btn.classList.add('active-fv-chip');
+  filterFeaturedVideos();
+}
+
+window.filterFeaturedVideos = filterFeaturedVideos;
+window.clearFVSearch = clearFVSearch;
+window.setFVCategory = setFVCategory;

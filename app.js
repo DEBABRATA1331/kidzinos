@@ -33,6 +33,15 @@ const state = {
   bannerInterval: null,
   bannerIndex: 0,
   loggedIn: false,
+  activeChallengeId: 'drill',
+  challengeState: JSON.parse(localStorage.getItem('kidzinos_challenge_state')) || {
+    drill: { registered: false, prerequisiteDone: false, played: false, score: 0, correct: '0/10', rank: 'Top 100%' },
+    war1: { registered: false, prerequisiteDone: false, played: false, score: 0, correct: '0/10', rank: 'Top 100%' },
+    war2: { registered: false, prerequisiteDone: false, played: false, score: 0, correct: '0/10', rank: 'Top 100%' },
+    war3: { registered: false, prerequisiteDone: false, played: false, score: 0, correct: '0/10', rank: 'Top 100%' },
+    clash: { registered: false, prerequisiteDone: false, played: false, score: 0, correct: '0/10', rank: 'Top 100%' },
+    battle: { registered: false, prerequisiteDone: false, played: false, score: 0, correct: '0/10', rank: 'Top 100%' }
+  }
 };
 
 // ===== QUESTION BANK =====
@@ -342,7 +351,7 @@ function handleLogout() {
 // ===== QUIZ =====
 // ===== PLAY TABS =====
 function switchPlayTab(tab) {
-  const tabs = ['drill', 'arcade', 'clash', 'war'];
+  const tabs = ['drill', 'clash', 'war', 'battle'];
   tabs.forEach(t => {
     const btn = document.getElementById(`ptab-${t}`);
     const content = document.getElementById(`ptab-content-${t}`);
@@ -355,16 +364,117 @@ function switchPlayTab(tab) {
     }
   });
 }
-
-// Challenge detail data
+// Challenge detail data
 const challengeData = {
-  'war1': { name: 'WAH WAH CHALLENGE', prize1: 'a50,000', prize2: 'a20,000', prize3: 'a10,000', day: 2, total: 7, ends: '29 Apr' },
-  'war2': { name: 'SCIENCE SHOWDOWN',  prize1: 'a25,000', prize2: 'a10,000', prize3: 'a5,000',  day: 1, total: 7, ends: '29 Apr' },
-  'war3': { name: 'HISTORY HUNTERS',   prize1: 'a10,000', prize2: 'a5,000',  prize3: 'a2,000',  day: 1, total: 7, ends: '30 Apr' },
-  'clash': { name: 'WEEK 12  DAY 3',  prize1: 'a2,000',  prize2: 'a1,000',  prize3: 'a500',    day: 3, total: 7, ends: '5 May'  },
+  'drill': {
+    name: "Today's Brain Drill",
+    type: 'Practice',
+    prize1: '10 Zino Coins',
+    prize2: '5 Zino Coins',
+    prize3: '2 Zino Coins',
+    day: 1,
+    total: 1,
+    ends: 'Today, 11:59 PM',
+    participation: 18450,
+    startDate: 'Today, 12:00 AM',
+    endDate: 'Today, 11:59 PM',
+    ytLink: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    externalLink: 'https://youtube.com/@crazyxyz',
+    rules: 'One set daily for free.\n10 Questions, 30s each.\nCorrect answers build your streak.'
+  },
+  'war1': {
+    name: 'WAH WAH CHALLENGE',
+    type: 'War',
+    prize1: '₹50,000 cash',
+    prize2: '₹20,000 cash',
+    prize3: '₹10,000 cash',
+    day: 2,
+    total: 7,
+    ends: '29 Apr',
+    participation: 8320,
+    startDate: 'April 22',
+    endDate: 'April 29',
+    ytLink: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    externalLink: 'https://youtube.com/@crazyxyz',
+    rules: 'One Shot Only - once you submit, that attempt is locked.\nBeat the Clock - finish before time runs out.\nFast + Right wins.'
+  },
+  'war2': {
+    name: 'SCIENCE SHOWDOWN',
+    type: 'War',
+    prize1: '₹25,000 cash',
+    prize2: '₹10,000 cash',
+    prize3: '₹5,000 cash',
+    day: 1,
+    total: 7,
+    ends: '29 Apr',
+    participation: 12450,
+    startDate: 'April 22',
+    endDate: 'April 29',
+    ytLink: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    externalLink: 'https://youtube.com/@crazyxyz',
+    rules: 'Science & Experiments focus.\nOne attempt only.\nBeat the Clock.'
+  },
+  'war3': {
+    name: 'HISTORY HUNTERS',
+    type: 'War',
+    prize1: '₹10,000 cash',
+    prize2: '₹5,000 cash',
+    prize3: '₹2,000 cash',
+    day: 1,
+    total: 7,
+    ends: '30 Apr',
+    participation: 6120,
+    startDate: 'April 23',
+    endDate: 'April 30',
+    ytLink: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    externalLink: 'https://youtube.com/@crazyxyz',
+    rules: 'History themed challenges.\nOne Shot Only.\nFast + Right wins.'
+  },
+  'clash': {
+    name: 'WEEK 12   DAY 3',
+    type: 'Clash',
+    prize1: '₹2,000 cash',
+    prize2: '₹1,000 cash',
+    prize3: '₹500 cash',
+    day: 3,
+    total: 7,
+    ends: '5 May',
+    participation: 4235,
+    startDate: 'May 1',
+    endDate: 'May 7',
+    ytLink: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    externalLink: 'https://youtube.com/@crazyxyz',
+    rules: 'Leaderboard rules apply.\nHigh difficulty questions.\nOpen to all Pass holders.'
+  },
+  'battle': {
+    name: 'Brain Battle 1v1',
+    type: 'Battle',
+    prize1: '+20 Zino Coins',
+    prize2: '+5 Zino Coins',
+    prize3: 'N/A',
+    day: 1,
+    total: 1,
+    ends: 'Always Active',
+    participation: 24900,
+    startDate: 'Ongoing',
+    endDate: 'Always Active',
+    ytLink: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+    externalLink: 'https://youtube.com/@crazyxyz',
+    rules: 'Real-time 1v1 Matchmaking.\nSpeed match format of 5 questions.\nEmoji attacks allowed.'
+  }
 };
 
+function completeChallengeStateSave() {
+  localStorage.setItem('kidzinos_challenge_state', JSON.stringify(state.challengeState));
+}
+
 function showChallengeDetail(id) {
+  state.activeChallengeId = id;
+  
+  if (!state.challengeState[id]) {
+    state.challengeState[id] = { registered: false, prerequisiteDone: false, played: false, score: 0, correct: '0/10', rank: 'Top 100%' };
+  }
+  
   let d;
   if (id && id.toString().startsWith('custom_')) {
     const customContests = JSON.parse(localStorage.getItem('kidzinos_contests') || '[]');
@@ -378,8 +488,13 @@ function showChallengeDetail(id) {
         day: 1,
         total: 1,
         ends: contest.endDate ? new Date(contest.endDate).toLocaleDateString('en-US', {month:'short', day:'numeric'}) : 'TBD',
-        rules: contest.rules || '',
-        type: contest.type || 'war'
+        rules: contest.rules || 'Solve the custom questions and win.',
+        type: contest.type || 'war',
+        participation: 5200,
+        startDate: 'Ongoing',
+        endDate: contest.endDate ? new Date(contest.endDate).toLocaleDateString('en-US', {month:'short', day:'numeric'}) : 'TBD',
+        ytLink: 'https://www.youtube.com/embed/dQw4w9WgXcQ',
+        externalLink: 'https://youtube.com/@crazyxyz'
       };
     }
   }
@@ -389,53 +504,245 @@ function showChallengeDetail(id) {
   }
 
   // Update content
-  document.getElementById('chd-name').textContent = d.name;
+  const chdName = document.getElementById('chd-name');
+  if (chdName) chdName.textContent = d.name;
 
-  // Update rewards
-  const rw = document.querySelectorAll('.chd-reward-row strong');
-  if (rw[0]) rw[0].textContent = d.prize1 + (d.prize1.includes('₹') || (d.prize1.includes('🎈') || d.prize1.includes('🪙')) || d.prize1.includes('cash') ? '' : ' cash');
-  if (rw[1]) rw[1].textContent = d.prize2 + (d.prize2.includes('₹') || (d.prize2.includes('🎈') || d.prize2.includes('🪙')) || d.prize2.includes('cash') ? '' : ' cash');
-  if (rw[2]) rw[2].textContent = d.prize3 + (d.prize3.includes('₹') || (d.prize3.includes('🎈') || d.prize3.includes('🪙')) || d.prize3.includes('cash') ? '' : ' cash');
+  const timelineEl = document.getElementById('chd-timeline');
+  if (timelineEl) timelineEl.innerHTML = `<i class="fa-regular fa-calendar"></i> Timeline: ${d.startDate || d.ends} • Ends: ${d.endDate || d.ends}`;
 
-  // Update stat
-  const stvals = document.querySelectorAll('.chd-stat-val');
-  if (stvals[0]) stvals[0].innerHTML = `<i class="fa-solid fa-fire"></i> ${d.type ? d.type.toUpperCase() : 'CONTEST'}`;
-  if (stvals[1]) stvals[1].innerHTML = `<i class="fa-solid fa-layer-group"></i> ${d.total || 1} Day(s)`;
-  if (stvals[2]) stvals[2].innerHTML = `<i class="fa-regular fa-calendar-check"></i> ${d.ends}`;
-
-  // Update rules for custom contest if custom rules present
-  const rulesList = document.querySelector('.chd-rules-list');
-  if (rulesList && d.rules) {
+  const prize1El = document.getElementById('chd-prize-1');
+  const prize2El = document.getElementById('chd-prize-2');
+  const prize3El = document.getElementById('chd-prize-3');
+  if (prize1El) prize1El.textContent = d.prize1;
+  if (prize2El) prize2El.textContent = d.prize2;
+  if (prize3El) prize3El.textContent = d.prize3;
+  
+  const rulesList = document.getElementById('chd-rules-list');
+  if (rulesList) {
     rulesList.innerHTML = d.rules.split('\n').filter(r => r.trim()).map((rule, idx) => `
       <div class="chd-rule">
         <span class="chd-rule-num">${idx + 1}</span>
         <span>${rule}</span>
       </div>
     `).join('');
-  } else if (rulesList) {
-    rulesList.innerHTML = `
-      <div class="chd-rule"><span class="chd-rule-num">1</span> <span>One Shot Only &ndash; Once you submit, that attempt is locked. No take-backs.</span></div>
-      <div class="chd-rule"><span class="chd-rule-num">2</span> <span>Beat the Clock &ndash; Finish before time runs out, or the test ends automatically.</span></div>
-      <div class="chd-rule"><span class="chd-rule-num">3</span> <span>Play Fair, Think Smart &ndash; No cheating, no outside help, no shortcuts.</span></div>
-      <div class="chd-rule"><span class="chd-rule-num">4</span> <span>Stable Net, Stable Mind &ndash; Poor connection is your risk. Keep internet ready.</span></div>
-      <div class="chd-rule"><span class="chd-rule-num">5</span> <span>Fast + Right Wins &ndash; Accuracy matters most, speed breaks ties.</span></div>
-    `;
   }
 
-  // Update the sticky CTA button to start the quiz
-  const ctaBtn = document.querySelector('.chd-sticky-cta button');
-  if (ctaBtn) {
-    const modeMap = { Practice: 'daily', Contest: 'daily', Clash: 'stash', War: 'war' };
-    const quizMode = modeMap[d.type] || 'daily';
-    ctaBtn.setAttribute('onclick', `startQuiz('${quizMode}')`);
-    ctaBtn.innerHTML = `<i class="fa-solid fa-lock-open"></i> Start Challenge Now`;
+  const extLink = document.getElementById('chd-ext-link');
+  if (extLink) extLink.href = d.externalLink || 'https://youtube.com/@crazyxyz';
+
+  const cState = state.challengeState[id];
+
+  // 1. Registration UI
+  const regStatus = document.getElementById('chd-reg-status');
+  const regBtn = document.getElementById('chd-reg-btn');
+  const partEl = document.getElementById('chd-participation');
+  
+  const displayParticipation = cState.registered ? d.participation + 1 : d.participation;
+  if (partEl) partEl.textContent = `${displayParticipation.toLocaleString()} Players Joined`;
+
+  if (cState.registered) {
+    if (regStatus) {
+      regStatus.textContent = 'Registered';
+      regStatus.className = 'chd-status-badge registered';
+    }
+    if (regBtn) {
+      regBtn.innerHTML = '<i class="fa-solid fa-circle-check"></i> Registered';
+      regBtn.className = 'chd-reg-btn registered';
+      regBtn.disabled = true;
+    }
+  } else {
+    if (regStatus) {
+      regStatus.textContent = 'Not Registered';
+      regStatus.className = 'chd-status-badge';
+    }
+    if (regBtn) {
+      regBtn.innerHTML = '<i class="fa-solid fa-user-plus"></i> Register for Challenge';
+      regBtn.className = 'chd-reg-btn';
+      regBtn.disabled = false;
+    }
+  }
+
+  // 2. Prerequisite UI
+  const prereqSection = document.getElementById('chd-prereq-section');
+  const prereqStatus = document.getElementById('chd-prereq-status');
+  const overlay = document.getElementById('prereq-video-overlay-play');
+  const playing = document.getElementById('prereq-video-playing-state');
+  
+  if (overlay) overlay.classList.remove('hidden');
+  if (playing) playing.classList.add('hidden');
+
+  if (cState.registered) {
+    if (prereqSection) prereqSection.classList.remove('locked-section');
+    if (prereqStatus) {
+      prereqStatus.textContent = cState.prerequisiteDone ? 'Completed' : 'Pending';
+      prereqStatus.className = cState.prerequisiteDone ? 'prereq-status-badge done' : 'prereq-status-badge';
+    }
+  } else {
+    if (prereqSection) prereqSection.classList.add('locked-section');
+    if (prereqStatus) {
+      prereqStatus.textContent = 'Locked';
+      prereqStatus.className = 'prereq-status-badge locked';
+    }
+  }
+
+  // 3. Play UI
+  const playSection = document.getElementById('chd-play-section');
+  const playBtn = document.getElementById('chd-play-btn');
+  const playStatusText = document.getElementById('chd-play-status-text');
+
+  if (!cState.registered) {
+    if (playSection) playSection.classList.add('locked-section');
+    if (playBtn) {
+      playBtn.className = 'chd-play-action-btn disabled';
+      playBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Play Locked';
+      playBtn.disabled = true;
+    }
+    if (playStatusText) playStatusText.textContent = 'Please register above to unlock Play.';
+  } else if (!cState.prerequisiteDone) {
+    if (playSection) playSection.classList.add('locked-section');
+    if (playBtn) {
+      playBtn.className = 'chd-play-action-btn disabled';
+      playBtn.innerHTML = '<i class="fa-solid fa-lock"></i> Play Locked';
+      playBtn.disabled = true;
+    }
+    if (playStatusText) playStatusText.textContent = 'Please watch prerequisite video or click skip to play.';
+  } else {
+    if (playSection) playSection.classList.remove('locked-section');
+    if (playBtn) {
+      playBtn.className = 'chd-play-action-btn active';
+      playBtn.innerHTML = '<i class="fa-solid fa-play"></i> Start Challenge Now';
+      playBtn.disabled = false;
+      
+      const modeMap = { Practice: 'daily', Contest: 'daily', Clash: 'stash', War: 'war', Battle: 'daily' };
+      const quizMode = modeMap[d.type] || 'daily';
+      
+      if (id === 'battle') {
+        playBtn.setAttribute('onclick', "startBrainBattleMatchmaking()");
+      } else {
+        playBtn.setAttribute('onclick', `startQuiz('${quizMode}')`);
+      }
+    }
+    if (playStatusText) playStatusText.textContent = 'All requirements met! Good luck!';
+  }
+
+  // 4. Completed score section UI
+  const scoreSection = document.getElementById('chd-score-section');
+  const scorePts = document.getElementById('chd-score-pts');
+  const scoreCorrect = document.getElementById('chd-score-correct');
+  const scoreRank = document.getElementById('chd-score-rank');
+
+  if (cState.played) {
+    if (scoreSection) scoreSection.classList.remove('hidden');
+    if (scorePts) scorePts.textContent = cState.score;
+    if (scoreCorrect) scoreCorrect.textContent = cState.correct;
+    if (scoreRank) scoreRank.textContent = cState.rank;
+  } else {
+    if (scoreSection) scoreSection.classList.add('hidden');
   }
 
   navigateTo('challenge');
 }
 
+function handleChallengeRegistration() {
+  const id = state.activeChallengeId;
+  if (!state.challengeState[id]) return;
+  state.challengeState[id].registered = true;
+  completeChallengeStateSave();
+  showToast("🎉 Registered successfully!");
+  showChallengeDetail(id);
+}
+
+let prereqVideoInterval = null;
+function startPrereqVideo() {
+  const id = state.activeChallengeId;
+  const overlay = document.getElementById('prereq-video-overlay-play');
+  const playing = document.getElementById('prereq-video-playing-state');
+  const timerText = document.getElementById('prereq-video-timer');
+  
+  if (overlay) overlay.classList.add('hidden');
+  if (playing) playing.classList.remove('hidden');
+  
+  let timeLeft = 5;
+  if (timerText) timerText.textContent = `Watching... ${timeLeft}s remaining`;
+  
+  clearInterval(prereqVideoInterval);
+  prereqVideoInterval = setInterval(() => {
+    timeLeft--;
+    if (timerText) timerText.textContent = `Watching... ${timeLeft}s remaining`;
+    if (timeLeft <= 0) {
+      clearInterval(prereqVideoInterval);
+      completePrereq();
+    }
+  }, 1000);
+}
+
+function skipPrereqVideo() {
+  clearInterval(prereqVideoInterval);
+  completePrereq();
+}
+
+function completePrereq() {
+  const id = state.activeChallengeId;
+  if (!state.challengeState[id]) return;
+  state.challengeState[id].prerequisiteDone = true;
+  completeChallengeStateSave();
+  showToast("📖 Prerequisite completed!");
+  showChallengeDetail(id);
+}
+
+function openShareScoreCardModal() {
+  const id = state.activeChallengeId;
+  const cState = state.challengeState[id];
+  const cData = challengeData[id];
+  
+  if (!cState || !cState.played) return;
+  
+  const nameEl = document.getElementById('vc-username');
+  const cityEl = document.getElementById('vc-city');
+  const chNameEl = document.getElementById('vc-challenge-name');
+  const scoreEl = document.getElementById('vc-score');
+  const correctEl = document.getElementById('vc-correct');
+  const rankEl = document.getElementById('vc-rank');
+  const dateEl = document.getElementById('vc-date');
+  const avatarEl = document.querySelector('.vc-avatar');
+  
+  if (nameEl) nameEl.textContent = state.user.name || "Jay Kumar";
+  if (cityEl) cityEl.textContent = state.user.city || "Mumbai";
+  if (chNameEl) chNameEl.textContent = cData?.name || "KIDZINOS CHALLENGE";
+  if (scoreEl) scoreEl.textContent = cState.score || 0;
+  if (correctEl) correctEl.textContent = cState.correct || "0/10";
+  if (rankEl) rankEl.textContent = cState.rank || "Top 100%";
+  if (dateEl) dateEl.textContent = new Date().toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  if (avatarEl) avatarEl.textContent = (state.user.name || "J")[0].toUpperCase();
+  
+  const modal = document.getElementById('share-score-modal');
+  if (modal) modal.classList.remove('hidden');
+}
+
+function closeShareScoreCardModal() {
+  const modal = document.getElementById('share-score-modal');
+  if (modal) modal.classList.add('hidden');
+}
+
+function shareScoreToSocial(platform) {
+  const id = state.activeChallengeId;
+  const cState = state.challengeState[id];
+  const cData = challengeData[id];
+  const scoreText = `I scored ${cState.score} pts in ${cData?.name} on Kidzinos! Beat my score! #Kidzinos #CrazyXYZ`;
+  
+  if (platform === 'whatsapp') {
+    window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(scoreText)}`, '_blank');
+  } else if (platform === 'instagram') {
+    showToast("📸 Story saved! Open Instagram to post.");
+  } else {
+    navigator.clipboard.writeText(scoreText).then(() => {
+      showToast("🔗 Challenge link copied to clipboard!");
+    });
+  }
+}
+
 function openDailyDrill() {
-  startQuiz('daily');
+  showChallengeDetail('drill');
 }
 function openWeeklyStash() {
   if (!checkSubscription('Weekly STASH')) return;
@@ -683,6 +990,15 @@ function endQuiz() {
   if (xpLvlEl) xpLvlEl.textContent = `Lv.${lvl} ${lvlName}`;
   if (xpValEl) xpValEl.textContent = `${xp.toLocaleString()} / ${nextXP.toLocaleString()} XP`;
   setTimeout(() => { const f = document.getElementById('result-xp-fill'); if (f) f.style.width = xpPct + '%'; }, 300);
+
+  const activeId = state.activeChallengeId;
+  if (state.challengeState[activeId]) {
+    state.challengeState[activeId].played = true;
+    state.challengeState[activeId].score = score;
+    state.challengeState[activeId].correct = `${correct}/${questions.length}`;
+    state.challengeState[activeId].rank = `Top ${rankPct}%`;
+    completeChallengeStateSave();
+  }
 
   state.user.challengeAttempts++;
   completeMission(0);
