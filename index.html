@@ -19,6 +19,7 @@
   <link rel="stylesheet" href="social-ui.css?v=1781628816" />
   <link rel="stylesheet" href="circle.css?v=1781628816" />
   <link rel="stylesheet" href="watch-features.css?v=1781628816" />
+  <link rel="stylesheet" href="daily-streak.css?v=1781628816" />
 </head>
 
 <body>
@@ -286,55 +287,9 @@
           </div>
         </div>
 
-        <!-- Card 2: Streak & Shield Card -->
-        <div class="home-sub-card streak-shield-card">
-          <div class="hsc-header" style="display:flex; align-items:center; justify-content:space-between; width:100%;">
-            <div style="display:flex; align-items:center; gap:8px;">
-              <span class="hsc-title"><i class="fa-solid fa-fire"></i> Streak &amp; Shield</span>
-              <span id="shh-status" class="status-badge"
-                style="font-size:0.72rem; font-weight:800; padding:5px 12px; border-radius:99px;">Fact Deck Pending
-                ⚡</span>
-            </div>
-            <button id="fact-toggle-btn" onclick="toggleFactAnalysis()"
-              style="background:rgba(255,255,255,0.1); border:none; width:32px; height:32px; border-radius:50%; color:#fff; display:flex; align-items:center; justify-content:center; cursor:pointer; transition:transform 0.3s; flex-shrink:0;">
-              <i class="fa-solid fa-chevron-down"></i>
-            </button>
-          </div>
-          <div class="hsc-body">
-            <div style="display:flex; gap:12px; margin-bottom:12px;">
-              <div
-                style="flex:1; background:rgba(255,107,0,0.08); border:1px solid rgba(255,107,0,0.2); border-radius:12px; padding:12px; text-align:center;">
-                <div id="shh-streak-count"
-                  style="font-family:var(--font-display); font-size:1.8rem; font-weight:900; color:#ff6b00;">5</div>
-                <div style="font-size:0.7rem; color:var(--st-muted); font-weight:700; text-transform:uppercase;">Day
-                  Streak</div>
-              </div>
-              <div
-                style="flex:1; background:rgba(124,58,237,0.08); border:1px solid rgba(124,58,237,0.2); border-radius:12px; padding:12px; text-align:center;">
-                <div id="hsc-shields-val"
-                  style="font-family:var(--font-display); font-size:1.8rem; font-weight:900; color:#a855f7;">1</div>
-                <div style="font-size:0.7rem; color:var(--st-muted); font-weight:700; text-transform:uppercase;">Active
-                  Shields</div>
-              </div>
-            </div>
-
-            <!-- Shifted Streak Level Title -->
-            <div style="text-align:center; margin-bottom:8px;">
-              <span id="streak-level-title"
-                style="font-family:var(--font-display); font-size:1rem; font-weight:800; color:var(--st-yellow);">5 Din
-                Ka King!</span>
-            </div>
-
-            <!-- Shifted 7-day Streak Calendar -->
-            <div id="home-streak-calendar" style="display:flex; justify-content:center; gap:6px; margin-bottom:12px;">
-              <!-- Rendered by JS -->
-            </div>
-
-            <p style="font-size:0.8rem; color:var(--st-muted); line-height:1.4; text-align:center;"
-              id="streak-card-footer-text">
-              Tap to review 6 Daily Facts and boost your streak!
-            </p>
-          </div>
+        <!-- Card 2: Daily Streak Card -->
+        <div class="home-sub-card daily-streak-card" id="daily-streak-card">
+          <!-- Rendered by daily-streak.js -->
         </div>
 
 
@@ -1927,6 +1882,53 @@
     </div>
   </div>
 
+  <!-- ====== MY TREE SCREEN ====== -->
+  <div id="screen-my-tree" class="screen app-screen">
+    <div class="app-wrap" style="display:flex; flex-direction:column; height:100vh;">
+      <div class="my-tree-header">
+        <button class="back-btn-inner" onclick="navigateTo('home')"><i class="fa-solid fa-arrow-left"></i></button>
+        <div class="my-tree-title">My CRAZiNOS Tree</div>
+        <div style="width:24px"></div>
+      </div>
+      <div class="my-tree-scene">
+        <div id="my-tree-display" class="tree-container tree-stage-1">
+          <div class="tree-foliage">
+            <div class="tree-layer"></div>
+            <div class="tree-layer"></div>
+            <div class="tree-layer"></div>
+          </div>
+          <div class="tree-trunk"></div>
+        </div>
+        <div class="my-tree-ground-strip">Your personal streak tree</div>
+      </div>
+      <div class="my-tree-stats-card">
+        <div class="mts-grid">
+          <div>
+            <div class="mts-item-val" id="mts-day">1</div>
+            <div class="mts-item-lbl">Day</div>
+          </div>
+          <div>
+            <div class="mts-item-val" id="mts-height">12 cm</div>
+            <div class="mts-item-lbl">Height</div>
+          </div>
+          <div>
+            <div class="mts-item-val" id="mts-stage" style="font-size:1.1rem">🌱 Seedling</div>
+            <div class="mts-item-lbl">Stage</div>
+          </div>
+        </div>
+        <button class="mts-share-btn" onclick="shareMyTree()">
+          <i class="fa-solid fa-share-nodes"></i> Share Progress
+        </button>
+      </div>
+      <div class="my-tree-milestones home-scroll" style="flex:1">
+        <div class="mtm-header">Growth Milestones</div>
+        <div class="mtm-list" id="mtm-list">
+          <!-- JS will render milestones -->
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ====== PROFILE SCREEN ====== -->
   <div id="screen-profile" class="screen app-screen">
     <div class="app-wrap">
@@ -3089,11 +3091,102 @@
     </div>
   </div>
 
+  <!-- ====== DAILY STREAK MODALS ====== -->
+  
+  <!-- Water Tree Modal -->
+  <div id="modal-water-tree" class="streak-modal-overlay hidden">
+    <div class="smo-header">
+      <div class="smo-title"><i class="fa-solid fa-tree"></i> Water the Tree</div>
+      <button class="smo-close-btn" onclick="closeWaterTreeModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="smo-body">
+      <div class="tree-scene">
+        <div class="water-particles-container"></div>
+        <div class="tree-container tree-stage-1">
+          <div class="tree-foliage">
+            <div class="tree-layer"></div>
+            <div class="tree-layer"></div>
+            <div class="tree-layer"></div>
+          </div>
+          <div class="tree-trunk"></div>
+        </div>
+        <div class="tree-ground"></div>
+      </div>
+      
+      <div class="tree-info-strip">
+        <div class="tree-info-item">
+          <div class="tree-info-val" id="tree-info-day">Day 1</div>
+          <div class="tree-info-lbl">Age</div>
+        </div>
+        <div class="tree-info-item">
+          <div class="tree-info-val" id="tree-info-height">12 cm</div>
+          <div class="tree-info-lbl">Height</div>
+        </div>
+        <div class="tree-info-item">
+          <div class="tree-info-val" id="tree-info-stage">🌱 Seedling</div>
+          <div class="tree-info-lbl">Stage</div>
+        </div>
+      </div>
+      
+      <div class="water-hold-area">
+        <div class="water-timer-ring">
+          <svg viewBox="0 0 96 96">
+            <circle class="water-ring-bg" cx="48" cy="48" r="42"/>
+            <circle class="water-ring-progress" id="water-ring-progress" cx="48" cy="48" r="42"/>
+          </svg>
+          <button class="water-hold-btn" id="water-hold-btn" onpointerdown="startHoldWater()" onpointerup="stopHoldWater()" onpointerleave="stopHoldWater()" onpointercancel="stopHoldWater()">
+            <i class="fa-solid fa-droplet"></i>
+            <span class="hold-sec">HOLD</span>
+          </button>
+        </div>
+        <div class="water-timer-text" id="water-timer-text" style="font-size:0.8rem; color:rgba(255,255,255,0.5); text-align:center;">Hold the button for 30 seconds!</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Math Sprint Modal -->
+  <div id="modal-math-sprint" class="streak-modal-overlay hidden">
+    <div class="smo-header">
+      <div class="smo-title" style="color:#63b3ed"><i class="fa-solid fa-plus-minus"></i> Math Sprint</div>
+      <button class="smo-close-btn" onclick="closeMathSprintModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="smo-body" id="math-sprint-body">
+      <!-- Injected by daily-streak.js -->
+    </div>
+  </div>
+
+  <!-- Word Sprint Modal -->
+  <div id="modal-word-sprint" class="streak-modal-overlay hidden">
+    <div class="smo-header">
+      <div class="smo-title" style="color:#fbbf24"><i class="fa-solid fa-font"></i> Word Sprint</div>
+      <button class="smo-close-btn" onclick="closeWordSprintModal()"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <div class="smo-body" id="word-sprint-body">
+      <!-- Injected by daily-streak.js -->
+    </div>
+  </div>
+
+  <!-- Streak Complete Overlay -->
+  <div id="modal-streak-complete" class="streak-modal-overlay hidden">
+    <div class="sc-content">
+      <div class="sc-emoji">🔥</div>
+      <div class="sc-title" id="sc-activity-label">Activity Complete!</div>
+      <div class="sc-sub">You kept your streak alive. Incredible work!</div>
+      <div class="sc-day-badge" id="sc-day-badge-text">🔥 Day X</div>
+      <div class="sc-coins-badge"><img src="zino-coin.png" style="width:20px;height:20px" alt="Zino" /> <span id="sc-coins-text">+X Bonus Zino Coins!</span></div>
+      <button class="sc-close-btn" onclick="closeStreakCompleteOverlay()">Awesome! 🚀</button>
+    </div>
+  </div>
+
+  <!-- Confetti Canvas -->
+  <canvas id="confetti-canvas" style="display:none;"></canvas>
+
   <script src="app.js?v=1781628816"></script>
   <script src="arcade-games.js?v=1781628816"></script>
   <script src="social-features.js?v=1781628816"></script>
   <script src="circle.js?v=1781628816"></script>
   <script src="watch-features.js?v=1781628816"></script>
+  <script src="daily-streak.js?v=999123999"></script>
 </body>
 
 </html>

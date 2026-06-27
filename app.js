@@ -243,7 +243,7 @@ function handleLogin() {
       showToast('✅ OTP Verified! Welcome back!');
       setTimeout(() => {
         navigateTo('home');
-        setTimeout(() => showStreakPopup(), 1500);
+        //  // Replaced by daily-streak.js
       }, 800);
     }, 0);
     return;
@@ -364,7 +364,8 @@ function switchPlayTab(tab) {
     }
   });
 }
-// Challenge detail data
+
+// Challenge detail data
 const challengeData = {
   'drill': {
     name: "Today's Brain Drill",
@@ -1251,7 +1252,7 @@ document.addEventListener('DOMContentLoaded', () => {
       if (typeof loadGameState === 'function') loadGameState();
       state.loggedIn = true;
       navigateTo('home');
-      setTimeout(() => showStreakPopup(), 1200);
+      
     } else {
       navigateTo('login');
     }
@@ -1283,32 +1284,6 @@ document.addEventListener('touchmove', function (e) {
 }, { passive: false });
 
 // ===== STREAK SYSTEM =====
-function claimDailyStreakRewardSilently() {
-  if (!state.loggedIn) return;
-  const s = state.user.streak || 5;
-  const bonus = s >= 7 ? 25 : s >= 5 ? 15 : s >= 3 ? 10 : 5;
-  
-  const todayStr = new Date().toDateString();
-  const lastClaim = localStorage.getItem('kidzinos_last_streak_claim');
-  if (lastClaim === todayStr) {
-    updateAllZinos();
-    if (typeof updateHomeStats === 'function') updateHomeStats();
-    updateHomeStreakStrip();
-    return;
-  }
-  
-  state.user.zinoCoins += bonus;
-  localStorage.setItem('kidzinos_last_streak_claim', todayStr);
-  if (typeof saveGameState === 'function') saveGameState();
-  
-  updateAllZinos();
-  if (typeof updateHomeStats === 'function') updateHomeStats();
-  updateHomeStreakStrip();
-  showToast(`⚡ Daily Streak Maintained! +${bonus} Zino Coins added!`);
-}
-function showStreakPopup() {
-  claimDailyStreakRewardSilently();
-}
 function closeStreakPopup() {
   // Legacy fallback
 }
@@ -2098,7 +2073,7 @@ function shareCityCard() {
 }
 
 // Init on page load
-document.addEventListener('DOMContentLoaded', () => { initSecretMissions(); });
+document.addEventListener('DOMContentLoaded', () => { initSecretMissions(); initStreakSystem(); });
 
 // ===== STORY VIEWER =====
 function openStory(name, avatarSrc, text) {
